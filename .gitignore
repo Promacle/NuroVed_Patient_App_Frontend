@@ -43,3 +43,24 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment and secret files
+.env
+.env.*
+!.env.example
+
+# Android signing keystores and properties
+android/key.properties
+*.jks
+*.keystore
+
+# Sensitive platform credentials
+google-services.json
+GoogleService-Info.plist
+
+# CocoaPods & iOS build artifacts
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+.flutter-plugins
+
