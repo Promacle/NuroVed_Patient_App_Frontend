@@ -12,6 +12,8 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final Function(String)? onChanged;
 
+  final TextInputType? keyboardType;
+
   const CustomTextField({
     super.key,
     required this.label,
@@ -22,6 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.borderColor,
     this.controller,
     this.onChanged,
+    this.keyboardType,
   });
 
   @override
@@ -43,6 +46,7 @@ class CustomTextField extends StatelessWidget {
         TextField(
           controller: controller,
           onChanged: onChanged,
+          keyboardType: keyboardType,
           obscureText: isPassword,
           decoration: InputDecoration(
             hintText: hint,

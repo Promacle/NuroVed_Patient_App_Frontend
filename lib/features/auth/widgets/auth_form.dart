@@ -21,6 +21,8 @@ class AuthForm extends StatelessWidget {
           label: 'Email Address',
           hint: isSignUp ? 'Enter your email address...' : 'name@example.com',
           prefixIcon: Icons.email_outlined,
+          controller: authController.emailController,
+          keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 20),
 
@@ -58,10 +60,10 @@ class AuthForm extends StatelessWidget {
               child: const Text(
                 'Forget password?',
                 style: TextStyle(
-                  color: Color(0xFFE11D48), // Precise red from your photo
+                  color: Color(0xFFE11D48),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline, // Underline from photo
+                  decoration: TextDecoration.underline,
                 ),
               ),
             ),
@@ -75,23 +77,31 @@ class AuthForm extends StatelessWidget {
             label: 'Password Confirmation',
             hint: '*******************',
             prefixIcon: Icons.lock_outline,
-            isPassword: !authController.isPasswordVisible,
+            isPassword: !authController.isConfirmPasswordVisible,
             controller: authController.confirmPasswordController,
             onChanged: (_) => authController.validatePasswords(),
             borderColor: authController.showPasswordError
                 ? const Color(0xFFFDA4AF)
                 : null,
-            suffixIcon: Icon(
-              authController.isPasswordVisible
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
-              color: Colors.grey.withOpacity(0.6),
+            suffixIcon: IconButton(
+              icon: Icon(
+                authController.isConfirmPasswordVisible
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: Colors.grey.withOpacity(0.6),
+              ),
+              onPressed: authController.toggleConfirmPasswordVisibility,
             ),
           ),
           if (authController.showPasswordError) ...[
             const SizedBox(height: 12),
-            _buildErrorBox('ERROR: Password do not match!'),
+            _buildErrorBox('Passwords do not match!'),
           ],
+        ],
+
+        if (authController.errorMessage != null) ...[
+          const SizedBox(height: 16),
+          _buildErrorBox(authController.errorMessage!),
         ],
 
         const SizedBox(height: 30),
@@ -108,7 +118,8 @@ class AuthForm extends StatelessWidget {
               ),
               elevation: 0,
             ),
-            onPressed: authController.showPasswordError
+            onPressed:
+                (authController.showPasswordError || authController.isLoading)
                 ? null
                 : () {
                     if (isSignUp) {
@@ -117,25 +128,34 @@ class AuthForm extends StatelessWidget {
                       authController.signIn(context);
                     }
                   },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  isSignUp ? 'Continue' : 'Sign In',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            child: authController.isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        isSignUp ? 'Continue' : 'Sign In',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_right_alt,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 12),
-                const Icon(
-                  Icons.arrow_right_alt,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -155,12 +175,14 @@ class AuthForm extends StatelessWidget {
         children: [
           const Icon(Icons.error, color: Color(0xFFE11D48), size: 20),
           const SizedBox(width: 10),
-          Text(
-            message,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
