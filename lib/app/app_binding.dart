@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 import '../core/config/app_config.dart';
 import '../core/repositories/auth_repository.dart';
 import '../core/repositories/fake/fake_auth_repository.dart';
+import '../core/repositories/fake/fake_profile_repository.dart';
+import '../core/repositories/profile_repository.dart';
 import '../core/repositories/supabase/supabase_auth_repository.dart';
 import '../features/auth/controllers/auth_controller.dart';
+import '../features/profile/controllers/profile_controller.dart';
 import 'app_router.dart';
 
 /// Root dependency injection binding widget.
@@ -28,11 +31,19 @@ class AppBinding extends StatelessWidget {
     // Update static router repository for route guards
     AppRouter.authRepository = effectiveAuthRepo;
 
+    final effectiveProfileRepo = FakeProfileRepository();
+    final effectiveProfileController =
+        ProfileController(repository: effectiveProfileRepo);
+
     return MultiProvider(
       providers: [
         Provider<AuthRepository>.value(value: effectiveAuthRepo),
         ChangeNotifierProvider<AuthController>(
           create: (_) => AuthController(authRepository: effectiveAuthRepo),
+        ),
+        Provider<ProfileRepository>.value(value: effectiveProfileRepo),
+        ChangeNotifierProvider<ProfileController>.value(
+          value: effectiveProfileController,
         ),
       ],
       child: child,

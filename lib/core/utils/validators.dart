@@ -204,4 +204,49 @@ class AppValidators {
 
     return null;
   }
+
+  // Convenient alias methods
+  static String? validateFullName(String? value) =>
+      requiredField(value, 'Full name');
+  static String? validateEmail(String? value) => email(value);
+  static String? validatePhone(String? value) => phone(value);
+  static String? validateDateOfBirth(String? value) => dateOfBirth(value);
+  static String? validateNumericMeasurement(
+    String? value, {
+    required double min,
+    required double max,
+    String fieldName = 'Value',
+    String? unit,
+  }) =>
+      numericMeasurement(
+        value,
+        min: min,
+        max: max,
+        fieldName: fieldName,
+        unit: unit,
+      );
+
+  static String? validateFileType(String fileName, List<String> allowed) {
+    final dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == fileName.length - 1) {
+      return 'File has no extension';
+    }
+    final ext = fileName.substring(dotIndex + 1).toLowerCase();
+    if (!allowed.map((e) => e.toLowerCase()).contains(ext)) {
+      return 'File format .$ext is not allowed. Supported formats: ${allowed.join(", ")}';
+    }
+    return null;
+  }
+
+  static String? validateFileSize(int bytes, int maxBytes) {
+    if (bytes <= 0) return 'File cannot be empty';
+    if (bytes > maxBytes) {
+      final maxMb = (maxBytes / (1024 * 1024)).toStringAsFixed(1);
+      return 'File size exceeds maximum allowed limit of ${maxMb}MB';
+    }
+    return null;
+  }
 }
+
+typedef Validators = AppValidators;
+
