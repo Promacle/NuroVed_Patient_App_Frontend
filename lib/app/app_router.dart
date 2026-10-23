@@ -9,6 +9,7 @@ import 'package:nuroved_patient/features/home/screens/main_layout.dart';
 import 'package:nuroved_patient/features/settings/screens/customer_support_screen.dart';
 
 // 1. Core and Wrapper Imports
+import '../core/repositories/auth_repository.dart';
 import '../core/utils/skeleton_wrapper.dart';
 import '../features/access/screens/access_screen.dart';
 // 2. Feature Screen Imports
@@ -75,7 +76,51 @@ class AppRouter {
   static const String changeEmail = '/change-email';
   static const String changePassword = '/change-password';
   static const String reportProblem = '/report-problem';
+
+  /// Injected active auth repository for route guard evaluation.
+  static AuthRepository? authRepository;
+
+  static bool get isAuthenticated => authRepository?.currentUser != null;
+
+  static const List<String> _publicRoutes = [
+    loading,
+    splash,
+    login,
+    signup,
+    forgotPassword,
+  ];
+
+  static const List<String> _authOnlyWhenUnauthenticatedRoutes = [
+    splash,
+    login,
+    signup,
+  ];
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    final routeName = settings.name ?? loading;
+
+    // Route Guard 1: Unauthenticated user attempting to access protected route -> redirect to login
+    if (!isAuthenticated && !_publicRoutes.contains(routeName)) {
+      return MaterialPageRoute(
+        settings: const RouteSettings(name: login),
+        builder: (_) => const LoginScreen(),
+      );
+    }
+
+    // Route Guard 2: Authenticated user attempting to access entry/auth screens -> redirect to home
+    if (isAuthenticated &&
+        _authOnlyWhenUnauthenticatedRoutes.contains(routeName)) {
+      return PageRouteBuilder(
+        settings: const RouteSettings(name: home),
+        maintainState: false,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainLayout(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      );
+    }
+
     // Helper function to create an animated route that triggers the skeleton
     Route _createAnimatedRoute(Widget child) {
       return PageRouteBuilder(
