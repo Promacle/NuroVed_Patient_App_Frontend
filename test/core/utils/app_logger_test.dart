@@ -4,14 +4,19 @@ import 'package:nuroved_patient/core/utils/app_logger.dart';
 void main() {
   group('AppLogger.sanitize', () {
     test('redacts bearer tokens', () {
-      final input = 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xyz';
+      final input =
+          'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xyz';
       final output = AppLogger.sanitize(input);
       expect(output, contains('Bearer [REDACTED_TOKEN]'));
-      expect(output, isNot(contains('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xyz')));
+      expect(
+        output,
+        isNot(contains('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xyz')),
+      );
     });
 
     test('redacts password parameters', () {
-      final input = 'User login failed with password: SecretPass123! and token=abc987xyz';
+      final input =
+          'User login failed with password: SecretPass123! and token=abc987xyz';
       final output = AppLogger.sanitize(input);
       expect(output, contains('password: [REDACTED]'));
       expect(output, contains('token=[REDACTED]'));

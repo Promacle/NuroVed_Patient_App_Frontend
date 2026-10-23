@@ -180,10 +180,11 @@ class _DetailedChartPainter extends CustomPainter {
       double x = paddingX + (i * xStep);
       double y = (paddingY + gHeight) - (values[i] / 25 * gHeight);
 
-      if (i == 0)
+      if (i == 0) {
         path.moveTo(x, y);
-      else
+      } else {
         path.lineTo(x, y);
+      }
       fillPath.lineTo(x, y);
     }
 

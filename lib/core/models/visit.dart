@@ -67,14 +67,17 @@ class Visit {
   factory Visit.fromMap(Map<String, dynamic> map) {
     return Visit(
       id: map['id']?.toString() ?? UuidGenerator.v4(),
-      profileName: (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
+      profileName:
+          (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
       date: map['date']?.toString() ?? '',
       title: map['title']?.toString() ?? 'Consultation',
       subtitle: map['subtitle']?.toString() ?? '',
       doctorName: (map['doctor_name'] ?? map['doctor'])?.toString(),
       specialty: map['specialty']?.toString(),
       hospitalName: (map['hospital_name'] ?? map['hospital'])?.toString(),
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString())
+          : null,
     );
   }
 

@@ -7,11 +7,7 @@ abstract class Failure {
   final String? code;
   final dynamic cause;
 
-  const Failure({
-    required this.message,
-    this.code,
-    this.cause,
-  });
+  const Failure({required this.message, this.code, this.cause});
 
   @override
   bool operator ==(Object other) =>
@@ -30,7 +26,8 @@ abstract class Failure {
 
 class NetworkFailure extends Failure {
   const NetworkFailure({
-    super.message = 'Network connection failed. Please check your internet connectivity.',
+    super.message =
+        'Network connection failed. Please check your internet connectivity.',
     super.code = 'NETWORK_ERROR',
     super.cause,
   });
@@ -62,7 +59,8 @@ class NotFoundFailure extends Failure {
 
 class ServerFailure extends Failure {
   const ServerFailure({
-    super.message = 'An unexpected server error occurred. Please try again later.',
+    super.message =
+        'An unexpected server error occurred. Please try again later.',
     super.code = 'SERVER_ERROR',
     super.cause,
   });

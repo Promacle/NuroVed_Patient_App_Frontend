@@ -13,7 +13,9 @@ void main() {
       final uuid = UuidGenerator.v4();
       expect(uuid.length, equals(36));
       expect(
-        RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$').hasMatch(uuid),
+        RegExp(
+          r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+        ).hasMatch(uuid),
         isTrue,
       );
     });
@@ -33,10 +35,7 @@ void main() {
       expect(result.dataOrNull, equals('patient_data'));
       expect(result.failureOrNull, isNull);
 
-      final folded = result.fold(
-        (f) => 'failed',
-        (data) => 'got: $data',
-      );
+      final folded = result.fold((f) => 'failed', (data) => 'got: $data');
       expect(folded, equals('got: patient_data'));
 
       final mapped = result.map((data) => data.toUpperCase());
@@ -44,7 +43,9 @@ void main() {
     });
 
     test('handles FailureResult correctly with fold and when', () {
-      const result = Result<String>.failure(ServerFailure(message: 'Server error'));
+      const result = Result<String>.failure(
+        ServerFailure(message: 'Server error'),
+      );
       expect(result.isSuccess, isFalse);
       expect(result.isFailure, isTrue);
       expect(result.dataOrNull, isNull);
@@ -135,14 +136,20 @@ void main() {
       expect(allResult.dataOrNull?.length, equals(2));
 
       // Filter by type
-      final labResult = await repo.getRecords(profileName: 'Self', recordType: 'Lab Report');
+      final labResult = await repo.getRecords(
+        profileName: 'Self',
+        recordType: 'Lab Report',
+      );
       expect(labResult.dataOrNull?.length, equals(1));
       expect(labResult.dataOrNull?.first.title, equals('HbA1c Blood Test'));
 
       // Search query
       final searchResult = await repo.getRecords(searchQuery: 'Insulin');
       expect(searchResult.dataOrNull?.length, equals(1));
-      expect(searchResult.dataOrNull?.first.title, equals('Insulin Prescription'));
+      expect(
+        searchResult.dataOrNull?.first.title,
+        equals('Insulin Prescription'),
+      );
 
       // Delete record
       final deleteResult = await repo.deleteRecord(addResult1.dataOrNull!.id);

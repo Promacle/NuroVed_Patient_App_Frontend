@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/backend_status_banner.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/auth_form.dart';
 import '../widgets/auth_header.dart';
@@ -25,6 +26,7 @@ class LoginScreen extends StatelessWidget {
                 titles: ['Welcome Back'],
                 imageAsset: AppAssets.loginDog,
               ),
+              const BackendStatusBanner(),
               Padding(
                 padding: const EdgeInsets.all(25.0),
                 child: Column(

@@ -16,13 +16,21 @@ class FakeRoutineRepository implements RoutineRepository {
   }
 
   @override
-  Future<Result<List<MedicineRoutine>>> getRoutines({String? profileName}) async {
+  Future<Result<List<MedicineRoutine>>> getRoutines({
+    String? profileName,
+  }) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to fetch medication routines'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to fetch medication routines'),
+      );
     }
     var list = _routines.toList();
     if (profileName != null && profileName.isNotEmpty) {
-      list = list.where((r) => r.profileName.toLowerCase() == profileName.toLowerCase()).toList();
+      list = list
+          .where(
+            (r) => r.profileName.toLowerCase() == profileName.toLowerCase(),
+          )
+          .toList();
     }
     return Result.success(List.unmodifiable(list));
   }
@@ -30,7 +38,9 @@ class FakeRoutineRepository implements RoutineRepository {
   @override
   Future<Result<MedicineRoutine>> addRoutine(MedicineRoutine routine) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to add medication routine'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to add medication routine'),
+      );
     }
     final created = routine.id.isEmpty
         ? routine.copyWith(id: UuidGenerator.v4())
@@ -40,13 +50,20 @@ class FakeRoutineRepository implements RoutineRepository {
   }
 
   @override
-  Future<Result<MedicineRoutine>> toggleRoutine(String routineId, bool isCompleted) async {
+  Future<Result<MedicineRoutine>> toggleRoutine(
+    String routineId,
+    bool isCompleted,
+  ) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to update routine'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to update routine'),
+      );
     }
     final index = _routines.indexWhere((r) => r.id == routineId);
     if (index == -1) {
-      return const Result.failure(NotFoundFailure(message: 'Routine not found'));
+      return const Result.failure(
+        NotFoundFailure(message: 'Routine not found'),
+      );
     }
     final updated = _routines[index].copyWith(isCompleted: isCompleted);
     _routines[index] = updated;
@@ -56,7 +73,9 @@ class FakeRoutineRepository implements RoutineRepository {
   @override
   Future<Result<void>> deleteRoutine(String routineId) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to delete routine'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to delete routine'),
+      );
     }
     _routines.removeWhere((r) => r.id == routineId);
     return const Result.success(null);

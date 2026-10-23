@@ -57,8 +57,10 @@ class MedicineRoutine {
   factory MedicineRoutine.fromMap(Map<String, dynamic> map) {
     return MedicineRoutine(
       id: map['id']?.toString() ?? UuidGenerator.v4(),
-      profileName: (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
-      medicineName: (map['name'] ?? map['medicine_name'])?.toString() ?? 'Medicine',
+      profileName:
+          (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
+      medicineName:
+          (map['name'] ?? map['medicine_name'])?.toString() ?? 'Medicine',
       instruction: map['instruction']?.toString() ?? '',
       isCompleted: map['isCompleted'] == true,
       time: map['time']?.toString(),
@@ -77,8 +79,10 @@ class MedicineRoutine {
           isCompleted == other.isCompleted;
 
   @override
-  int get hashCode => id.hashCode ^ medicineName.hashCode ^ isCompleted.hashCode;
+  int get hashCode =>
+      id.hashCode ^ medicineName.hashCode ^ isCompleted.hashCode;
 
   @override
-  String toString() => 'MedicineRoutine(id: $id, name: $medicineName, isCompleted: $isCompleted)';
+  String toString() =>
+      'MedicineRoutine(id: $id, name: $medicineName, isCompleted: $isCompleted)';
 }

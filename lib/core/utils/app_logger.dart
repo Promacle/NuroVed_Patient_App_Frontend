@@ -24,10 +24,22 @@ class AppLogger {
   static String sanitize(String input) {
     if (input.isEmpty) return input;
     var sanitized = input;
-    sanitized = sanitized.replaceAllMapped(_bearerTokenRegex, (m) => '${m.group(1)}[REDACTED_TOKEN]');
-    sanitized = sanitized.replaceAllMapped(_passwordParamRegex, (m) => '${m.group(1)}${m.group(2)}[REDACTED]');
-    sanitized = sanitized.replaceAllMapped(_emailRegex, (_) => '[REDACTED_EMAIL]');
-    sanitized = sanitized.replaceAllMapped(_phoneRegex, (_) => '[REDACTED_PHONE]');
+    sanitized = sanitized.replaceAllMapped(
+      _bearerTokenRegex,
+      (m) => '${m.group(1)}[REDACTED_TOKEN]',
+    );
+    sanitized = sanitized.replaceAllMapped(
+      _passwordParamRegex,
+      (m) => '${m.group(1)}${m.group(2)}[REDACTED]',
+    );
+    sanitized = sanitized.replaceAllMapped(
+      _emailRegex,
+      (_) => '[REDACTED_EMAIL]',
+    );
+    sanitized = sanitized.replaceAllMapped(
+      _phoneRegex,
+      (_) => '[REDACTED_PHONE]',
+    );
     return sanitized;
   }
 
@@ -52,7 +64,12 @@ class AppLogger {
     _log('ERROR', message, error, stackTrace);
   }
 
-  static void _log(String level, String message, dynamic error, StackTrace? stackTrace) {
+  static void _log(
+    String level,
+    String message,
+    dynamic error,
+    StackTrace? stackTrace,
+  ) {
     final sanitizedMsg = sanitize(message);
     final timestamp = DateTime.now().toIso8601String();
     final logLine = '[$timestamp] [$level] $sanitizedMsg';

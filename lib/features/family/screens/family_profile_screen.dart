@@ -3,7 +3,6 @@ import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/family/screens/add_family_member_screen.dart';
 
 import '../../profile/controllers/profile_controller.dart';
-import '../../settings/controllers/app_settings_controller.dart';
 import '../controllers/family_controller.dart';
 import '../widgets/family_member_tile.dart';
 import 'edit_family_member_screen.dart';
@@ -17,7 +16,6 @@ class FamilyProfilesScreen extends StatefulWidget {
 
 class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
   final FamilyController _controller = FamilyController();
-  final AppSettingsController _settingsController = AppSettingsController();
 
   // Inside your _FamilyProfilesScreenState build method:
   @override

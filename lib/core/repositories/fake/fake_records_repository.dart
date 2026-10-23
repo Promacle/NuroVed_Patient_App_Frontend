@@ -22,17 +22,27 @@ class FakeRecordsRepository implements RecordsRepository {
     String? recordType,
   }) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to fetch medical records'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to fetch medical records'),
+      );
     }
 
     var list = _records.toList();
 
     if (profileName != null && profileName.isNotEmpty) {
-      list = list.where((r) => r.profileName.toLowerCase() == profileName.toLowerCase()).toList();
+      list = list
+          .where(
+            (r) => r.profileName.toLowerCase() == profileName.toLowerCase(),
+          )
+          .toList();
     }
 
-    if (recordType != null && recordType.isNotEmpty && recordType.toLowerCase() != 'all') {
-      list = list.where((r) => r.recordType.toLowerCase() == recordType.toLowerCase()).toList();
+    if (recordType != null &&
+        recordType.isNotEmpty &&
+        recordType.toLowerCase() != 'all') {
+      list = list
+          .where((r) => r.recordType.toLowerCase() == recordType.toLowerCase())
+          .toList();
     }
 
     if (searchQuery != null && searchQuery.trim().isNotEmpty) {
@@ -51,7 +61,9 @@ class FakeRecordsRepository implements RecordsRepository {
   @override
   Future<Result<MedicalRecord>> addRecord(MedicalRecord record) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to save medical record'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to save medical record'),
+      );
     }
     final created = record.id.isEmpty
         ? record.copyWith(id: UuidGenerator.v4(), createdAt: DateTime.now())
@@ -63,7 +75,9 @@ class FakeRecordsRepository implements RecordsRepository {
   @override
   Future<Result<void>> deleteRecord(String recordId) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to delete medical record'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to delete medical record'),
+      );
     }
     _records.removeWhere((r) => r.id == recordId);
     return const Result.success(null);

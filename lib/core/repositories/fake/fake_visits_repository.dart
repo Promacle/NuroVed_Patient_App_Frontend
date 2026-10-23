@@ -18,11 +18,17 @@ class FakeVisitsRepository implements VisitsRepository {
   @override
   Future<Result<List<Visit>>> getVisits({String? profileName}) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to fetch visits'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to fetch visits'),
+      );
     }
     var list = _visits.toList();
     if (profileName != null && profileName.isNotEmpty) {
-      list = list.where((v) => v.profileName.toLowerCase() == profileName.toLowerCase()).toList();
+      list = list
+          .where(
+            (v) => v.profileName.toLowerCase() == profileName.toLowerCase(),
+          )
+          .toList();
     }
     return Result.success(List.unmodifiable(list));
   }
@@ -30,7 +36,9 @@ class FakeVisitsRepository implements VisitsRepository {
   @override
   Future<Result<Visit>> addVisit(Visit visit) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to save visit'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to save visit'),
+      );
     }
     final created = visit.id.isEmpty
         ? visit.copyWith(id: UuidGenerator.v4(), createdAt: DateTime.now())
@@ -42,7 +50,9 @@ class FakeVisitsRepository implements VisitsRepository {
   @override
   Future<Result<void>> deleteVisit(String visitId) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to delete visit'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to delete visit'),
+      );
     }
     _visits.removeWhere((v) => v.id == visitId);
     return const Result.success(null);

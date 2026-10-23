@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/backend_status_banner.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/auth_form.dart';
 import '../widgets/auth_header.dart';
@@ -79,6 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     _buildStepBackButton(authController),
                   ],
                 ),
+                const BackendStatusBanner(),
 
                 // 2. SLIDING BODY
                 Expanded(

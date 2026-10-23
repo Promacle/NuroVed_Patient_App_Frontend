@@ -12,12 +12,14 @@ class FakeProfileRepository implements ProfileRepository {
   bool shouldFail = false;
 
   FakeProfileRepository({UserProfile? initialProfile})
-      : _profile = initialProfile ?? UserProfile.empty();
+    : _profile = initialProfile ?? UserProfile.empty();
 
   @override
   Future<Result<UserProfile>> getProfile() async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to retrieve profile'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to retrieve profile'),
+      );
     }
     return Result.success(_profile);
   }
@@ -25,7 +27,9 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Result<UserProfile>> updateProfile(UserProfile profile) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to update profile'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to update profile'),
+      );
     }
     _profile = profile.copyWith(updatedAt: DateTime.now());
     return Result.success(_profile);
@@ -34,7 +38,9 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Result<List<FamilyMember>>> getFamilyMembers() async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to retrieve family members'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to retrieve family members'),
+      );
     }
     return Result.success(List.unmodifiable(_familyMembers));
   }
@@ -42,7 +48,9 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Result<FamilyMember>> addFamilyMember(FamilyMember member) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to add family member'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to add family member'),
+      );
     }
     final created = member.id.isEmpty
         ? member.copyWith(id: UuidGenerator.v4())
@@ -54,7 +62,9 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<Result<void>> deleteFamilyMember(String memberId) async {
     if (shouldFail) {
-      return const Result.failure(ServerFailure(message: 'Failed to delete family member'));
+      return const Result.failure(
+        ServerFailure(message: 'Failed to delete family member'),
+      );
     }
     _familyMembers.removeWhere((m) => m.id == memberId);
     return const Result.success(null);

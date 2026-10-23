@@ -19,9 +19,7 @@ class AuthForm extends StatelessWidget {
         // 1. Email Field
         CustomTextField(
           label: 'Email Address',
-          hint: isSignUp
-              ? 'Enter your email address...'
-              : 'name@example.com',
+          hint: isSignUp ? 'Enter your email address...' : 'name@example.com',
           prefixIcon: Icons.email_outlined,
         ),
         const SizedBox(height: 20),

@@ -15,7 +15,8 @@ class ErrorMapper {
 
     if (error is TimeoutException) {
       return const NetworkFailure(
-        message: 'The request timed out. Please check your internet connection.',
+        message:
+            'The request timed out. Please check your internet connection.',
         code: 'TIMEOUT',
       );
     }
@@ -42,7 +43,8 @@ class ErrorMapper {
         message.contains('jwt') ||
         message.contains('token expired')) {
       return const AuthFailure(
-        message: 'Your session has expired or authentication failed. Please sign in again.',
+        message:
+            'Your session has expired or authentication failed. Please sign in again.',
         code: 'UNAUTHORIZED',
       );
     }

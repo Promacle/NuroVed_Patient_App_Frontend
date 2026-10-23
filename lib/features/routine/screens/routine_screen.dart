@@ -465,9 +465,6 @@ class _BarChartPainter extends CustomPainter {
     final gridPaint = Paint()
       ..color = Colors.grey.withValues(alpha: 0.4)
       ..strokeWidth = 1;
-    final dashedPaint = Paint()
-      ..color = const Color(0xFF004445)
-      ..strokeWidth = 2.5;
     for (int i = 0; i < 4; i++) {
       double x = (size.width / 3.1) * i;
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);

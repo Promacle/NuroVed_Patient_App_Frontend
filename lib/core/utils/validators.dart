@@ -121,7 +121,8 @@ class AppValidators {
   static int _daysInMonth(int year, int month) {
     switch (month) {
       case 2:
-        final isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        final isLeapYear =
+            (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
         return isLeapYear ? 29 : 28;
       case 4:
       case 6:
@@ -134,7 +135,10 @@ class AppValidators {
   }
 
   /// Validates that a string field is not empty.
-  static String? requiredField(String? value, [String fieldName = 'This field']) {
+  static String? requiredField(
+    String? value, [
+    String fieldName = 'This field',
+  ]) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';
     }
@@ -181,7 +185,9 @@ class AppValidators {
       return 'File has no extension';
     }
     final ext = fileName.substring(dotIndex + 1).toLowerCase();
-    final normalizedAllowed = allowedExtensions.map((e) => e.toLowerCase()).toList();
+    final normalizedAllowed = allowedExtensions
+        .map((e) => e.toLowerCase())
+        .toList();
 
     if (!normalizedAllowed.contains(ext)) {
       return 'File format .$ext is not allowed. Supported formats: ${allowedExtensions.join(", ")}';

@@ -124,16 +124,22 @@ class UserProfile {
       name: map['name']?.toString() ?? 'Not provided',
       email: map['email']?.toString() ?? 'Not provided',
       phone: map['phone']?.toString() ?? 'Not provided',
-      dateOfBirth: (map['dob'] ?? map['date_of_birth'])?.toString() ?? 'Not provided',
+      dateOfBirth:
+          (map['dob'] ?? map['date_of_birth'])?.toString() ?? 'Not provided',
       gender: map['gender']?.toString() ?? 'Not provided',
       height: map['height']?.toString() ?? 'Not provided',
       weight: map['weight']?.toString() ?? 'Not provided',
-      bloodGroup: (map['blood'] ?? map['blood_group'])?.toString() ?? 'Not provided',
+      bloodGroup:
+          (map['blood'] ?? map['blood_group'])?.toString() ?? 'Not provided',
       allergies: allergiesList,
       chronicConditions: conditionsList,
       photoUrl: map['photo_url']?.toString(),
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
-      updatedAt: map['updated_at'] != null ? DateTime.tryParse(map['updated_at'].toString()) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString())
+          : null,
+      updatedAt: map['updated_at'] != null
+          ? DateTime.tryParse(map['updated_at'].toString())
+          : null,
     );
   }
 

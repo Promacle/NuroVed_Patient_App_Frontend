@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 
 class EmergencyCardView extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -159,11 +160,13 @@ class EmergencyCardView extends StatelessWidget {
   }
 
   Widget _buildFamilyMemberRow() {
-    final emergencyContact = _controller.familyMembers.length > 1
-        ? _controller.familyMembers[1]
+    final controller = ProfileController();
+    final emergencyContact = controller.familyMembers.length > 1
+        ? controller.familyMembers[1]
         : null;
     final contactName = emergencyContact?['name'] ?? "Not assigned";
-    final contactRelation = emergencyContact?['relation'] ?? "Emergency Contact";
+    final contactRelation =
+        emergencyContact?['relation'] ?? "Emergency Contact";
 
     return Row(
       children: [

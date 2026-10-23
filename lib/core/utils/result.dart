@@ -14,14 +14,14 @@ sealed class Result<T> {
   bool get isFailure => this is FailureResult<T>;
 
   T? get dataOrNull => switch (this) {
-        Success(data: final d) => d,
-        FailureResult() => null,
-      };
+    Success(data: final d) => d,
+    FailureResult() => null,
+  };
 
   Failure? get failureOrNull => switch (this) {
-        Success() => null,
-        FailureResult(failure: final f) => f,
-      };
+    Success() => null,
+    FailureResult(failure: final f) => f,
+  };
 
   /// Pattern-matching fold function.
   R fold<R>(
@@ -61,7 +61,9 @@ final class Success<T> extends Result<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Success<T> && runtimeType == other.runtimeType && data == other.data;
+      other is Success<T> &&
+          runtimeType == other.runtimeType &&
+          data == other.data;
 
   @override
   int get hashCode => data.hashCode;

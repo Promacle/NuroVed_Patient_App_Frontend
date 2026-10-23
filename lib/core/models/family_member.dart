@@ -85,5 +85,6 @@ class FamilyMember {
   int get hashCode => id.hashCode ^ name.hashCode ^ relation.hashCode;
 
   @override
-  String toString() => 'FamilyMember(id: $id, name: $name, relation: $relation)';
+  String toString() =>
+      'FamilyMember(id: $id, name: $name, relation: $relation)';
 }

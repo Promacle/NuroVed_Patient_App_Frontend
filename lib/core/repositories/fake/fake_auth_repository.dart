@@ -18,7 +18,9 @@ class FakeAuthRepository implements AuthRepository {
     required String password,
   }) async {
     if (shouldFail) {
-      return Result.failure(customFailure ?? const AuthFailure(message: 'Invalid credentials.'));
+      return Result.failure(
+        customFailure ?? const AuthFailure(message: 'Invalid credentials.'),
+      );
     }
     final user = UserProfile(
       id: UuidGenerator.v4(),
@@ -46,7 +48,9 @@ class FakeAuthRepository implements AuthRepository {
     required String name,
   }) async {
     if (shouldFail) {
-      return Result.failure(customFailure ?? const AuthFailure(message: 'Sign up failed.'));
+      return Result.failure(
+        customFailure ?? const AuthFailure(message: 'Sign up failed.'),
+      );
     }
     final user = UserProfile(
       id: UuidGenerator.v4(),
@@ -81,7 +85,9 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<Result<void>> resetPassword(String email) async {
     if (shouldFail) {
-      return Result.failure(customFailure ?? const AuthFailure(message: 'Reset password failed.'));
+      return Result.failure(
+        customFailure ?? const AuthFailure(message: 'Reset password failed.'),
+      );
     }
     return const Result.success(null);
   }

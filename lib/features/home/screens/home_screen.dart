@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/widgets/backend_status_banner.dart';
 
 import '../widgets/graph_card.dart';
 import '../widgets/home_header.dart';
@@ -14,7 +15,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       // No Scaffold here!
-      child: Column(children: [_buildTopHeader(), _buildBodyContent()]),
+      child: Column(
+        children: [
+          _buildTopHeader(),
+          const BackendStatusBanner(),
+          _buildBodyContent(),
+        ],
+      ),
     );
   }
 

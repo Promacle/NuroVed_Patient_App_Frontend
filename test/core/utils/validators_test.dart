@@ -39,11 +39,14 @@ void main() {
       expect(AppValidators.phone(''), contains('required'));
     });
 
-    test('rejects phone numbers with alphabetic characters or invalid length', () {
-      expect(AppValidators.phone('91234abcde'), contains('digits'));
-      expect(AppValidators.phone('12345'), contains('valid'));
-      expect(AppValidators.phone('12345678901234567'), contains('valid'));
-    });
+    test(
+      'rejects phone numbers with alphabetic characters or invalid length',
+      () {
+        expect(AppValidators.phone('91234abcde'), contains('digits'));
+        expect(AppValidators.phone('12345'), contains('valid'));
+        expect(AppValidators.phone('12345678901234567'), contains('valid'));
+      },
+    );
   });
 
   group('AppValidators.dateOfBirth', () {
@@ -55,17 +58,27 @@ void main() {
     });
 
     test('rejects invalid leap year dates', () {
-      expect(AppValidators.dateOfBirth('29/02/2003'), contains('Day must be between 1 and 28'));
+      expect(
+        AppValidators.dateOfBirth('29/02/2003'),
+        contains('Day must be between 1 and 28'),
+      );
     });
 
     test('rejects days exceeding month length', () {
-      expect(AppValidators.dateOfBirth('31/04/2000'), contains('Day must be between 1 and 30'));
-      expect(AppValidators.dateOfBirth('32/01/2000'), contains('Day must be between 1 and 31'));
+      expect(
+        AppValidators.dateOfBirth('31/04/2000'),
+        contains('Day must be between 1 and 30'),
+      );
+      expect(
+        AppValidators.dateOfBirth('32/01/2000'),
+        contains('Day must be between 1 and 31'),
+      );
     });
 
     test('rejects future dates', () {
       final tomorrow = DateTime.now().add(const Duration(days: 1));
-      final formatted = '${tomorrow.day.toString().padLeft(2, '0')}/${tomorrow.month.toString().padLeft(2, '0')}/${tomorrow.year}';
+      final formatted =
+          '${tomorrow.day.toString().padLeft(2, '0')}/${tomorrow.month.toString().padLeft(2, '0')}/${tomorrow.year}';
       expect(AppValidators.dateOfBirth(formatted), contains('future'));
     });
 
@@ -76,7 +89,10 @@ void main() {
     test('rejects invalid format or empty input', () {
       expect(AppValidators.dateOfBirth(null), contains('required'));
       expect(AppValidators.dateOfBirth('not-a-date'), contains('valid'));
-      expect(AppValidators.dateOfBirth('15/13/2000'), contains('Month must be between 1 and 12'));
+      expect(
+        AppValidators.dateOfBirth('15/13/2000'),
+        contains('Month must be between 1 and 12'),
+      );
     });
   });
 
@@ -86,32 +102,83 @@ void main() {
     });
 
     test('rejects null and whitespace', () {
-      expect(AppValidators.requiredField(null, 'Full Name'), equals('Full Name is required'));
-      expect(AppValidators.requiredField('   ', 'Full Name'), equals('Full Name is required'));
+      expect(
+        AppValidators.requiredField(null, 'Full Name'),
+        equals('Full Name is required'),
+      );
+      expect(
+        AppValidators.requiredField('   ', 'Full Name'),
+        equals('Full Name is required'),
+      );
     });
   });
 
   group('AppValidators.numericMeasurement', () {
     test('accepts numbers within biological bounds', () {
-      expect(AppValidators.numericMeasurement('175', min: 30, max: 280, fieldName: 'Height', unit: 'cm'), isNull);
-      expect(AppValidators.numericMeasurement('70.5', min: 2, max: 400, fieldName: 'Weight', unit: 'kg'), isNull);
-      expect(AppValidators.numericMeasurement('5.7', min: 3, max: 20, fieldName: 'HbA1c', unit: '%'), isNull);
+      expect(
+        AppValidators.numericMeasurement(
+          '175',
+          min: 30,
+          max: 280,
+          fieldName: 'Height',
+          unit: 'cm',
+        ),
+        isNull,
+      );
+      expect(
+        AppValidators.numericMeasurement(
+          '70.5',
+          min: 2,
+          max: 400,
+          fieldName: 'Weight',
+          unit: 'kg',
+        ),
+        isNull,
+      );
+      expect(
+        AppValidators.numericMeasurement(
+          '5.7',
+          min: 3,
+          max: 20,
+          fieldName: 'HbA1c',
+          unit: '%',
+        ),
+        isNull,
+      );
     });
 
     test('rejects numbers outside bounds', () {
       expect(
-        AppValidators.numericMeasurement('20', min: 30, max: 280, fieldName: 'Height', unit: 'cm'),
+        AppValidators.numericMeasurement(
+          '20',
+          min: 30,
+          max: 280,
+          fieldName: 'Height',
+          unit: 'cm',
+        ),
         contains('cannot be less than 30.0 cm'),
       );
       expect(
-        AppValidators.numericMeasurement('500', min: 2, max: 400, fieldName: 'Weight', unit: 'kg'),
+        AppValidators.numericMeasurement(
+          '500',
+          min: 2,
+          max: 400,
+          fieldName: 'Weight',
+          unit: 'kg',
+        ),
         contains('cannot exceed 400.0 kg'),
       );
     });
 
     test('rejects non-numeric inputs', () {
-      expect(AppValidators.numericMeasurement('abc', min: 10, max: 100), contains('valid number'));
-      expect(AppValidators.numericMeasurement(null, min: 10, max: 100), contains('required'));
+      expect(
+        AppValidators.numericMeasurement('abc', min: 10, max: 100),
+        contains('valid number'),
+      );
+      expect(
+        AppValidators.numericMeasurement(null, min: 10, max: 100),
+        contains('required'),
+      );
     });
   });
 

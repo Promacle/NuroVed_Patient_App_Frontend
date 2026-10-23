@@ -82,7 +82,8 @@ class MedicalRecord {
   factory MedicalRecord.fromMap(Map<String, dynamic> map) {
     return MedicalRecord(
       id: map['id']?.toString() ?? UuidGenerator.v4(),
-      profileName: (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
+      profileName:
+          (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
       title: map['title']?.toString() ?? 'Untitled Record',
       recordType: (map['type'] ?? map['record_type'])?.toString() ?? 'Other',
       date: map['date']?.toString() ?? '',
@@ -92,7 +93,9 @@ class MedicalRecord {
       fileName: (map['file_name'] ?? map['fileName'])?.toString(),
       fileUrl: (map['file_url'] ?? map['fileUrl'])?.toString(),
       fileSize: map['file_size'] is int ? map['file_size'] as int : null,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at'].toString()) : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString())
+          : null,
     );
   }
 
