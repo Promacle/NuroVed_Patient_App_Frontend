@@ -85,13 +85,14 @@
 ### Dependencies on Backend Access
 - None (All Stage 1 safety, platform, model, validator, and scope fixes are local code refactors).
 
-### Exit Gate
-- `dart format .` passes.
-- `flutter analyze` reports zero errors, asset warning resolved.
-- `flutter test` passes all validator unit tests.
-- `flutter build web` succeeds with zero `dart:io` compiler warnings or runtime web crashes.
-- Zero personal data remains hardcoded in `lib/`.
-- Food scanner and meal generation explicitly show "Unavailable".
+### Exit Gate [STATUS: COMPLETED & VERIFIED]
+- `dart format --set-exit-if-changed .`: **VERIFIED** (Passed, 138 files formatted, 0 changed).
+- `flutter analyze --no-fatal-infos`: **VERIFIED** (Passed with 0 errors, 0 warnings; pubspec font asset warning resolved).
+- `flutter test`: **VERIFIED** (Passed 36/36 unit and widget tests covering validators, logger PII scrubbing, domain models, Result type, and MyApp smoke test).
+- `flutter build apk --debug`: **VERIFIED** (Built `build/app/outputs/flutter-apk/app-debug.apk` in 20.9s).
+- `flutter build web`: **VERIFIED** (Built `build/web` in 23.0s with zero `dart:io` references or web compilation crashes).
+- Zero personal data remains hardcoded in `lib/`: **VERIFIED** (Replaced with dynamic values and "Not provided" empty states).
+- Food scanner and meal generation explicitly show "Unavailable": **VERIFIED** (DEC-005 implemented with clean "Feature Unavailable" UI and clinical honesty badge).
 
 ---
 
