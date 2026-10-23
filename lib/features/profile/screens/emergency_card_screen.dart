@@ -159,6 +159,12 @@ class EmergencyCardView extends StatelessWidget {
   }
 
   Widget _buildFamilyMemberRow() {
+    final emergencyContact = _controller.familyMembers.length > 1
+        ? _controller.familyMembers[1]
+        : null;
+    final contactName = emergencyContact?['name'] ?? "Not assigned";
+    final contactRelation = emergencyContact?['relation'] ?? "Emergency Contact";
+
     return Row(
       children: [
         Container(
@@ -183,16 +189,16 @@ class EmergencyCardView extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Umar chk",
-              style: TextStyle(
+            Text(
+              contactName,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2C4E4E),
               ),
             ),
             Text(
-              "Friend",
+              contactRelation,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
             ),
           ],

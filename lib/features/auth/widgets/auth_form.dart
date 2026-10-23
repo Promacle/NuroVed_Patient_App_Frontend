@@ -21,7 +21,7 @@ class AuthForm extends StatelessWidget {
           label: 'Email Address',
           hint: isSignUp
               ? 'Enter your email address...'
-              : 'elementary221b@gmail.co',
+              : 'name@example.com',
           prefixIcon: Icons.email_outlined,
         ),
         const SizedBox(height: 20),

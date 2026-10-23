@@ -11,14 +11,14 @@ class VisitsController extends ChangeNotifier {
     // Initial dummy data
     _allVisits = [
       {
-        "profile": "Fazilkhan Malek",
+        "profile": "Self",
         "date": "10 january 2026",
         "title": "Visited Dr. Priya Mehta",
         "subtitle": "Routine diabetes checkup.\nHbA1c levels discussed.",
         "icon": Icons.local_hospital_rounded,
       },
       {
-        "profile": "Fazilkhan Malek",
+        "profile": "Self",
         "date": "10 january 2026",
         "title": "Blood sugar test",
         "subtitle": "Blood test report for sugar level",

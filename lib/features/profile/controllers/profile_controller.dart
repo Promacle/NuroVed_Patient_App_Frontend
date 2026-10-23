@@ -11,27 +11,25 @@ class ProfileController extends ChangeNotifier {
   factory ProfileController() => _instance;
 
   ProfileController._internal() {
-    // Initialize the family list with the main user data
+    // Initialize the family list with only the main user profile
     _familyList = [
       {'name': userData['name'], 'relation': "Self", 'isMain': true},
-      {'name': "Umar chk", 'relation': "Friend", 'isMain': false},
-      {'name': "Sara Malek", 'relation': "Wife", 'isMain': false},
     ];
   }
 
   // 2. THE DATA
   Map<String, dynamic> userData = {
-    'name': "Fazilkhan Malek",
-    'email': "malekfazilkhan@gmail.com",
-    'phone': "+91 98765 43210",
-    'dob': "02/05/2007",
-    'height': "175",
-    'weight': "95",
-    'gender': "male",
-    'blood': "B+",
+    'name': "Not provided",
+    'email': "Not provided",
+    'phone': "Not provided",
+    'dob': "Not provided",
+    'height': "Not provided",
+    'weight': "Not provided",
+    'gender': "Not provided",
+    'blood': "Not provided",
     'imageFile': null,
-    'allergies': ["Penicillin"],
-    'chronicConditions': ["Mild Asthma"],
+    'allergies': <String>[],
+    'chronicConditions': <String>[],
   };
 
   // 3. DYNAMIC FAMILY LIST LOGIC
@@ -59,7 +57,7 @@ class ProfileController extends ChangeNotifier {
     notifyListeners(); // This triggers the UI update across the app
   }
 
-  String activeProfileName = "Fazilkhan Malek";
+  String activeProfileName = "Self";
 
   // 4. NAVIGATION & EDIT LOGIC
   Future<void> navigateToEdit(

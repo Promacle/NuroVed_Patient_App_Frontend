@@ -53,14 +53,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     final data = widget.initialData;
-    _nameController = TextEditingController(text: data['name']);
-    _emailController = TextEditingController(text: data['email']);
-    _phoneController = TextEditingController(text: data['phone'] ?? "");
-    _dobController = TextEditingController(text: data['dob'] ?? "02/05/2007");
-    _heightController = TextEditingController(text: data['height']);
-    _weightController = TextEditingController(text: data['weight']);
-    _selectedGender = data['gender'] ?? "male";
-    _selectedBloodGroup = data['blood'] ?? "B+";
+    _nameController = TextEditingController(
+      text: data['name'] == 'Not provided' ? '' : (data['name'] ?? ''),
+    );
+    _emailController = TextEditingController(
+      text: data['email'] == 'Not provided' ? '' : (data['email'] ?? ''),
+    );
+    _phoneController = TextEditingController(
+      text: data['phone'] == 'Not provided' ? '' : (data['phone'] ?? ''),
+    );
+    _dobController = TextEditingController(
+      text: data['dob'] == 'Not provided' ? '' : (data['dob'] ?? ''),
+    );
+    _heightController = TextEditingController(
+      text: data['height'] == 'Not provided' ? '' : (data['height'] ?? ''),
+    );
+    _weightController = TextEditingController(
+      text: data['weight'] == 'Not provided' ? '' : (data['weight'] ?? ''),
+    );
+    _selectedGender = data['gender'] == 'Not provided' ? 'male' : (data['gender'] ?? 'male');
+    _selectedBloodGroup = data['blood'] == 'Not provided' ? 'O+' : (data['blood'] ?? 'O+');
     _selectedImage = data['imageFile'];
 
     for (var a in (data['allergies'] ?? [])) {

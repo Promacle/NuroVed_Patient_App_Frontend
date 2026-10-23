@@ -27,10 +27,10 @@ void main() {
     });
 
     test('redacts phone numbers', () {
-      final input = 'SMS OTP sent to +91 98765 43210';
+      final input = 'SMS OTP sent to +91 91234 56780';
       final output = AppLogger.sanitize(input);
       expect(output, contains('[REDACTED_PHONE]'));
-      expect(output, isNot(contains('98765 43210')));
+      expect(output, isNot(contains('91234 56780')));
     });
 
     test('preserves harmless non-sensitive messages', () {

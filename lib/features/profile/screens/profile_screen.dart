@@ -85,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 15),
           Text(
-            data['name'],
+            data['name'] ?? 'Not provided',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -93,16 +93,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Text(
-            "${_controller.calculateAge()} old",
+            _controller.calculateAge() == 'N/A'
+                ? 'Age not provided'
+                : "${_controller.calculateAge()} old",
             style: const TextStyle(
               color: Colors.black,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
           ),
-          const Text(
-            "User id: 23802839490",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 12),
+          Text(
+            "User ID: ${data['id'] ?? 'Not assigned'}",
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 12),
           ),
           const SizedBox(height: 15),
           // Email in white container
@@ -115,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: Center(
               child: Text(
-                data['email'],
+                data['email'] ?? 'Not provided',
                 style: const TextStyle(
                   color: Color(0xFF2C4E4E),
                   fontWeight: FontWeight.w500,

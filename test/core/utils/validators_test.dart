@@ -27,10 +27,10 @@ void main() {
 
   group('AppValidators.phone', () {
     test('accepts valid Indian and international numbers', () {
-      expect(AppValidators.phone('9876543210'), isNull);
-      expect(AppValidators.phone('+91 98765 43210'), isNull);
-      expect(AppValidators.phone('+91-9876543210'), isNull);
-      expect(AppValidators.phone('09876543210'), isNull);
+      expect(AppValidators.phone('9123456780'), isNull);
+      expect(AppValidators.phone('+91 91234 56780'), isNull);
+      expect(AppValidators.phone('+91-9123456780'), isNull);
+      expect(AppValidators.phone('09123456780'), isNull);
       expect(AppValidators.phone('+14155552671'), isNull);
     });
 
@@ -40,7 +40,7 @@ void main() {
     });
 
     test('rejects phone numbers with alphabetic characters or invalid length', () {
-      expect(AppValidators.phone('98765abcde'), contains('digits'));
+      expect(AppValidators.phone('91234abcde'), contains('digits'));
       expect(AppValidators.phone('12345'), contains('valid'));
       expect(AppValidators.phone('12345678901234567'), contains('valid'));
     });

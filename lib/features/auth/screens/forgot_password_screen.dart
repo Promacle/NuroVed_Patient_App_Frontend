@@ -141,7 +141,7 @@ class SuccessEmailSheet extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'We’ve sent the reset password email to elem*******221b@gmail.com',
+                'We’ve sent password reset instructions to your registered email address.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFF64748B),

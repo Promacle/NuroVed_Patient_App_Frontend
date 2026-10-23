@@ -4,12 +4,12 @@ class RoutineController extends ChangeNotifier {
   static final RoutineController _instance = RoutineController._internal();
   factory RoutineController() => _instance;
   RoutineController._internal() {
-    // Initialize default data for the main user
-    _initializeProfile("Fazilkhan Malek");
+    // Initialize default data for the main user profile
+    _initializeProfile("Self");
   }
 
   String selectedTab = "Routines";
-  String _currentProfile = "Fazilkhan Malek";
+  String _currentProfile = "Self";
 
   // Data storage per profile
   final Map<String, List<Map<String, dynamic>>> _medicinesPerProfile = {};
