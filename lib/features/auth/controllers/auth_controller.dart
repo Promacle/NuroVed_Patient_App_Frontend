@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/utils/app_logger.dart';
 
 class AuthController extends ChangeNotifier {
   final PageController pageController = PageController();
@@ -57,13 +58,12 @@ class AuthController extends ChangeNotifier {
 
   /// Handle Sign In / Continue logic
   void signIn(BuildContext context) {
-    // Add your validation logic here
-    debugPrint("Signing In...");
+    AppLogger.info("Attempting sign in");
     navigateToHome(context);
   }
 
   void completeSignUp(BuildContext context) {
-    debugPrint("Completing Sign Up...");
+    AppLogger.info("Completing sign up");
     navigateToHome(context);
   }
 

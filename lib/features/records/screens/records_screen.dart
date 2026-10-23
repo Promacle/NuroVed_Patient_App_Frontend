@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/app_logger.dart';
 
 import '../../profile/controllers/profile_controller.dart';
 import '../controllers/records_controller.dart';
@@ -163,7 +164,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
           // Added required onTap
           onTap: () {
             // Placeholder: Navigate to record viewer in future
-            debugPrint("Tapped on ${record['title']}");
+            AppLogger.debug("Tapped on record");
           },
           onDelete: () {
             _controller.deleteRecord(record, _searchController.text);

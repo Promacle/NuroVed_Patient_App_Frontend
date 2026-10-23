@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'app_logger.dart';
 
 class LauncherUtils {
   static Future<void> launchURL(String url) async {
@@ -9,7 +10,7 @@ class LauncherUtils {
         throw 'Could not launch $url';
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      AppLogger.error('Failed to launch URL', e);
     }
   }
 }

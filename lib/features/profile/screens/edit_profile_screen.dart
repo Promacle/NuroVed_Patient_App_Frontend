@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../../../core/utils/app_logger.dart';
+
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> initialData;
   const EditProfileScreen({super.key, required this.initialData});
@@ -43,7 +45,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
     } catch (e) {
-      debugPrint("Error picking image: $e");
+      AppLogger.error("Error picking image", e);
     }
   }
 

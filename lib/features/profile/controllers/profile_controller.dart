@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/app_logger.dart';
 import '../screens/edit_profile_screen.dart';
 
 // Change this line:
@@ -89,7 +90,7 @@ class ProfileController extends ChangeNotifier {
   }
 
   void logout() {
-    debugPrint("User logged out");
+    AppLogger.info("User logged out");
   }
 
   String calculateAge() {
@@ -131,8 +132,8 @@ class ProfileController extends ChangeNotifier {
       // Add the new record to the specific profile
       (_familyList[index]['records'] as List).add(record);
 
-      debugPrint(
-        "Record added to $name. Total records: ${_familyList[index]['records'].length}",
+      AppLogger.info(
+        "Record added to profile. Total records: ${_familyList[index]['records'].length}",
       );
     }
   }
