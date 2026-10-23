@@ -210,6 +210,47 @@
 
 ---
 
+## Stage 4.5: Profile, Family Profiles, Active Subject Isolation & Emergency Card (Phase 4)
+
+### Goals
+1. Strongly typed profile and family models with immutable UUIDs matching backend schema.
+2. Patient profile editing with input validation, photo validation (size <= 10MB, extension jpg/jpeg/png), and optimistic UI with rollback on repository failure.
+3. Family profiles CRUD: add, edit, select, and remove with confirmation. Members managed with stable UUIDs.
+4. Delegated access model: explicit `care_access_grants` relation (invite, accept, scope check, revocation). Existence of family member does NOT automatically grant access.
+5. Profile switching with strict data isolation: `activeSubjectId` acts as single source of truth; records, routines, visits, and timeline immediately purge previous subject data and reload for active subject.
+6. Emergency card: displays only patient-entered data, missing fields fallback to "Not provided" (hard-coded defaults removed), renders prominent "PATIENT-ENTERED, UNVERIFIED" badge, dynamically displays designated emergency contact.
+7. Local cache persistence across app restarts with retry on network failure.
+
+### Files Created / Modified
+- `lib/core/models/care_access_grant.dart` (NEW domain model for access grants)
+- `lib/core/models/family_member.dart` (Verified stable UUIDs and emergency contact attributes)
+- `lib/core/repositories/profile_repository.dart` (Contract with family CRUD and caregiver grant operations)
+- `lib/core/repositories/fake/fake_profile_repository.dart` (In-memory implementation with simulated failure toggle)
+- `lib/features/profile/controllers/profile_controller.dart` (Refactored for optimistic UI, active subject isolation, avatar validation, offline cache)
+- `lib/features/family/controllers/family_controller.dart` (Delegates to ProfileController with stable UUIDs)
+- `lib/features/records/controllers/records_controller.dart` (Strict subject isolation and cache purge on switch)
+- `lib/features/visits/controllers/visits_controller.dart` (Strict subject isolation and cache purge on switch)
+- `lib/features/routine/controllers/routine_controller.dart` (Strict subject isolation for medications and meals)
+- `lib/features/profile/screens/emergency_card_screen.dart` (Removed hardcoded defaults, added unverified badge, dynamic contact)
+- `lib/features/profile/screens/edit_profile_screen.dart` (Avatar validation, input validation, optimistic save)
+- `lib/features/family/screens/family_profile_screen.dart` (Active indicator badge, bottom sheet for switching/editing, delete confirmation)
+- `lib/features/family/screens/edit_family_member_screen.dart` (Stable UUID update support)
+- `lib/features/access/screens/access_screen.dart` (Caregiver invite with scopes and revocation dialog)
+- `lib/features/access/screens/hospital_details_screen.dart` (Revoke access button with confirmation)
+- `lib/app/app_binding.dart` (Registered ProfileRepository and ProfileController in MultiProvider)
+- `test/features/profile/profile_controller_test.dart` (12 unit tests for profile CRUD, optimistic rollback, avatar validation, age calculation)
+- `test/features/family/family_isolation_test.dart` (5 integration tests for family CRUD and strict multi-profile data isolation)
+- `test/features/profile/emergency_card_test.dart` (4 widget tests for empty/partial/full emergency card states and unverified badge)
+- `test/features/access/caregiver_scope_test.dart` (5 tests for caregiver invite, accept, scope evaluation, and revocation)
+
+### Phase 4 Verification Results
+- `flutter test`: **VERIFIED** (99/99 tests passing; 26 new tests added for Phase 4).
+- `flutter analyze --no-fatal-infos`: **VERIFIED** (0 errors, 0 warnings).
+- Dead-Control Sweep: **VERIFIED** (Profile edit, avatar pickers, family add/edit/delete, switch subject, caregiver invite and revocation all cleanly wired).
+- Documentation: **VERIFIED** (`docs/TESTING_GUIDE.md` updated with Suites 9-13).
+
+---
+
 ## Stage 5: Feature Repair & Dead-Control Elimination
 
 ### Goals

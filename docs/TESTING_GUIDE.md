@@ -115,3 +115,85 @@ This guide provides test procedures for validating the authentication, session s
 ### TC-8.1: Full Logout State Purge
 1. Open **Profile** screen (`/profile`) and tap **Logout**.
    - **Expected Result**: Session tokens, in-memory controllers, and cached profile data are completely purged. App navigates to `/login` and clears the navigation stack so the Back button cannot return to protected screens.
+
+---
+
+## Test Suite 9: Patient Profile Management & Optimistic UI
+
+### TC-9.1: Edit Profile, Input Validation, and Rollback on Failure
+1. On the **Profile** screen, tap the edit pen icon on the avatar or navigate to `/edit-profile`.
+2. Modify name, date of birth, blood group, height, weight, allergies, and chronic conditions.
+3. Tap **Save Changes**.
+   - **Expected Result**: Changes take effect immediately in optimistic UI. If repository operation fails (e.g. simulated network error), UI displays an error snackbar and immediately rolls back fields to their previous state.
+4. Attempt to save an invalid date of birth (e.g., `31/02/1990` or future year) or invalid metric number.
+   - **Expected Result**: Inline validator rejects the input and blocks submission.
+
+### TC-9.2: Profile Photo Validation (Size & Extension)
+1. In `/edit-profile`, tap the camera icon on the avatar.
+2. Select a valid PNG or JPEG image under 10MB.
+   - **Expected Result**: Image previews correctly and passes client-side validation.
+3. Attempt to upload a file exceeding 10MB (or an unpermitted format like `.pdf` or `.exe`).
+   - **Expected Result**: Validation fails immediately with a descriptive snackbar: "Image size exceeds maximum allowed limit of 10.0MB" or "File format is not allowed".
+
+---
+
+## Test Suite 10: Family Profiles & Stable UUIDs
+
+### TC-10.1: Add, Edit, and Delete Family Member with Confirmation
+1. On **Profile**, toggle to **Emergency Card**, then tap **View all family profiles** (or navigate to `/family-profiles`).
+2. Tap **+ Add New Profile**.
+3. Fill in family member name, relation (e.g. "Father"), DOB, blood group, and emergency contact toggle. Tap **Add New Profile**.
+   - **Expected Result**: Member is assigned an immutable, stable UUID and appears in the list.
+4. Tap the family member card and select **Edit Member** from the bottom sheet. Update details and tap **Save**.
+   - **Expected Result**: Updates persist under the existing stable UUID.
+5. In `/family-profiles`, tap the delete icon on a family member.
+   - **Expected Result**: A confirmation dialog appears ("Delete Family Member? Are you sure you want to remove...?").
+6. Tap **Cancel** -> Member remains intact.
+7. Tap **Delete** -> Member is removed by stable UUID. If the deleted member was currently the active health subject, active subject immediately falls back to the primary patient UUID.
+
+---
+
+## Test Suite 11: Single Source of Truth & Subject Switching Isolation
+
+### TC-11.1: Multi-profile Subject Switching and Cache Purging
+1. In the app bar on **Records** (`/records`), tap the profile switch dropdown.
+2. Add a record titled "Primary Patient Lab Report" for the primary patient.
+3. Switch active profile to "Father".
+   - **Expected Result**: Active subject UUID updates app-wide. The records screen immediately purges John's records and displays an empty or Father-specific state. No stale data from the previous subject is visible.
+4. Add a record titled "Father ECG Test" under Father's profile.
+5. Navigate to **Visits** (`/visits`) and add a visit "Father Cardiology Checkup".
+6. Navigate to **Routines** (`/routine`) -> Only Father's routine is visible (Metformin from primary user is NOT displayed).
+7. Switch back to "Self" (Primary Patient).
+   - **Expected Result**: Records immediately reload only primary user's "Primary Patient Lab Report". Father's ECG and cardiology visits disappear from the view.
+
+---
+
+## Test Suite 12: Emergency Card & Unverified Badge
+
+### TC-12.1: Missing Field Fallback ("Not provided") and Unverified Badge
+1. Toggle to **Emergency Card** on the Profile screen (`/profile`).
+2. Verify top banner displays a prominent **"PATIENT-ENTERED, UNVERIFIED"** badge.
+3. For a profile with unpopulated allergies, chronic conditions, or blood group:
+   - **Expected Result**: Missing fields explicitly display **"Not provided"** (no hard-coded "B+" or "None").
+
+### TC-12.2: Designated Emergency Contact Dynamic Display
+1. In Family Profiles, designate a family member with a valid phone number as the Emergency Contact (`isEmergencyContact: true`).
+2. Return to Emergency Card.
+   - **Expected Result**: The Family Profiles emergency contact section renders that member's name, relation badge `(Emergency Contact)`, and phone number.
+3. If no member is designated:
+   - **Expected Result**: Displays "Not assigned" and "Phone not provided" with a button to view and assign family profiles.
+
+---
+
+## Test Suite 13: Caregiver Delegated Access & Scopes
+
+### TC-13.1: Caregiver Invitation, Accept, Scopes, and Revocation
+1. Navigate to **Hospital Access** (`/access`).
+2. Select hospital or caregiver name, choose scopes (`Only Medical Records`, `Only Health Timeline`, or `Full Profile`), access type (`View Only` vs `Edit & View`), and duration.
+3. Tap **Review & Grant Access**.
+   - **Expected Result**: A `care_access_grants` record is created with `status: 'pending'` and specified scopes.
+4. When accepted, grant status transitions to `active`.
+5. Tap the hospital tile to inspect details on `/hospital-details` or tap the red cancel icon on `/access`.
+6. Confirm revocation dialog.
+   - **Expected Result**: Grant status updates immediately to `revoked` with timestamp `revoked_at`. All resource checks for this caregiver fail immediately.
+
