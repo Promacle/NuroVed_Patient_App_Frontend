@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 
 import '../controllers/family_controller.dart';
 import '../widgets/family_form_fields.dart';
@@ -27,13 +26,14 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
   String _selectedGender = "Female";
   String _selectedBloodGroup = "B+";
-  File? _selectedImage;
+  AppPlatformFile? _selectedImage;
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() => _selectedImage = File(image.path));
+      final platformFile = await AppPlatformFile.fromXFile(image);
+      setState(() => _selectedImage = platformFile);
     }
   }
 
@@ -196,8 +196,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(25),
-            child: _selectedImage != null
-                ? Image.file(_selectedImage!, fit: BoxFit.cover)
+            child: _selectedImage?.bytes != null
+                ? Image.memory(_selectedImage!.bytes!, fit: BoxFit.cover)
                 : Icon(Icons.person, size: 50, color: Colors.grey.shade400),
           ),
         ),

@@ -1,6 +1,7 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 
 class FamilyMemberTile extends StatelessWidget {
   final Map<String, dynamic> member;
@@ -86,6 +87,13 @@ class FamilyMemberTile extends StatelessWidget {
 
   Widget _buildAvatar() {
     final dynamic imageFile = member['imageFile'];
+    Widget? avatarImage;
+    if (imageFile is AppPlatformFile && imageFile.bytes != null) {
+      avatarImage = Image.memory(imageFile.bytes!, fit: BoxFit.cover);
+    } else if (imageFile is Uint8List) {
+      avatarImage = Image.memory(imageFile, fit: BoxFit.cover);
+    }
+
     return Container(
       height: 55,
       width: 55,
@@ -94,12 +102,9 @@ class FamilyMemberTile extends StatelessWidget {
         color: Color(0xFFDCEAE5),
       ),
       child: ClipOval(
-        child: imageFile != null
-            ? Image.file(
-                imageFile as File,
-                fit: BoxFit.cover,
-              ) // Show the uploaded photo
-            : const Icon(Icons.person, size: 30, color: Colors.grey),
+        child:
+            avatarImage ??
+            const Icon(Icons.person, size: 30, color: Colors.grey),
       ),
     );
   }

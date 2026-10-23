@@ -1,9 +1,10 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 import 'package:nuroved_patient/features/routine/controllers/routine_controller.dart';
 
@@ -151,9 +152,16 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: ClipOval(
-                      child: selectedImage != null
-                          ? Image.file(selectedImage as File, fit: BoxFit.cover)
-                          : Image.asset(AppAssets.userIcon, scale: 2),
+                      child:
+                          selectedImage is AppPlatformFile &&
+                              selectedImage.bytes != null
+                          ? Image.memory(
+                              selectedImage.bytes!,
+                              fit: BoxFit.cover,
+                            )
+                          : (selectedImage is Uint8List
+                                ? Image.memory(selectedImage, fit: BoxFit.cover)
+                                : Image.asset(AppAssets.userIcon, scale: 2)),
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -232,9 +240,11 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                           CircleAvatar(
                             radius: 20,
                             backgroundColor: AppColors.mintBackground,
-                            backgroundImage: imageFile != null
-                                ? FileImage(imageFile as File)
-                                : null,
+                            backgroundImage: imageFile is AppPlatformFile
+                                ? imageFile.toImageProvider()
+                                : (imageFile is Uint8List
+                                      ? MemoryImage(imageFile)
+                                      : null),
                             child: imageFile == null
                                 ? Text(member['name'][0].toUpperCase())
                                 : null,

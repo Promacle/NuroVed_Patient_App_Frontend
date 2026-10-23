@@ -1,8 +1,9 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 import 'package:nuroved_patient/features/visits/screens/select_related_records.dart';
 
@@ -205,12 +206,14 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
-          child: selectedImage != null
-              ? Image.file(selectedImage as File, fit: BoxFit.cover)
-              : Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(AppAssets.userIcon),
-                ),
+          child: selectedImage is AppPlatformFile && selectedImage.bytes != null
+              ? Image.memory(selectedImage.bytes!, fit: BoxFit.cover)
+              : (selectedImage is Uint8List
+                    ? Image.memory(selectedImage, fit: BoxFit.cover)
+                    : Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(AppAssets.userIcon),
+                      )),
         ),
       ),
       title: "Profiles",
@@ -253,9 +256,11 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                     CircleAvatar(
                       radius: 22,
                       backgroundColor: AppColors.mintBackground,
-                      backgroundImage: imageFile != null
-                          ? FileImage(imageFile as File)
-                          : null,
+                      backgroundImage: imageFile is AppPlatformFile
+                          ? imageFile.toImageProvider()
+                          : (imageFile is Uint8List
+                                ? MemoryImage(imageFile)
+                                : null),
                       child: imageFile == null
                           ? Text(
                               member['name'][0].toUpperCase(),

@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 
 class ProfileAvatar extends StatelessWidget {
   final dynamic imageFile;
@@ -26,8 +28,9 @@ class ProfileAvatar extends StatelessWidget {
           ),
           child: CircleAvatar(
             radius: 55,
-            backgroundColor: Colors.grey[200],
-            backgroundImage: imageFile != null ? FileImage(imageFile) : null,
+            backgroundImage: imageFile is AppPlatformFile
+                ? imageFile.toImageProvider()
+                : (imageFile is Uint8List ? MemoryImage(imageFile) : null),
             child: imageFile == null
                 ? const Icon(Icons.person, size: 60, color: Colors.grey)
                 : null,

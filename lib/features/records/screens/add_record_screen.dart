@@ -1,11 +1,10 @@
-import 'dart:io'; // Add this for File
-
 import 'package:file_picker/file_picker.dart'; // Add this
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart'; // Add this
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 import 'package:nuroved_patient/features/records/screens/record_success_screen.dart';
 
@@ -28,7 +27,6 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   bool _isFileExpanded = false;
-  File? _selectedFile;
   dynamic _pickedFileObject;
   String _fileName = "Upload Your Record Document";
 
@@ -62,9 +60,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       "file": _pickedFileObject, // Contains File path or Web Bytes
     };
 
-    // Logic to save to the controller
-    final controller = ProfileController();
-    // Assuming your controller handles adding the record to the specific profile
+    // Save to profile controller
     ProfileController().addRecordToProfile(_selectedProfileName, recordData);
 
     // 2. IMPORTANT: Set this as the active profile so the RecordsScreen knows who to display
@@ -83,20 +79,17 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   }
 
   Future<void> _pickFile() async {
-    // Change .platform to .instance for Web compatibility
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'doc', 'jpg', 'png'],
-      withData: kIsWeb, // Required for Web to get file content
+      withData: true,
     );
 
     if (result != null) {
+      final file = result.files.single;
       setState(() {
-        // Handle web vs mobile file paths
-        if (result.files.single.path != null) {
-          _selectedFile = File(result.files.single.path!);
-        }
-        _fileName = result.files.single.name;
+        _pickedFileObject = file.bytes ?? file.path;
+        _fileName = file.name;
         _isFileExpanded = false;
       });
     }
@@ -110,7 +103,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       final bytes = await photo.readAsBytes();
       setState(() {
         _fileName = "Photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
-        _pickedFileObject = kIsWeb ? bytes : File(photo.path);
+        _pickedFileObject = bytes;
         _isFileExpanded = false;
       });
     }
@@ -277,12 +270,19 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: selectedImage != null
-                          ? Image.file(selectedImage as File, fit: BoxFit.cover)
-                          : Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Image.asset(AppAssets.userIcon),
-                            ),
+                      child:
+                          selectedImage is AppPlatformFile &&
+                              selectedImage.bytes != null
+                          ? Image.memory(
+                              selectedImage.bytes!,
+                              fit: BoxFit.cover,
+                            )
+                          : (selectedImage is Uint8List
+                                ? Image.memory(selectedImage, fit: BoxFit.cover)
+                                : Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Image.asset(AppAssets.userIcon),
+                                  )),
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -363,9 +363,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                               CircleAvatar(
                                 radius: 22,
                                 backgroundColor: AppColors.mintBackground,
-                                backgroundImage: imageFile != null
-                                    ? FileImage(imageFile as File)
-                                    : null,
+                                backgroundImage: imageFile is AppPlatformFile
+                                    ? imageFile.toImageProvider()
+                                    : (imageFile is Uint8List
+                                          ? MemoryImage(imageFile)
+                                          : null),
                                 child: imageFile == null
                                     ? Text(
                                         member['name'][0].toUpperCase(),
@@ -966,11 +968,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         Text(
                           _fileName, // DYNAMIC FILE NAME
                           style: TextStyle(
-                            color: _selectedFile != null
+                            color: _pickedFileObject != null
                                 ? AppColors.primaryTeal
                                 : AppColors.textGrey,
                             fontSize: 11,
-                            fontWeight: _selectedFile != null
+                            fontWeight: _pickedFileObject != null
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                           ),

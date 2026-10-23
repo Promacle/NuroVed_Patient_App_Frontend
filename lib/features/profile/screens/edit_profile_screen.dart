@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../core/utils/app_logger.dart';
+import '../../../core/utils/platform_file.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> initialData;
@@ -26,7 +25,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final List<TextEditingController> _allergyControllers = [];
   final List<TextEditingController> _chronicControllers = [];
   String _selectedGender = "male", _selectedBloodGroup = "B+";
-  File? _selectedImage;
+  AppPlatformFile? _selectedImage;
   String _completePhoneNumber = "";
 
   Future<void> _pickImage() async {
@@ -40,8 +39,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (pickedFile != null) {
+        final platformFile = await AppPlatformFile.fromXFile(pickedFile);
         setState(() {
-          _selectedImage = File(pickedFile.path);
+          _selectedImage = platformFile;
         });
       }
     } catch (e) {
@@ -71,8 +71,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _weightController = TextEditingController(
       text: data['weight'] == 'Not provided' ? '' : (data['weight'] ?? ''),
     );
-    _selectedGender = data['gender'] == 'Not provided' ? 'male' : (data['gender'] ?? 'male');
-    _selectedBloodGroup = data['blood'] == 'Not provided' ? 'O+' : (data['blood'] ?? 'O+');
+    _selectedGender = data['gender'] == 'Not provided'
+        ? 'male'
+        : (data['gender'] ?? 'male');
+    _selectedBloodGroup = data['blood'] == 'Not provided'
+        ? 'O+'
+        : (data['blood'] ?? 'O+');
     _selectedImage = data['imageFile'];
 
     for (var a in (data['allergies'] ?? [])) {
@@ -306,8 +310,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: _selectedImage != null
-                ? Image.file(_selectedImage!, fit: BoxFit.cover)
+            child: _selectedImage?.bytes != null
+                ? Image.memory(_selectedImage!.bytes!, fit: BoxFit.cover)
                 : Icon(Icons.person, size: 60, color: Colors.grey.shade400),
           ),
         ),

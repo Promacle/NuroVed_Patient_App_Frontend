@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../../../core/utils/platform_file.dart';
 
 // lib/features/records/widgets/profile_selector.dart
 
@@ -43,9 +43,9 @@ class ProfileSelector extends StatelessWidget {
               radius: 14,
               backgroundColor: const Color(0xFFE1ECE7),
               // DYNAMIC PHOTO LOGIC
-              backgroundImage: imageFile != null
-                  ? FileImage(imageFile as File)
-                  : null,
+              backgroundImage: imageFile is AppPlatformFile
+                  ? imageFile.toImageProvider()
+                  : (imageFile is Uint8List ? MemoryImage(imageFile) : null),
               child: imageFile == null
                   ? Text(
                       name.isNotEmpty

@@ -1,10 +1,11 @@
-import 'dart:io'; // Needed for the profile photo file
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/utils/platform_file.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../controllers/home_controller.dart';
 
@@ -20,6 +21,12 @@ class HomeHeader extends StatelessWidget {
       listenable: controller,
       builder: (context, _) {
         final imageFile = controller.userData['imageFile'];
+        ImageProvider? imageProvider;
+        if (imageFile is AppPlatformFile) {
+          imageProvider = imageFile.toImageProvider();
+        } else if (imageFile is Uint8List) {
+          imageProvider = MemoryImage(imageFile);
+        }
 
         return Row(
           children: [
@@ -42,10 +49,8 @@ class HomeHeader extends StatelessWidget {
                       CircleAvatar(
                         radius: 24,
                         backgroundColor: const Color(0xFFE8F2EF),
-                        backgroundImage: imageFile != null
-                            ? FileImage(imageFile as File)
-                            : null,
-                        child: imageFile == null
+                        backgroundImage: imageProvider,
+                        child: imageProvider == null
                             ? const Icon(
                                 Icons.person,
                                 color: Color(0xFF7CB9A8),
