@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:provider/provider.dart';
 
+import '../../auth/controllers/auth_controller.dart';
 import '../../settings/controllers/app_settings_controller.dart';
 import '../controllers/profile_controller.dart';
 import '../widgets/allergy_card.dart';
@@ -131,17 +133,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           AllergyCard(allergies: List<String>.from(data['allergies'])),
           const SizedBox(height: 25),
           LogoutButton(
-            onLogout: () {
-              // 1. Optional: Add your logout logic (clearing session, etc.)
+            onLogout: () async {
               _controller.logout();
-
-              // 2. Navigate to login and clear the entire stack
-              // This ensures the user cannot go "back" to the profile
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/login',
-                (route) => false,
-              );
+              await context.read<AuthController>().logout(context);
             },
           ),
         ],

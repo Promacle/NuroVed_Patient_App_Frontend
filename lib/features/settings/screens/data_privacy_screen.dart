@@ -1,19 +1,213 @@
 import 'package:flutter/material.dart';
-import 'package:nuroved_patient/core/constants/app_assets.dart';
-import 'package:nuroved_patient/core/theme/app_colors.dart';
-import 'package:nuroved_patient/features/auth/screens/forgot_password_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/constants/app_assets.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 class DataPrivacyScreen extends StatelessWidget {
   const DataPrivacyScreen({super.key});
 
-  void _showSuccessDialog(BuildContext context) {
-    showModalBottomSheet(
+  void _showDeleteConfirmation(BuildContext context) {
+    final passwordController = TextEditingController();
+    bool isDeleting = false;
+    String? dialogError;
+
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const SuccessEmailSheet(),
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              'Delete Account & Data',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFE11D48),
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Are you sure you want to permanently delete your account? All medical records, visits, and timeline data will be permanently erased. This action cannot be reversed.',
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Confirm your password:',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Enter password',
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                if (dialogError != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    dialogError!,
+                    style: const TextStyle(
+                      color: Color(0xFFE11D48),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isDeleting ? null : () => Navigator.pop(dialogCtx),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE11D48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: isDeleting
+                    ? null
+                    : () async {
+                        final pwd = passwordController.text;
+                        if (pwd.isEmpty) {
+                          setDialogState(() {
+                            dialogError = 'Password confirmation is required.';
+                          });
+                          return;
+                        }
+
+                        setDialogState(() {
+                          isDeleting = true;
+                          dialogError = null;
+                        });
+
+                        final authController = dialogCtx.read<AuthController>();
+                        final result = await authController.deleteAccount(
+                          passwordConfirm: pwd,
+                          context: dialogCtx,
+                        );
+
+                        if (result.isFailure) {
+                          setDialogState(() {
+                            isDeleting = false;
+                            dialogError =
+                                result.failureOrNull?.message ??
+                                'Account deletion failed.';
+                          });
+                        } else {
+                          if (dialogCtx.mounted) {
+                            Navigator.pop(dialogCtx);
+                          }
+                        }
+                      },
+                child: isDeleting
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Permanently Delete',
+                        style: TextStyle(color: Colors.white),
+                      ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _triggerResetPassword(BuildContext context) async {
+    final authController = context.read<AuthController>();
+    final email = authController.currentUser?.email;
+
+    if (email == null || email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No active email found for current user.'),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sending password reset instructions...')),
+    );
+
+    final result = await authController.sendPasswordReset(email);
+
+    if (context.mounted) {
+      result.when(
+        success: (_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Reset instructions sent to $email.'),
+              backgroundColor: AppColors.primaryTeal,
+            ),
+          );
+        },
+        failure: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message),
+              backgroundColor: const Color(0xFFE11D48),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  void _showPrivacyPolicy(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Privacy & Security Policy'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'NuroVed places patient privacy and health data sovereignty at its core.\n\n'
+            '1. Patient Data Ownership: You own your health records, blood sugar logs, and clinical timelines.\n'
+            '2. End-to-End Protection: Data at rest and in transit is encrypted using industry standard AES-256 and TLS 1.3.\n'
+            '3. Zero Credential Leakage: Authentication is verified directly with security-hardened tokens.\n'
+            '4. Permanent Account Deletion: You have the right to permanently erase your account and all associated health records at any time.',
+            style: TextStyle(fontSize: 13, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -52,13 +246,21 @@ class DataPrivacyScreen extends StatelessWidget {
                         Navigator.pushNamed(context, AppRouter.changeEmail),
                   ),
                   _buildOptionCard(
-                    title: 'Reset password via mail',
-                    onTap: () => _showSuccessDialog(context),
+                    title: 'Change password',
+                    onTap: () =>
+                        Navigator.pushNamed(context, AppRouter.changePassword),
                   ),
-                  _buildOptionCard(title: 'Privacy Policy', onTap: () {}),
-                  const SizedBox(height: 80),
+                  _buildOptionCard(
+                    title: 'Reset password via email',
+                    onTap: () => _triggerResetPassword(context),
+                  ),
+                  _buildOptionCard(
+                    title: 'Privacy Policy',
+                    onTap: () => _showPrivacyPolicy(context),
+                  ),
+                  const SizedBox(height: 60),
                   _buildDeleteAccountButton(context),
-                  const SizedBox(height: 150),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -125,10 +327,9 @@ class DataPrivacyScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 12,
-              offset: const Offset(0, 10),
-              spreadRadius: -5,
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -157,26 +358,20 @@ class DataPrivacyScreen extends StatelessWidget {
 
   Widget _buildDeleteAccountButton(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account deletion request sent.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      },
+      onTap: () => _showDeleteConfirmation(context),
       child: Container(
         width: double.infinity,
         height: 60,
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F3F3),
+          color: const Color(0xFFFFF1F2),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFFECDD3)),
         ),
-        child: Center(
+        child: const Center(
           child: Text(
             'Delete My Account',
             style: TextStyle(
-              color: Colors.red.shade400,
+              color: Color(0xFFE11D48),
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),

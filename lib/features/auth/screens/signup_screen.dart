@@ -20,27 +20,20 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  String selectedGender = 'Male';
-  final TextEditingController _dobController = TextEditingController();
-
-  @override
-  void dispose() {
-    _dobController.dispose();
-    super.dispose();
-  }
-
-  // Logic to show Calendar
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(
+    BuildContext context,
+    AuthController controller,
+  ) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime(2000),
-      firstDate: DateTime(1950),
+      firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: AppColors.primaryTeal, // Brand color
+              primary: AppColors.primaryTeal,
               onPrimary: Colors.white,
               onSurface: Colors.black,
             ),
@@ -51,53 +44,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
 
     if (picked != null) {
-      setState(() {
-        _dobController.text = DateFormat('dd/MM/yyyy').format(picked);
-      });
+      controller.dobController.text = DateFormat('dd/MM/yyyy').format(picked);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthController(),
-      child: Consumer<AuthController>(
-        builder: (context, authController, child) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Column(
-              children: [
-                // 1. FIXED HEADER: Background and Dog stay still, Text slides
-                Stack(
+    return Consumer<AuthController>(
+      builder: (context, authController, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            children: [
+              // 1. FIXED HEADER
+              Stack(
+                children: [
+                  AuthHeader(
+                    controller: authController.headerPageController,
+                    titles: const ['Sign Up For Free!', 'Create Account'],
+                    subTitles: const ['', 'Complete your profile'],
+                    imageAsset: AppAssets.signUpDog,
+                  ),
+                  _buildStepBackButton(authController),
+                ],
+              ),
+              const BackendStatusBanner(),
+
+              // 2. SLIDING BODY
+              Expanded(
+                child: PageView(
+                  controller: authController.pageController,
+                  physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    AuthHeader(
-                      controller: authController.headerPageController,
-                      titles: const ['Sign Up For Free!', 'Create Account'],
-                      subTitles: const ['', 'Complete your profile'],
-                      imageAsset: AppAssets.signUpDog,
-                    ),
-                    // Back Button only on second page
-                    _buildStepBackButton(authController),
+                    _buildStepOne(context),
+                    _buildStepTwo(context, authController),
                   ],
                 ),
-                const BackendStatusBanner(),
-
-                // 2. SLIDING BODY
-                Expanded(
-                  child: PageView(
-                    controller: authController.pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildStepOne(context),
-                      _buildStepTwo(context, authController),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -139,17 +126,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  // STEP 2: Profile Details (Calendar & Country Code)
+  // STEP 2: Profile Details
   Widget _buildStepTwo(BuildContext context, AuthController controller) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CustomTextField(
+          CustomTextField(
             label: 'Full Name',
             hint: 'Enter your name...',
             prefixIcon: Icons.person_outline,
+            controller: controller.nameController,
           ),
           const SizedBox(height: 20),
 
@@ -163,11 +151,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () => _selectDate(context),
+                onTap: () => _selectDate(context, controller),
                 child: AbsorbPointer(
                   child: CustomTextField(
                     label: '',
-                    controller: _dobController,
+                    controller: controller.dobController,
                     hint: 'DD/MM/YYYY',
                     prefixIcon: Icons.calendar_today_outlined,
                   ),
@@ -184,11 +172,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           const SizedBox(height: 10),
           Row(
             children: [
-              _genderButton('Male'),
+              _genderButton('Male', controller),
               const SizedBox(width: 10),
-              _genderButton('Female'),
+              _genderButton('Female', controller),
               const SizedBox(width: 10),
-              _genderButton('Other'),
+              _genderButton('Other', controller),
             ],
           ),
           const SizedBox(height: 20),
@@ -202,6 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           IntlPhoneField(
             initialCountryCode: 'IN',
             dropdownIconPosition: IconPosition.trailing,
+            controller: controller.phoneController,
             decoration: InputDecoration(
               hintText: 'Enter your number...',
               filled: true,
@@ -226,9 +215,85 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Terms and Conditions Acknowledgement Checkbox
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 24,
+                width: 24,
+                child: Checkbox(
+                  value: controller.acknowledgedTerms,
+                  activeColor: AppColors.primaryTeal,
+                  onChanged: (val) =>
+                      controller.setAcknowledgedTerms(val ?? false),
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text.rich(
+                  TextSpan(
+                    text: 'I acknowledge and agree to the ',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    children: [
+                      TextSpan(
+                        text: 'Terms of Service',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryTeal,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextSpan(text: ' and '),
+                      TextSpan(
+                        text: 'Privacy Policy',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryTeal,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextSpan(text: '.'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          if (controller.errorMessage != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.error, color: Color(0xFFE11D48), size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      controller.errorMessage!,
+                      style: const TextStyle(
+                        color: Colors.black87,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           const SizedBox(height: 30),
-          _buildSignUpButton(),
+          _buildSignUpButton(context, controller),
           const SizedBox(height: 20),
           _buildFooter(context),
         ],
@@ -236,11 +301,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _genderButton(String gender) {
-    bool isSelected = selectedGender == gender;
+  Widget _genderButton(String gender, AuthController controller) {
+    bool isSelected = controller.selectedGender == gender;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => selectedGender = gender),
+        onTap: () => controller.setSelectedGender(gender),
         child: Container(
           height: 50,
           decoration: BoxDecoration(
@@ -262,7 +327,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildSignUpButton() {
+  Widget _buildSignUpButton(BuildContext context, AuthController controller) {
     return SizedBox(
       width: double.infinity,
       height: 58,
@@ -273,24 +338,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(18),
           ),
         ),
-        onPressed: () {
-          Navigator.pushNamed(context, AppRouter.home);
-        },
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        onPressed: controller.isLoading
+            ? null
+            : () => controller.completeSignUp(context),
+        child: controller.isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
+                ],
               ),
-            ),
-            SizedBox(width: 10),
-            Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
-          ],
-        ),
       ),
     );
   }

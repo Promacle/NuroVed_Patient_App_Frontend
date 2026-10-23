@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
+import '../controllers/auth_controller.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -98,11 +100,36 @@ class _LoadingScreenState extends State<LoadingScreen>
     // Navigation Logic
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Navigator.pushReplacementNamed(context, AppRouter.splash);
+        _animationCompleted = true;
+        _maybeNavigate();
       }
     });
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSession();
+    });
+
     _controller.forward();
+  }
+
+  bool _sessionRestored = false;
+  bool _animationCompleted = false;
+
+  void _maybeNavigate() {
+    if (!_animationCompleted) return;
+    if (!mounted) return;
+
+    if (_sessionRestored) {
+      Navigator.pushReplacementNamed(context, AppRouter.home);
+    } else {
+      Navigator.pushReplacementNamed(context, AppRouter.splash);
+    }
+  }
+
+  Future<void> _checkSession() async {
+    final authController = context.read<AuthController>();
+    _sessionRestored = await authController.restoreSession();
+    _maybeNavigate();
   }
 
   @override

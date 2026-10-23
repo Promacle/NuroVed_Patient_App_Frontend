@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/backend_status_banner.dart';
-import '../controllers/auth_controller.dart';
 import '../widgets/auth_form.dart';
 import '../widgets/auth_header.dart';
 
@@ -15,34 +13,31 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthController(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const AuthHeader(
-                titles: ['Welcome Back'],
-                imageAsset: AppAssets.loginDog,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const AuthHeader(
+              titles: ['Welcome Back'],
+              imageAsset: AppAssets.loginDog,
+            ),
+            const BackendStatusBanner(),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Column(
+                children: [
+                  const AuthForm(),
+                  const SizedBox(height: 25),
+                  _buildDivider(),
+                  const SizedBox(height: 25),
+                  _buildGoogleButton(context),
+                  const SizedBox(height: 35),
+                  _buildFooter(context),
+                ],
               ),
-              const BackendStatusBanner(),
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Column(
-                  children: [
-                    const AuthForm(),
-                    const SizedBox(height: 25),
-                    _buildDivider(),
-                    const SizedBox(height: 25),
-                    _buildGoogleButton(),
-                    const SizedBox(height: 35),
-                    _buildFooter(context),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -61,7 +56,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGoogleButton() {
+  Widget _buildGoogleButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 55,
@@ -74,7 +69,15 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          // Handle Google Sign In
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Google Sign-In is unconfigured in this environment. Please sign in with email and password.',
+              ),
+              backgroundColor: AppColors.primaryTeal,
+              duration: Duration(seconds: 3),
+            ),
+          );
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
