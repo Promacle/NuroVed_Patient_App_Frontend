@@ -21,7 +21,7 @@ The following items are required to transition from local/mock repair into live 
 
 | Item | Description | Why It Is Needed | Current State |
 | :--- | :--- | :--- | :--- |
-| **Primary Patient Test Account** | Valid credentials (email + password or phone OTP) for testing. | To verify sign-in, profile updates, and session expiration without using personal credentials. | **BLOCKED**: Hardcoded to personal account `malekfazilkhan@gmail.com`. |
+| **Primary Patient Test Account** | Valid credentials (email + password or phone OTP) for testing. | To verify sign-in, profile updates, and session expiration without using personal credentials. | **BLOCKED**: Hardcoded personal email [REDACTED] in `lib/features/profile/controllers/profile_controller.dart:24`. |
 | **Clinician / Hospital Test Persona** | Test account representing an authorized hospital/clinician. | To verify doctor access sharing, audit trails, and access revocation. | **BLOCKED**: Doctor sharing module is currently 0 bytes. |
 
 ---

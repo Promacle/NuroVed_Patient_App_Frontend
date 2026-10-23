@@ -64,15 +64,15 @@
    - *Limitation / What Could NOT be Checked*: Automated scanners `gitleaks` and `trufflehog` are not installed on this system. Manual regex grep was performed across all remote commits instead.
 
 2. **Committed Personal Data (PII) Found in Remote History (VERIFIED)**:
-   - Scanned with `git grep -E "Fazilkhan|malekfazilkhan|98765 43210|02/05/2007|Umar chk|Sara Malek|23802839490|elementary221b" origin/main origin/master`:
-     - **Full Name**: `"Fazilkhan Malek"` committed in `lib/features/profile/controllers/profile_controller.dart`, `lib/features/routine/controllers/routine_controller.dart`, `lib/features/visits/controllers/visits_controller.dart`.
-     - **Primary Email**: `"malekfazilkhan@gmail.com"` committed in `lib/features/profile/controllers/profile_controller.dart`.
-     - **Secondary Email**: `'elementary221b@gmail.co'` committed in `lib/features/auth/widgets/auth_form.dart` and `'elem*******221b@gmail.com'` in `lib/features/auth/screens/forgot_password_screen.dart`.
-     - **Phone Number**: `"+91 98765 43210"` committed in `lib/features/profile/controllers/profile_controller.dart`.
-     - **Date of Birth**: `"02/05/2007"` committed in `lib/features/profile/controllers/profile_controller.dart` and `lib/features/profile/screens/edit_profile_screen.dart`.
-     - **Blood Group & Health Details**: `"B+"`, `["Penicillin"]`, `["Mild Asthma"]` committed in `lib/features/profile/controllers/profile_controller.dart`.
-     - **Family Members**: `"Umar chk"` (Friend), `"Sara Malek"` (Wife) committed in `lib/features/profile/controllers/profile_controller.dart` and `lib/features/profile/screens/emergency_card_screen.dart`.
-     - **Hardcoded User ID**: `"User id: 23802839490"` committed in `lib/features/profile/screens/profile_screen.dart`.
+   - Scanned across remote history commits on `origin/main` and `origin/master`:
+     - **Full Name**: [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:23`, `lib/features/routine/controllers/routine_controller.dart:18`, `lib/features/visits/controllers/visits_controller.dart:14,21`.
+     - **Primary Email**: [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:24`.
+     - **Secondary Email**: [REDACTED] committed in `lib/features/auth/widgets/auth_form.dart:73` and `lib/features/auth/screens/forgot_password_screen.dart:45`.
+     - **Phone Number**: [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:25`.
+     - **Date of Birth**: [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:26` and `lib/features/profile/screens/edit_profile_screen.dart:34`.
+     - **Blood Group & Health Details**: Blood group [REDACTED], allergies [REDACTED], conditions [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:28-30`.
+     - **Family Members**: Friend [REDACTED], Spouse [REDACTED] committed in `lib/features/profile/controllers/profile_controller.dart:8-9` and `lib/features/profile/screens/emergency_card_screen.dart:73`.
+     - **Hardcoded User ID**: [REDACTED] committed in `lib/features/profile/screens/profile_screen.dart:104`.
 
 ---
 
@@ -86,7 +86,7 @@
 | `SplashScreen` | `lib/features/auth/screens/splash_screen.dart` | `/splash` | Named route | None | Navigates to `/login` or `/signup`. External links to google.com terms/privacy. |
 | `LoginScreen` | `lib/features/auth/screens/login_screen.dart` | `/login` | Named route | None | Sign In navigates to `/home` with NO auth check. Google login empty. |
 | `SignUpScreen` | `lib/features/auth/screens/signup_screen.dart` | `/signup` | Named route | None | Multi-step sign-up. Discards inputs and navigates to `/home`. |
-| `ForgotPasswordScreen` | `lib/features/auth/screens/forgot_password_screen.dart` | `/forgot-password` | Named route | None | Shows modal with hardcoded email `elem*******221b@gmail.com`. FAKE-SUCCESS. |
+| `ForgotPasswordScreen` | `lib/features/auth/screens/forgot_password_screen.dart` | `/forgot-password` | Named route | None | Shows modal with hardcoded email [REDACTED] (`forgot_password_screen.dart:45`). FAKE-SUCCESS. |
 | `MainLayout` | `lib/features/home/screens/main_layout.dart` | `/home` | Named route | `initialIndex` (optional int) | Hosts `IndexedStack` with 5 tab navigators. WORKS. |
 | `HomeScreen` | `lib/features/home/screens/home_screen.dart` | Nested Tab 0 | Tab index | None | Header, static chart, quick access, hardcoded record cards. |
 | `RecordsScreen` | `lib/features/records/screens/records_screen.dart` | `/records` (Tab 1) | Tab index / Named | None | Record grid, filter chips, profile selector, FAB to add. |
@@ -206,8 +206,8 @@
 | Feature Data | Storage Medium | Survives App Restart? | Synchronization / Remote |
 | :--- | :--- | :--- | :--- |
 | **Authentication Session** | Memory | **NO** (App always boots to loading screen, any click bypasses auth) | None |
-| **User Profile Data** | Memory (`ProfileController.userData`) | **NO** (Resets to hardcoded "Fazilkhan Malek" on launch) | None |
-| **Family Members** | Memory (`ProfileController._familyList`) | **NO** (Resets to default Umar, Sara) | None |
+| **User Profile Data** | Memory (`ProfileController.userData`) | **NO** (Resets to hardcoded profile name [REDACTED] on launch) | None |
+| **Family Members** | Memory (`ProfileController._familyList`) | **NO** (Resets to hardcoded default family members [REDACTED]) | None |
 | **Medical Records** | Memory (`ProfileController._familyList[index]['records']`) | **NO** (All uploaded files & metadata vanish on restart) | None |
 | **Doctor / Hospital Access** | Memory (`_AccessScreenState._activeHospitals`) | **NO** (Resets on screen pop) | None |
 | **Visits Timeline** | Memory (`VisitsController._allVisits`) | **NO** (Resets to 2 dummy visits) | None |
@@ -222,14 +222,14 @@
 ### E. Hardcoded Sample & Demo Data Inventory
 
 1. **User Identity & Personal Details** (`lib/features/profile/controllers/profile_controller.dart:22-34`):
-   - Name: `"Fazilkhan Malek"`
-   - Email: `"malekfazilkhan@gmail.com"`
-   - Phone: `"+91 98765 43210"`
-   - Date of Birth: `"02/05/2007"`
-   - Height: `"175"`, Weight: `"95"`, Gender: `"male"`, Blood: `"B+"`
-   - Allergies: `["Penicillin"]`, Chronic Conditions: `["Mild Asthma"]`
-   - Family Members: `"Umar chk"` (Friend), `"Sara Malek"` (Wife)
-   - Hardcoded User ID: `"User id: 23802839490"` (`profile_screen.dart:104`)
+   - Name: [REDACTED] (`profile_controller.dart:23`)
+   - Email: [REDACTED] (`profile_controller.dart:24`)
+   - Phone: [REDACTED] (`profile_controller.dart:25`)
+   - Date of Birth: [REDACTED] (`profile_controller.dart:26`)
+   - Height, Weight, Gender, Blood Group: [REDACTED] (`profile_controller.dart:27-28`)
+   - Allergies, Chronic Conditions: [REDACTED] (`profile_controller.dart:29-30`)
+   - Family Members: [REDACTED] (`profile_controller.dart:8-9`)
+   - Hardcoded User ID: [REDACTED] (`profile_screen.dart:104`)
 
 2. **Visits & Doctors** (`lib/features/visits/controllers/visits_controller.dart:13-27`):
    - `"Visited Dr. Priya Mehta"`, `"Routine diabetes checkup. HbA1c levels discussed."`

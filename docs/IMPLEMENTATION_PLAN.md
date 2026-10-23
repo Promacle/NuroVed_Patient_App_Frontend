@@ -12,7 +12,7 @@
 
 ### Goals
 1. **Remove Hardcoded Personal Data (PII)**:
-   - Strip all hardcoded personal data from `lib/` (name `"Fazilkhan Malek"`, email `"malekfazilkhan@gmail.com"`, phone `"+91 98765 43210"`, DOB `"02/05/2007"`, family members `"Umar chk"`, `"Sara Malek"`, user ID `"23802839490"`).
+   - Strip all hardcoded personal data from `lib/` (full name [REDACTED] in `profile_controller.dart:23`, `routine_controller.dart:18`, `visits_controller.dart:14,21`; email [REDACTED] in `profile_controller.dart:24`, `auth_form.dart:73`, `forgot_password_screen.dart:45`; phone [REDACTED] in `profile_controller.dart:25`; DOB [REDACTED] in `profile_controller.dart:26`, `edit_profile_screen.dart:34`; blood group & allergies [REDACTED] in `profile_controller.dart:28-30`; family members [REDACTED] in `profile_controller.dart:8-9`, `emergency_card_screen.dart:73`; user ID [REDACTED] in `profile_screen.dart:104`).
    - Initialize models to empty/unauthenticated state.
 
 2. **Android Release Signing Fix**:
