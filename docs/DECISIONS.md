@@ -1,6 +1,6 @@
 # NuroVed Patient App — Architectural Decisions & Open Questions
 
-> **Document Status**: ACTIVE  
+> **Document Status**: ACTIVE (PHASE 0 REVISED)  
 > **Date**: October 23, 2026
 
 This document records key architectural decisions, rationale, and recommended resolutions for open questions in accordance with NuroVed Engineering Rules.
@@ -31,6 +31,21 @@ This document records key architectural decisions, rationale, and recommended re
   2. `Fake*Repository`: In-memory implementation used for widget tests, unit tests, and offline mock mode.
 - **Rationale**: Decouples UI development and testing from live backend availability.
 
+### DEC-005: Food Scanner and Meal Generation Scope (MVP)
+- **Context**: The current food scanner produces simulated, hardcoded Lay's chips nutritional values for any scanned barcode, and AI meal planner outputs identical static meals for all users.
+- **Decision**: Explicitly **disable** the food scanner and meal generation features in the UI for MVP, presenting a clean "Feature Unavailable" state. **Do NOT integrate any external food API in the MVP.**
+- **Rationale**: Clinical honesty. NuroVed Engineering Rules strictly prohibit fabricating medical data or nutritional claims. Integrating a third-party food API introduces external dependencies, rate limits, and unverified data risks that are out of scope for MVP repair.
+
+### DEC-006: Android Release Signing Architecture
+- **Context**: `android/app/build.gradle.kts` currently signs release builds with the debug keystore.
+- **Decision**: Configure release signing in Gradle using an untracked properties file (`android/key.properties`) loaded dynamically if present, falling back to an unsigned build or prompting if missing. Commit `android/key.properties.example` with template fields (`storePassword`, `keyPassword`, `keyAlias`, `storeFile`). Add `android/key.properties` and keystores to `.gitignore`.
+- **Rationale**: Prevents committing private signing credentials while ensuring reproducible, secure release packaging.
+
+### DEC-007: Centralized Safe Logging
+- **Context**: `debugPrint` is used haphazardly, and some files print personal actions directly.
+- **Decision**: Introduce `AppLogger` (`lib/core/utils/app_logger.dart`) that filters out sensitive fields (passwords, tokens, personal medical data) and disables non-error logging in production builds.
+- **Rationale**: Adheres to strict privacy and zero-swallowed-exception policies.
+
 ---
 
 ## 2. Open Questions & Recommendations
@@ -39,18 +54,12 @@ This document records key architectural decisions, rationale, and recommended re
 - **Question**: `lib/features/doctor_share/` contains 4 empty (0-byte) files, while `lib/features/access/` contains a partially developed UI for managing hospital access. Should these be unified into a single "Access Management" feature?
 - **Recommendation**: **(Recommended) Yes, unify into Access Management.** Patients should have one single, unambiguous place to review, grant, and revoke access for both individual doctors and healthcare institutions. Delete the empty files in `lib/features/doctor_share/` to prevent confusion.
 
-### Question 2: Barcode Food Scanner Approach for MVP
-- **Question**: The current food scanner displays hardcoded nutrition facts for Lay's chips for every scanned barcode. What should be done for MVP?
-- **Recommendation**: **(Recommended) Integrate the free Open Food Facts API with a safe fallback.**
-  - If barcode is found: display real verified nutrition data.
-  - If barcode is not found: display a clear "Barcode not found in database — enter details manually" message. Never show simulated or fabricated nutrition advice to a diabetic patient.
-
-### Question 3: Premium / In-App Purchases Scope
+### Question 2: Premium / In-App Purchases Scope
 - **Question**: The purchase flow is simulated with "Demo: Failed" and "Demo: Renew" buttons and has no active payment gateway.
 - **Recommendation**: **(Recommended) Temporarily disable subscription checkout and mark as "Coming Soon" in MVP.**
   - Rationale: Building secure, compliant Apple In-App Purchases and Google Play Billing requires store credentials, merchant agreements, and webhook servers. Simulating payment in a medical app is misleading and unacceptable. Document in `docs/MVP_SCOPE.md`.
 
-### Question 4: Local Storage Engine for Offline Adherence
+### Question 3: Local Storage Engine for Offline Adherence
 - **Question**: When the patient is offline (e.g., in a clinic basement or traveling), medication routines and visits need local persistence.
 - **Recommendation**: **(Recommended) Use Hive / SharedPreferences for local caching alongside Supabase.**
   - Keep `SharedPreferences` for simple settings and use a lightweight local cache for recent timeline events.

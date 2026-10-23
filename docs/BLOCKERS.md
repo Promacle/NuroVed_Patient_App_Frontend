@@ -1,6 +1,6 @@
 # NuroVed Patient App — Blockers & Required Credentials
 
-> **Document Status**: ACTIVE (PENDING USER INPUT)  
+> **Document Status**: ACTIVE (PHASE 0 REVISED)  
 > **Date**: October 23, 2026
 
 The following items are required to transition from local/mock repair into live end-to-end verification and production readiness.
@@ -30,15 +30,15 @@ The following items are required to transition from local/mock repair into live 
 
 | Item | Description | Why It Is Needed | Current State |
 | :--- | :--- | :--- | :--- |
-| **Android Release Signing Keystore** | Keystore file (`.jks`), key alias, keystore password, and key password (passed securely via environment or untracked file). | Required to produce valid production release APK/AAB; currently release build uses debug keystore. | **BLOCKED**: Debug key configured in `build.gradle.kts`. |
+| **Android Release Signing Keystore** | Keystore file (`.jks`), key alias, keystore password, and key password (passed securely via untracked `android/key.properties`). | Required to produce valid production release APK/AAB; currently release build uses debug keystore. | **BLOCKED**: Debug key configured in `build.gradle.kts`. `android/key.properties.example` to be committed in Stage 1. |
 | **Firebase / APNs Push Notification Configuration** | `google-services.json` (Android) and `GoogleService-Info.plist` (iOS). | Required to configure real medication reminders and doctor-share alerts. | **BLOCKED**: Notifications are currently hardcoded static widgets. |
 
 ---
 
-## 4. Product Scope Decisions
+## 4. Product Scope Decisions (Resolved & Pending)
 
-| Item | Context / Choice | Decision Needed | Impact on Implementation |
+| Item | Context / Choice | Status / Decision | Impact on Implementation |
 | :--- | :--- | :--- | :--- |
-| **Payment & Subscription Integration** | Premium screen currently simulates subscription purchases with "Demo: Failed" and "Demo: Renew" buttons. | Should in-app purchases (RevenueCat / Razorpay / Stripe) be integrated now, or should Premium be disabled/marked as "Coming Soon" for MVP? | If MVP: Hide demo buttons, disable checkout, and document in `docs/MVP_SCOPE.md`. If required: payment gateway credentials needed. |
-| **Food & Barcode Scanner Database** | Food scanner currently displays hardcoded "Lay's Sour Cream & Onion" for any scanned barcode. | Should a third-party food API (e.g. Open Food Facts API) be integrated, or should scanner be scoped out or set to show "Barcode not recognized"? | Prevents misleading diabetic patients with false nutritional information. |
-| **Doctor Share Module Scope** | All 4 files under `lib/features/doctor_share/` are 0-byte empty files. | Is doctor sharing distinct from the Hospital Access screen (`lib/features/access/`), or should they be unified under one Access Management feature? | Unifying prevents duplicated/orphaned code paths and clarifies patient consent. |
+| **Food & Barcode Scanner** | Scanner displays hardcoded Lay's chips for all barcodes; meal planner outputs static meals. | **RESOLVED**: Scanner and meal-generation features will be disabled with a clear "Unavailable" state in Stage 1. **No external food API will be integrated in MVP.** | Prevents false medical/nutritional claims; zero external API dependencies. |
+| **Payment & Subscription Integration** | Premium screen currently simulates subscription purchases with "Demo: Failed" and "Demo: Renew" buttons. | **PENDING USER DECISION**: Confirm disabling subscription checkout and marking as "Coming Soon" in MVP. | Hides demo buttons, disables simulated purchases, and documents in `docs/MVP_SCOPE.md`. |
+| **Doctor Share Module Scope** | All 4 files under `lib/features/doctor_share/` are 0-byte empty files. | **PENDING USER DECISION**: Confirm unifying Doctor Share with Hospital Access (`lib/features/access/`) under single Access Management feature. | Eliminates 4 dead 0-byte files; unifies consent and audit logs. |
