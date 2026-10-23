@@ -159,6 +159,17 @@
 - Full sign-in, sign-up, session check, and sign-out flows execute with state preservation.
 - Every `await` is guarded with `if (!context.mounted) return;`.
 
+### Phase 2 Verification Results
+- `flutter analyze --no-fatal-infos`: **VERIFIED** (Passed with 0 errors, 0 warnings).
+- `flutter test`: **VERIFIED** (Passed 74/74 tests covering AuthController, session restoration, route guards, logout cleanup, validators, logger, models, and smoke tests).
+- `flutter build apk --debug`: **VERIFIED** (Built `build/app/outputs/flutter-apk/app-debug.apk` in 25.9s).
+- `flutter build web`: **VERIFIED** (Built `build/web` in 33.3s with zero web compilation errors).
+- `SupabaseAuthRepository`: **IMPLEMENTED-UNVERIFIED** (Production repository implemented using Supabase Auth REST and `delete_user_account` RPC; live credentials unconfigured in local test environment).
+- `FakeAuthRepository`: **VERIFIED** (Full in-memory implementation supporting credential verification, session token storage, password change, email update, and permanent account deletion).
+- Route Guards: **VERIFIED** (Unauthenticated users attempting to access `/home`, `/records`, `/visits` redirected to `/login`; authenticated users redirected to `/home`).
+- Dead-Control Sweep: **VERIFIED** (Eliminated all simulated snackbars, wired email and password controllers, added terms checkbox, wired password visibility toggles, provided unconfigured notification for Google button).
+- Documentation: **VERIFIED** (`docs/TESTING_GUIDE.md` and `docs/SUPABASE_SETUP.md` created and committed).
+
 ---
 
 ## Stage 4: Backend Persistence & Private Storage
