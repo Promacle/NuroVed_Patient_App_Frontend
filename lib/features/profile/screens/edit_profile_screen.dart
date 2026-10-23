@@ -5,6 +5,8 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/platform_file.dart';
+import '../../../core/utils/validators.dart';
+import '../controllers/profile_controller.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic> initialData;
@@ -29,6 +31,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _completePhoneNumber = "";
 
   Future<void> _pickImage() async {
+
     final ImagePicker picker = ImagePicker();
     try {
       final XFile? pickedFile = await picker.pickImage(
@@ -40,9 +43,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (pickedFile != null) {
         final platformFile = await AppPlatformFile.fromXFile(pickedFile);
-        setState(() {
-          _selectedImage = platformFile;
-        });
+        final validationResult =
+            ProfileController.instance.validateProfilePhoto(platformFile);
+
+        validationResult.when(
+          success: (validFile) {
+            setState(() {
+              _selectedImage = validFile;
+            });
+          },
+          failure: (failure) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(failure.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+        );
       }
     } catch (e) {
       AppLogger.error("Error picking image", e);
@@ -90,14 +110,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // FIXED NAVIGATION: Clears stack and pushes to a specific route (Home/Dashboard)
   // to ensure user lands on the Profile tab correctly.
   void _finalSaveAndNavigate() {
+    final nameError = Validators.validateFullName(_nameController.text);
+    if (nameError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(nameError), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final emailError = Validators.validateEmail(_emailController.text);
+    if (emailError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(emailError), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    final phone = _completePhoneNumber.isNotEmpty
+        ? _completePhoneNumber
+        : _phoneController.text;
+    if (phone.isNotEmpty) {
+      final phoneError = Validators.validatePhone(phone);
+      if (phoneError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(phoneError), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
+
+    if (_dobController.text.isNotEmpty) {
+      final dobError = Validators.validateDateOfBirth(_dobController.text);
+      if (dobError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(dobError), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
+
+    if (_heightController.text.isNotEmpty) {
+      final heightError = Validators.validateNumericMeasurement(
+        _heightController.text,
+        min: 20,
+        max: 300,
+        fieldName: 'Height',
+      );
+      if (heightError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(heightError), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
+
+    if (_weightController.text.isNotEmpty) {
+      final weightError = Validators.validateNumericMeasurement(
+        _weightController.text,
+        min: 1,
+        max: 500,
+        fieldName: 'Weight',
+      );
+      if (weightError != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(weightError), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
+
     final updatedData = {
       'name': _nameController.text,
       'email': _emailController.text,
-      // If _completePhoneNumber is empty (field not touched), use the existing phone
-      'phone': _completePhoneNumber.isNotEmpty
-          ? _completePhoneNumber
-          : _phoneController.text,
-      'dob': _dobController.text, // Added this to reflect DOB changes
+      'phone': phone,
+      'dob': _dobController.text,
       'height': _heightController.text,
       'weight': _weightController.text,
       'gender': _selectedGender,
@@ -116,6 +202,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // This returns the Map back to the ProfileController/ProfileScreen
     Navigator.of(context).pop(updatedData);
   }
+
 
   @override
   Widget build(BuildContext context) {

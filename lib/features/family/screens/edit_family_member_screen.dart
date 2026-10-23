@@ -344,7 +344,7 @@ class _EditFamilyMemberScreenState extends State<EditFamilyMemberScreen> {
       height: 52,
       child: ElevatedButton(
         onPressed: () {
-          _controller.updateFamilyMember(widget.index, {
+          _controller.updateFamilyMember(widget.memberData['id'] ?? widget.index, {
             'name': _nameController.text,
             'relation': _relationController.text,
             'dob': _dobController.text,

@@ -25,24 +25,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.kMainBg,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const ProfileHeader(),
-            const SizedBox(height: 20),
-            // FIXED: Using the new Toggle Widget
-            ProfileToggle(
-              isProfileSelected: isProfileSelected,
-              onToggle: (val) => setState(() => isProfileSelected = val),
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.kMainBg,
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                const ProfileHeader(),
+                const SizedBox(height: 20),
+                ProfileToggle(
+                  isProfileSelected: isProfileSelected,
+                  onToggle: (val) => setState(() => isProfileSelected = val),
+                ),
+                const SizedBox(height: 25),
+                _buildAnimatedContent(),
+                const SizedBox(height: 150),
+              ],
             ),
-            const SizedBox(height: 25),
-            _buildAnimatedContent(),
-            const SizedBox(height: 150),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

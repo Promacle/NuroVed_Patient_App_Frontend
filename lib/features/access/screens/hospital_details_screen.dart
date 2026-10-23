@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class HospitalDetailsScreen extends StatelessWidget {
   final String hospitalName;
@@ -30,9 +31,64 @@ class HospitalDetailsScreen extends StatelessWidget {
                   _buildSummaryCard(),
                   const SizedBox(height: 25),
                   _buildActivityLog(),
+                  const SizedBox(height: 25),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      icon: const Icon(Icons.cancel_outlined),
+                      label: const Text(
+                        "Revoke Access",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      onPressed: () => _confirmRevoke(context),
+                    ),
+                  ),
+                  const SizedBox(height: 50),
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmRevoke(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Revoke Access?"),
+        content: Text(
+          "Are you sure you want to revoke access for $hospitalName? They will immediately lose access to your data.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              final grant = ProfileController.instance.caregiverGrant;
+              if (grant != null) {
+                await ProfileController.instance.revokeCaregiver(grant.id);
+              }
+              Navigator.pop(ctx);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Access revoked for $hospitalName"),
+                ),
+              );
+            },
+            child: const Text("Revoke", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

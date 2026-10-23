@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../widgets/access_widgets.dart';
+import '../../profile/controllers/profile_controller.dart';
 import 'hospital_details_screen.dart';
 
 class AccessScreen extends StatefulWidget {
@@ -296,12 +297,37 @@ class _AccessScreenState extends State<AccessScreen> {
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                final hospitalName = _selectedHospital == "Select Hospital"
+                    ? "Caregiver"
+                    : _selectedHospital;
+
+                final List<String> scopes = [];
+                if (_selectedData.contains("Only Health Timeline")) {
+                  scopes.add("health_timeline");
+                }
+                if (_selectedData.contains("Only Medical Records")) {
+                  scopes.add("medical_records");
+                }
+                if (_selectedData.contains("Only Profile Page") ||
+                    _selectedData.isEmpty) {
+                  scopes.add("full_profile");
+                }
+
+                await ProfileController.instance.inviteCaregiver(
+                  email:
+                      "${hospitalName.toLowerCase().replaceAll(' ', '')}@example.com",
+                  name: hospitalName,
+                  scopes: scopes.isEmpty ? ["medical_records"] : scopes,
+                  accessType: _selectedType == "Edit & View"
+                      ? "view_and_edit"
+                      : "view_only",
+                  purpose: "Delegated caregiver access",
+                );
+
                 setState(() {
                   _activeHospitals.insert(0, {
-                    "name": _selectedHospital == "Select Hospital"
-                        ? "New Hospital"
-                        : _selectedHospital,
+                    "name": hospitalName,
                     "type": _selectedType,
                     "data": _selectedData.isEmpty
                         ? "Full Profile"
@@ -311,9 +337,13 @@ class _AccessScreenState extends State<AccessScreen> {
                         : _selectedDuration,
                   });
                 });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Access Granted Successfully!")),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Access Granted Successfully!"),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.kPrimary,
@@ -458,9 +488,56 @@ class _AccessScreenState extends State<AccessScreen> {
                 ],
               ),
             ),
+            IconButton(
+              icon: const Icon(
+                Icons.cancel_outlined,
+                color: Colors.redAccent,
+                size: 22,
+              ),
+              tooltip: "Revoke Access",
+              onPressed: () => _confirmRevoke(hospital),
+            ),
             const Icon(Icons.arrow_forward, size: 18, color: Colors.black54),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmRevoke(Map<String, String> hospital) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Revoke Access?"),
+        content: Text(
+          "Are you sure you want to revoke access for ${hospital['name']}? They will immediately lose access to your data.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              final grant = ProfileController.instance.caregiverGrant;
+              if (grant != null) {
+                await ProfileController.instance.revokeCaregiver(grant.id);
+              }
+              setState(() {
+                _activeHospitals.remove(hospital);
+              });
+              Navigator.pop(ctx);
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Access revoked for ${hospital['name']}"),
+                  ),
+                );
+              }
+            },
+            child: const Text("Revoke", style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

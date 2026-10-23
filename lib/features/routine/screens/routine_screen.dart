@@ -141,8 +141,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                     .toList(),
                 onSelected: (name) {
                   setState(() {
-                    _profileController.activeProfileName = name;
-                    _controller.setProfile(name);
+                    _profileController.switchSubjectByName(name);
                   });
                 },
               ),

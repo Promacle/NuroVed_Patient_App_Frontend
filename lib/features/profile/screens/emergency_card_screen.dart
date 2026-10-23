@@ -7,8 +7,6 @@ class EmergencyCardView extends StatelessWidget {
 
   const EmergencyCardView({super.key, required this.data});
 
-  final String? familyImage = null;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,6 +19,31 @@ class EmergencyCardView extends StatelessWidget {
   }
 
   Widget _buildEmergencyRedCard() {
+    final blood = data['blood']?.toString();
+    final displayBlood =
+        (blood != null && blood.isNotEmpty && blood != 'Not provided')
+            ? blood
+            : 'Not provided';
+
+    final allergies =
+        data['allergies'] is List ? (data['allergies'] as List) : [];
+    final displayAllergies = allergies
+        .map((e) => e.toString())
+        .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
+        .join(', ');
+    final finalAllergies =
+        displayAllergies.isEmpty ? 'Not provided' : displayAllergies;
+
+    final conditions = data['chronicConditions'] is List
+        ? (data['chronicConditions'] as List)
+        : [];
+    final displayConditions = conditions
+        .map((e) => e.toString())
+        .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
+        .join(', ');
+    final finalConditions =
+        displayConditions.isEmpty ? 'Not provided' : displayConditions;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(24),
@@ -29,13 +52,14 @@ class EmergencyCardView extends StatelessWidget {
         borderRadius: BorderRadius.circular(35),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 15,
-            offset: const Offset(0, 8), // Deep 3D Shadow
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -51,16 +75,36 @@ class EmergencyCardView extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+          // Patient-entered, unverified badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline, color: Colors.white, size: 14),
+                SizedBox(width: 5),
+                Text(
+                  "PATIENT-ENTERED, UNVERIFIED",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
-          _buildInfoTile("Blood Group", data['blood'] ?? "B+"),
-          _buildInfoTile(
-            "Allergies",
-            (data['allergies'] as List? ?? ["None"]).join(", "),
-          ),
-          _buildInfoTile(
-            "Chronic Conditions",
-            (data['chronicConditions'] as List? ?? ["None"]).join(", "),
-          ),
+          _buildInfoTile("Blood Group", displayBlood),
+          _buildInfoTile("Allergies", finalAllergies),
+          _buildInfoTile("Chronic Conditions", finalConditions),
         ],
       ),
     );
@@ -72,8 +116,7 @@ class EmergencyCardView extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
       decoration: BoxDecoration(
-        // Frosted Glass Effect: White with low opacity
-        color: Colors.white.withOpacity(0.25),
+        color: Colors.white.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(22),
       ),
       child: Column(
@@ -82,7 +125,7 @@ class EmergencyCardView extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withValues(alpha: 0.85),
               fontSize: 14,
             ),
           ),
@@ -105,16 +148,16 @@ class EmergencyCardView extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.kMainBg, // Consistent with theme
+        color: AppColors.kMainBg,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
         ],
-        border: Border.all(color: Colors.black.withOpacity(0.03)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.03)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,14 +171,14 @@ class EmergencyCardView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _buildFamilyMemberRow(),
+          _buildFamilyMemberRow(context),
           const SizedBox(height: 25),
           SizedBox(
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.sageGreen, // Using Common Colors
+                backgroundColor: AppColors.sageGreen,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -159,67 +202,91 @@ class EmergencyCardView extends StatelessWidget {
     );
   }
 
-  Widget _buildFamilyMemberRow() {
-    final controller = ProfileController();
-    final emergencyContact = controller.familyMembers.length > 1
-        ? controller.familyMembers[1]
-        : null;
-    final contactName = emergencyContact?['name'] ?? "Not assigned";
-    final contactRelation =
-        emergencyContact?['relation'] ?? "Emergency Contact";
+  Widget _buildFamilyMemberRow(BuildContext context) {
+    final controller = ProfileController.instance;
+    // Check for an explicit designated emergency contact
+    final members = controller.familyMembersList;
+    final emergencyMember = members.where((m) => m.isEmergencyContact).firstOrNull;
 
-    return Row(
-      children: [
-        Container(
-          height: 65,
-          width: 65,
-          decoration: BoxDecoration(
-            color: Colors.white, // Background for the icon
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: familyImage != null
-                ? Image.network(familyImage!, fit: BoxFit.cover)
-                : Icon(
-                    Icons.person,
-                    size: 35,
-                    color: Colors.grey.shade400,
-                  ), // Default Person Icon
-          ),
-        ),
-        const SizedBox(width: 15),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              contactName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C4E4E),
+    final contactName = emergencyMember?.name ?? "Not assigned";
+    final contactRelation = emergencyMember != null
+        ? "${emergencyMember.relation} (Emergency Contact)"
+        : "Emergency Contact";
+    final contactPhone = emergencyMember?.phone != null &&
+            emergencyMember!.phone!.isNotEmpty
+        ? emergencyMember.phone!
+        : "Phone not provided";
+
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, '/family-profiles');
+      },
+      borderRadius: BorderRadius.circular(18),
+      child: Row(
+        children: [
+          Container(
+            height: 65,
+            width: 65,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Icon(
+                Icons.person,
+                size: 35,
+                color: Colors.grey.shade400,
               ),
             ),
-            Text(
-              contactRelation,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  contactName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  contactRelation,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (emergencyMember != null)
+                  Text(
+                    contactPhone,
+                    style: const TextStyle(
+                      color: AppColors.primaryTeal,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E4D4D), // Dark Teal Button
-            borderRadius: BorderRadius.circular(15),
           ),
-          child: const Icon(
-            Icons.arrow_forward_rounded,
-            color: Colors.white,
-            size: 22,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E4D4D),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

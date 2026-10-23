@@ -125,8 +125,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         .map((e) => e['name'] as String)
                         .toList(),
                     onSelected: (name) {
-                      profileController.activeProfileName = name;
-                      _controller.runFilter(_searchController.text);
+                      profileController.switchSubjectByName(name);
                       setState(() {});
                     },
                   ),

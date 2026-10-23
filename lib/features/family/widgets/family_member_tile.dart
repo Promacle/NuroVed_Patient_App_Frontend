@@ -1,18 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 
 class FamilyMemberTile extends StatelessWidget {
   final Map<String, dynamic> member;
   final VoidCallback onTap;
-  final VoidCallback? onDelete; // Callback for the delete icon
+  final VoidCallback? onDelete;
+  final bool isActive;
 
   const FamilyMemberTile({
     super.key,
     required this.member,
     required this.onTap,
     this.onDelete,
+    this.isActive = false,
   });
 
   @override
@@ -29,9 +32,12 @@ class FamilyMemberTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFF0F5F3),
               borderRadius: BorderRadius.circular(15),
+              border: isActive
+                  ? Border.all(color: AppColors.primaryTeal, width: 2)
+                  : Border.all(color: Colors.black.withValues(alpha: 0.05)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -60,6 +66,24 @@ class FamilyMemberTile extends StatelessWidget {
                     fontSize: 11,
                   ),
                 ),
+                if (isActive)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryTeal,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      "ACTIVE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -98,13 +122,17 @@ class FamilyMemberTile extends StatelessWidget {
       height: 55,
       width: 55,
       decoration: const BoxDecoration(
+        color: Colors.white,
         shape: BoxShape.circle,
-        color: Color(0xFFDCEAE5),
       ),
-      child: ClipOval(
-        child:
-            avatarImage ??
-            const Icon(Icons.person, size: 30, color: Colors.grey),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: avatarImage ??
+            const Icon(
+              Icons.person,
+              color: Color(0xFF7CB9A8),
+              size: 30,
+            ),
       ),
     );
   }

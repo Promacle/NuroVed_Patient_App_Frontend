@@ -48,24 +48,16 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                     if (index == members.length)
                       return _buildAddMemberCard(context);
 
+                    final isCurrentActive =
+                        members[index]['id'] == ProfileController.instance.activeSubjectId;
+
                     return FamilyMemberTile(
                       member: members[index],
-                      onTap: () async {
-                        // RESTORE THIS LOGIC:
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditFamilyMemberScreen(
-                              memberData: members[index],
-                              index: index,
-                            ),
-                          ),
-                        );
-                      },
+                      isActive: isCurrentActive,
+                      onTap: () => _onMemberTapped(context, members[index], index),
                       onDelete: () => _confirmDeletion(
                         context,
-                        index,
-                        members[index]['name'],
+                        members[index],
                       ),
                     );
                   },
@@ -78,8 +70,88 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
     );
   }
 
-  // Add this helper method to handle the confirmation
-  void _confirmDeletion(BuildContext context, int index, String name) {
+  void _onMemberTapped(
+    BuildContext context,
+    Map<String, dynamic> member,
+    int index,
+  ) {
+    final profileCtrl = ProfileController.instance;
+    final memberId = member['id']?.toString() ?? '';
+    final isAlreadyActive = memberId == profileCtrl.activeSubjectId;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                member['name'] ?? 'Family Member',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2C4E4E),
+                ),
+              ),
+              const SizedBox(height: 15),
+              if (!isAlreadyActive)
+                ListTile(
+                  leading: const Icon(
+                    Icons.check_circle_outline,
+                    color: AppColors.primaryTeal,
+                  ),
+                  title: const Text("Select as Active Profile"),
+                  subtitle: const Text(
+                    "Switch health timeline, records and routine to this person",
+                  ),
+                  onTap: () {
+                    profileCtrl.switchSubject(memberId);
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Switched active profile to ${member['name']}",
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ListTile(
+                leading: const Icon(
+                  Icons.edit_outlined,
+                  color: Color(0xFF2C4E4E),
+                ),
+                title: const Text("Edit Member Profile"),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditFamilyMemberScreen(
+                        memberData: member,
+                        index: index,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeletion(BuildContext context, Map<String, dynamic> member) {
+    final name = member['name'] ?? 'this profile';
+    final id = member['id']?.toString() ?? '';
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -94,7 +166,9 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
           ),
           TextButton(
             onPressed: () {
-              _controller.removeFamilyMember(index);
+              if (id.isNotEmpty) {
+                _controller.removeFamilyMemberById(id);
+              }
               Navigator.pop(context);
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
@@ -103,6 +177,7 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
       ),
     );
   }
+
 
   Widget _buildHeader(BuildContext context) {
     return Container(

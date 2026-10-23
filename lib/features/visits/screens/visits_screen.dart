@@ -130,9 +130,7 @@ class _VisitsScreenState extends State<VisitsScreen> {
                         .toList(),
                     onSelected: (name) {
                       setState(() {
-                        profileController.activeProfileName = name;
-                        _controller
-                            .loadVisits(); // Refresh visits for this person
+                        profileController.switchSubjectByName(name);
                       });
                     },
                   ),
