@@ -8,6 +8,8 @@ import 'package:nuroved_patient/core/utils/result.dart';
 import 'package:nuroved_patient/core/utils/uuid_generator.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('UuidGenerator.v4', () {
     test('generates valid RFC 4122 v4 UUIDs', () {
       final uuid = UuidGenerator.v4();
