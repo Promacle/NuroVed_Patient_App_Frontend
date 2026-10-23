@@ -3,39 +3,71 @@ import 'package:flutter/material.dart';
 import '../../profile/controllers/profile_controller.dart';
 
 class RecordsController extends ChangeNotifier {
-  final ProfileController _profileController = ProfileController();
+  static final RecordsController _instance = RecordsController._internal();
+  factory RecordsController() => _instance;
 
-  // The list now stores dynamic maps to accommodate records saved from AddRecordScreen
+  RecordsController._internal() {
+    _attachProfileListener();
+  }
+
+  void _attachProfileListener() {
+    ProfileController.instance.removeListener(_onProfileChanged);
+    ProfileController.instance.addListener(_onProfileChanged);
+  }
+
+  static void resetForTesting() {
+    _instance.filteredRecords = [];
+    _instance._recordsBySubjectId.clear();
+    _instance.selectedFilter = "All";
+    _instance._currentSubjectId = null;
+    _instance._attachProfileListener();
+  }
+
+  ProfileController get _profileController => ProfileController.instance;
+
+  // Records isolated strictly by subject UUID
+  final Map<String, List<Map<String, dynamic>>> _recordsBySubjectId = {};
+
   List<Map<String, dynamic>> filteredRecords = [];
   String selectedFilter = "All";
+  String? _currentSubjectId;
 
-  // Returns the last record added (most recent)
   Map<String, dynamic>? get recentRecord {
     return filteredRecords.isNotEmpty ? filteredRecords.last : null;
   }
 
+  void _onProfileChanged() {
+    final activeId = _profileController.activeSubjectId;
+    if (_currentSubjectId != activeId) {
+      // Immediately purge previous subject's records to prevent stale data flash
+      filteredRecords = [];
+      _currentSubjectId = activeId;
+      runFilter("");
+    }
+  }
+
+  /// Reloads records strictly for the active subject ID
   void runFilter(String query) {
-    // 1. Get the current active profile name
-    final activeProfile = _profileController.activeProfileName;
+    final activeId = _profileController.activeSubjectId;
 
-    // 2. Find the family member matching the active profile
-    final member = _profileController.familyMembers.firstWhere(
-      (m) => m['name'] == activeProfile,
-      orElse: () => <String, dynamic>{},
-    );
+    if (_currentSubjectId != activeId) {
+      // Purge previous subject records
+      filteredRecords = [];
+      _currentSubjectId = activeId;
+    }
 
-    // 3. Get the records for this specific member
-    final List<dynamic> allMemberRecords = member['records'] ?? [];
+    final allSubjectRecords = _recordsBySubjectId[activeId] ?? [];
 
-    // 4. Apply search and category filters
-    filteredRecords = allMemberRecords
+    filteredRecords = allSubjectRecords
         .map((e) => Map<String, dynamic>.from(e))
         .where((record) {
-          final bool matchesSearch =
-              query.isEmpty ||
-              (record["title"] ?? "").toLowerCase().contains(
-                query.toLowerCase(),
-              );
+          final bool matchesSearch = query.isEmpty ||
+              (record["title"] ?? "").toString().toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ||
+              (record["sub"] ?? "").toString().toLowerCase().contains(
+                    query.toLowerCase(),
+                  );
 
           final bool matchesFilter =
               selectedFilter == "All" || record["type"] == selectedFilter;
@@ -47,22 +79,33 @@ class RecordsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addRecord(Map<String, dynamic> record, [String currentSearch = ""]) {
+    final activeId = _profileController.activeSubjectId;
+    if (!_recordsBySubjectId.containsKey(activeId)) {
+      _recordsBySubjectId[activeId] = [];
+    }
+    final newRecord = Map<String, dynamic>.from(record);
+    newRecord['subjectId'] = activeId;
+    _recordsBySubjectId[activeId]!.add(newRecord);
+    runFilter(currentSearch);
+  }
+
   void deleteRecord(Map<String, dynamic> record, String currentSearch) {
-    final activeProfile = _profileController.activeProfileName;
-
-    // Find the member in the ProfileController data
-    final member = _profileController.familyMembers.firstWhere(
-      (m) => m['name'] == activeProfile,
-      orElse: () => <String, dynamic>{},
-    );
-
-    if (member.isNotEmpty && member['records'] != null) {
-      // Remove by unique ID (or title/timestamp if ID isn't used)
-      (member['records'] as List).removeWhere(
-        (r) => r['title'] == record['title'] && r['date'] == record['date'],
+    final activeId = _profileController.activeSubjectId;
+    final records = _recordsBySubjectId[activeId];
+    if (records != null) {
+      records.removeWhere(
+        (r) =>
+            r['id'] == record['id'] ||
+            (r['title'] == record['title'] && r['date'] == record['date']),
       );
     }
-
     runFilter(currentSearch);
+  }
+
+  @override
+  void dispose() {
+    _profileController.removeListener(_onProfileChanged);
+    super.dispose();
   }
 }

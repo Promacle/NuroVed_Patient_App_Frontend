@@ -1,102 +1,148 @@
 import 'package:flutter/material.dart';
 
+import '../../profile/controllers/profile_controller.dart';
+
 class RoutineController extends ChangeNotifier {
   static final RoutineController _instance = RoutineController._internal();
   factory RoutineController() => _instance;
+
   RoutineController._internal() {
-    // Initialize default data for the main user profile
-    _initializeProfile("Self");
+    _attachProfileListener();
+    _initializeProfile(_profileController.activeSubjectId);
   }
 
-  String selectedTab = "Routines";
-  String _currentProfile = "Self";
+  void _attachProfileListener() {
+    ProfileController.instance.removeListener(_onProfileChanged);
+    ProfileController.instance.addListener(_onProfileChanged);
+  }
 
-  // Data storage per profile
-  final Map<String, List<Map<String, dynamic>>> _medicinesPerProfile = {};
-  final Map<String, List<Map<String, dynamic>>> _mealsPerProfile = {};
+  static void resetForTesting() {
+    _instance._medicinesPerSubject.clear();
+    _instance._mealsPerSubject.clear();
+    _instance._currentSubjectId = null;
+    _instance.progress = 0.0;
+    _instance.progressText = "0/0 Completed";
+    _instance._attachProfileListener();
+    _instance._initializeProfile(ProfileController.instance.activeSubjectId);
+  }
+
+  ProfileController get _profileController => ProfileController.instance;
+
+  String selectedTab = "Routines";
+  String? _currentSubjectId;
+
+  // Data storage per subject UUID
+  final Map<String, List<Map<String, dynamic>>> _medicinesPerSubject = {};
+  final Map<String, List<Map<String, dynamic>>> _mealsPerSubject = {};
 
   double progress = 0.0;
   String progressText = "0/0 Completed";
 
-  // Getters for the current profile's data
   List<Map<String, dynamic>> get medicines =>
-      _medicinesPerProfile[_currentProfile] ?? [];
-  List<Map<String, dynamic>> get meals =>
-      _mealsPerProfile[_currentProfile] ?? [];
+      _medicinesPerSubject[_currentSubjectId ?? _profileController.activeSubjectId] ??
+      [];
 
-  void _initializeProfile(String name) {
-    if (!_medicinesPerProfile.containsKey(name)) {
-      _medicinesPerProfile[name] = [
-        {
-          "name": "Atorvastatin 10mg",
-          "instruction": "1 tablet * 09:00 * Take Before bed",
-          "isCompleted": false,
-        },
-        {
-          "name": "Aspirin 75mg",
-          "instruction": "1 tablet * 09:00 * Take after lunch",
-          "isCompleted": false,
-        },
-        {
-          "name": "Atorvastatin 10mg",
-          "instruction": "2 tablet * 09:00 * Take before breakfast",
-          "isCompleted": true,
-        },
-      ];
+  List<Map<String, dynamic>> get meals =>
+      _mealsPerSubject[_currentSubjectId ?? _profileController.activeSubjectId] ??
+      [];
+
+  void _onProfileChanged() {
+    final activeId = _profileController.activeSubjectId;
+    if (_currentSubjectId != activeId) {
+      setSubject(activeId);
     }
-    if (!_mealsPerProfile.containsKey(name)) {
-      _mealsPerProfile[name] = [
-        {
-          "title": "Breakfast",
-          "time": "Morning * 08:00 AM",
-          "mealName": "Oatmeal with Banana and Almond Milk",
-          "calories": "350 Calories",
-          "ingredients": ["rolled oats", "banana", "almond milk"],
-          "isCompleted": false,
-        },
-        {
-          "title": "Lunch",
-          "time": "Afternoon * 01:00 PM",
-          "mealName": "Vegetable Wrap",
-          "calories": "400 Calories",
-          "ingredients": [
-            "whole wheat wrap",
-            "cucumber",
-            "tomato",
-            "boiled potato",
-            "onion",
-          ],
-          "isCompleted": false,
-        },
-        {
-          "title": "Dinner",
-          "time": "Dinner * 08:00 PM",
-          "mealName": "Quinoa and Vegetable Stir-Fry",
-          "calories": "500 Calories",
-          "ingredients": ["quinoa", "broccoli", "carrots", "onions", "potato"],
-          "isCompleted": false,
-        },
-      ];
+  }
+
+  void _initializeProfile(String subjectId) {
+    if (!_medicinesPerSubject.containsKey(subjectId)) {
+      // Default diabetic routine only for primary user
+      if (subjectId == _profileController.profile.id || _profileController.isMainPatientActive) {
+        _medicinesPerSubject[subjectId] = [
+          {
+            "name": "Atorvastatin 10mg",
+            "instruction": "1 tablet * 09:00 * Take Before bed",
+            "isCompleted": false,
+          },
+          {
+            "name": "Aspirin 75mg",
+            "instruction": "1 tablet * 09:00 * Take after lunch",
+            "isCompleted": false,
+          },
+          {
+            "name": "Metformin 500mg",
+            "instruction": "1 tablet * 08:00 * Take with breakfast",
+            "isCompleted": true,
+          },
+        ];
+      } else {
+        // Family members start with clean, isolated schedule
+        _medicinesPerSubject[subjectId] = [];
+      }
     }
+
+    if (!_mealsPerSubject.containsKey(subjectId)) {
+      if (subjectId == _profileController.profile.id || _profileController.isMainPatientActive) {
+        _mealsPerSubject[subjectId] = [
+          {
+            "title": "Breakfast",
+            "time": "Morning * 08:00 AM",
+            "mealName": "Oatmeal with Almond Milk",
+            "calories": "350 Calories",
+            "ingredients": ["rolled oats", "almond milk"],
+            "isCompleted": false,
+          },
+          {
+            "title": "Lunch",
+            "time": "Afternoon * 01:00 PM",
+            "mealName": "Vegetable Salad & Lentils",
+            "calories": "400 Calories",
+            "ingredients": ["cucumber", "tomato", "boiled lentils"],
+            "isCompleted": false,
+          },
+        ];
+      } else {
+        _mealsPerSubject[subjectId] = [];
+      }
+    }
+
     _recalculateProgress();
   }
 
-  void setProfile(String name) {
-    _currentProfile = name;
-    _initializeProfile(name); // Ensure data exists for this profile
+  void setSubject(String subjectId) {
+    _currentSubjectId = subjectId;
+    _initializeProfile(subjectId);
     notifyListeners();
   }
 
+  /// Backward-compatible setProfile by name
+  void setProfile(String name) {
+    _profileController.switchSubjectByName(name);
+  }
+
   void toggleMedicine(int index) {
-    if (index < medicines.length) {
-      medicines[index]['isCompleted'] = !medicines[index]['isCompleted'];
+    final list = medicines;
+    if (index >= 0 && index < list.length) {
+      list[index]['isCompleted'] = !(list[index]['isCompleted'] == true);
       _recalculateProgress();
+      notifyListeners();
     }
   }
 
-  void updateTab(String tab) {
-    selectedTab = tab;
-    _recalculateProgress(); // Now recalculates progress based on the new tab
+  void addMedicine(dynamic nameOrMap, [String? instruction]) {
+    final subjectId = _currentSubjectId ?? _profileController.activeSubjectId;
+    if (!_medicinesPerSubject.containsKey(subjectId)) {
+      _medicinesPerSubject[subjectId] = [];
+    }
+    if (nameOrMap is Map<String, dynamic>) {
+      _medicinesPerSubject[subjectId]!.add(Map<String, dynamic>.from(nameOrMap));
+    } else {
+      _medicinesPerSubject[subjectId]!.add({
+        "name": nameOrMap.toString(),
+        "instruction": instruction ?? "",
+        "isCompleted": false,
+      });
+    }
+    _recalculateProgress();
     notifyListeners();
   }
 
@@ -105,6 +151,7 @@ class RoutineController extends ChangeNotifier {
     if (index != -1 && !meals[index]['isCompleted']) {
       meals[index]['isCompleted'] = true;
       _recalculateProgress();
+      notifyListeners();
     }
   }
 
@@ -121,37 +168,33 @@ class RoutineController extends ChangeNotifier {
     }
   }
 
-  void addMedicine(String name, String instruction) {
-    if (!_medicinesPerProfile.containsKey(_currentProfile)) {
-      _medicinesPerProfile[_currentProfile] = [];
-    }
-    _medicinesPerProfile[_currentProfile]!.add({
-      "name": name,
-      "instruction": instruction,
-      "isCompleted": false,
-    });
+  void updateTab(String tab) {
+    selectedTab = tab;
     _recalculateProgress();
+    notifyListeners();
   }
 
   void _recalculateProgress() {
-    // Select the list based on the current tab
-    final targetItems = selectedTab == "Medicines" ? medicines : meals;
-    final totalCount = targetItems.length;
+    int completed = 0;
+    int total = 0;
 
-    if (totalCount == 0) {
-      progress = 0.0;
-      progressText = "0/0 Completed";
+    if (selectedTab == "Medicines" || selectedTab == "Routines") {
+      final list = medicines;
+      total = list.length;
+      completed = list.where((m) => m['isCompleted'] == true).length;
     } else {
-      int completedCount = targetItems
-          .where((item) => item['isCompleted'] == true)
-          .length;
-
-      // Calculate progress percentage based on the selected tab's items
-      progress = completedCount / totalCount;
-
-      // Update text to show "completed/total" for the selected tab
-      progressText = "$completedCount/$totalCount Completed";
+      final list = meals;
+      total = list.length;
+      completed = list.where((m) => m['isCompleted'] == true).length;
     }
-    notifyListeners();
+
+    progress = total == 0 ? 0.0 : completed / total;
+    progressText = "$completed/$total Completed";
+  }
+
+  @override
+  void dispose() {
+    _profileController.removeListener(_onProfileChanged);
+    super.dispose();
   }
 }
