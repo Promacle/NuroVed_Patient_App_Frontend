@@ -16,7 +16,9 @@ class FamilyController {
 
   List<FamilyMember> get typedMembers => _profileController.familyMembersList;
 
-  Future<Result<FamilyMember>> addFamilyMember(Map<String, dynamic> data) async {
+  Future<Result<FamilyMember>> addFamilyMember(
+    Map<String, dynamic> data,
+  ) async {
     final member = FamilyMember(
       id: data['id']?.toString() ?? UuidGenerator.v4(),
       name: data['name']?.toString() ?? 'Unnamed',
@@ -56,7 +58,8 @@ class FamilyController {
           ? updatedData['is_emergency_contact'] == true
           : existing.isEmergencyContact,
       phone: updatedData['phone']?.toString() ?? existing.phone,
-      bloodGroup: updatedData['blood']?.toString() ??
+      bloodGroup:
+          updatedData['blood']?.toString() ??
           updatedData['blood_group']?.toString() ??
           existing.bloodGroup,
     );

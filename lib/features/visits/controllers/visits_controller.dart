@@ -52,20 +52,25 @@ class VisitsController extends ChangeNotifier {
   VisitsRepository get repository => _repository;
 
   VisitsController._internal({VisitsRepository? repository, bool empty = false})
-      : _repository = repository ??
-            FakeVisitsRepository(
-              recordsRepository: RecordsController.instance.repository,
-            ) {
+    : _repository =
+          repository ??
+          FakeVisitsRepository(
+            recordsRepository: RecordsController.instance.repository,
+          ) {
     _attachProfileListener();
     if (!empty) {
       _initializeDefaultVisits();
     }
   }
 
-  static void resetForTesting({VisitsRepository? repository, bool empty = false}) {
+  static void resetForTesting({
+    VisitsRepository? repository,
+    bool empty = false,
+  }) {
     ProfileController.instance.removeListener(_instance._onProfileChanged);
     _instance = VisitsController._internal(
-      repository: repository ??
+      repository:
+          repository ??
           FakeVisitsRepository(
             recordsRepository: RecordsController.instance.repository,
           ),
@@ -223,18 +228,22 @@ class VisitsController extends ChangeNotifier {
 
     if (visitInput is Visit) {
       visit = visitInput.copyWith(
-        subjectId: visitInput.subjectId.isEmpty ? activeId : visitInput.subjectId,
+        subjectId: visitInput.subjectId.isEmpty
+            ? activeId
+            : visitInput.subjectId,
         profileName: _profileController.activeProfileName,
         userId: _profileController.profile.id,
         relatedRecordIds: visitInput.relatedRecordIds.toSet().toList(),
       );
     } else if (visitInput is Map<String, dynamic>) {
-      final parsedDate = DateParser.parse(visitInput['date']) ??
+      final parsedDate =
+          DateParser.parse(visitInput['date']) ??
           (visitInput['visit_date'] != null
               ? DateParser.parse(visitInput['visit_date'])
               : DateTime.now());
 
-      final rawRelated = visitInput['relatedRecordIds'] ??
+      final rawRelated =
+          visitInput['relatedRecordIds'] ??
           visitInput['related_record_ids'] ??
           visitInput['relatedRecord'];
       List<String> relatedList = [];
@@ -249,15 +258,25 @@ class VisitsController extends ChangeNotifier {
         userId: _profileController.profile.id,
         subjectId: activeId,
         profileName: _profileController.activeProfileName,
-        date: visitInput['date']?.toString() ?? DateParser.formatDisplay(parsedDate),
+        date:
+            visitInput['date']?.toString() ??
+            DateParser.formatDisplay(parsedDate),
         visitDate: parsedDate,
         title: visitInput['title']?.toString() ?? 'Doctor Visit',
         subtitle: visitInput['subtitle']?.toString() ?? '',
-        doctorName: visitInput['doctor']?.toString() ?? visitInput['doctor_name']?.toString(),
+        doctorName:
+            visitInput['doctor']?.toString() ??
+            visitInput['doctor_name']?.toString(),
         specialty: visitInput['specialty']?.toString(),
-        hospitalName: visitInput['hospital']?.toString() ?? visitInput['hospital_name']?.toString(),
-        notes: visitInput['notes']?.toString() ?? visitInput['subtitle']?.toString(),
-        followUpDate: DateParser.parse(visitInput['follow_up_date'] ?? visitInput['followUpDate']),
+        hospitalName:
+            visitInput['hospital']?.toString() ??
+            visitInput['hospital_name']?.toString(),
+        notes:
+            visitInput['notes']?.toString() ??
+            visitInput['subtitle']?.toString(),
+        followUpDate: DateParser.parse(
+          visitInput['follow_up_date'] ?? visitInput['followUpDate'],
+        ),
         relatedRecordIds: relatedList.toSet().toList(),
         createdAt: DateTime.now(),
       );
@@ -372,4 +391,3 @@ class VisitsController extends ChangeNotifier {
     super.dispose();
   }
 }
-

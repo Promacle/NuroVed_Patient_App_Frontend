@@ -669,7 +669,6 @@ class _AccessScreenState extends State<AccessScreen> {
   }
 }
 
-
 class _ToggleItem extends StatelessWidget {
   final String label;
   final bool isSelected;

@@ -28,9 +28,12 @@ class _SelectRelatedRecordsScreenState
   void _loadRecords() {
     final recordsCtrl = RecordsController();
     final all = recordsCtrl.records;
-    final matched = all.where(
-      (r) => r.profileName.toLowerCase() == widget.profileName.toLowerCase(),
-    ).toList();
+    final matched = all
+        .where(
+          (r) =>
+              r.profileName.toLowerCase() == widget.profileName.toLowerCase(),
+        )
+        .toList();
 
     setState(() {
       _profileRecords = matched.isNotEmpty ? matched : all;
@@ -126,7 +129,8 @@ class _SelectRelatedRecordsScreenState
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RecordDetailsScreen(record: record),
+                          builder: (context) =>
+                              RecordDetailsScreen(record: record),
                         ),
                       );
                     },
@@ -218,13 +222,10 @@ class _SelectRelatedRecordsScreenState
         child: ElevatedButton(
           onPressed: _selectedIndex == -1
               ? null
-              : () => Navigator.pop(
-                  context,
-                  {
-                    'id': _profileRecords[_selectedIndex].id,
-                    'title': _profileRecords[_selectedIndex].title,
-                  },
-                ),
+              : () => Navigator.pop(context, {
+                  'id': _profileRecords[_selectedIndex].id,
+                  'title': _profileRecords[_selectedIndex].title,
+                }),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.darkTeal,
             shape: RoundedRectangleBorder(

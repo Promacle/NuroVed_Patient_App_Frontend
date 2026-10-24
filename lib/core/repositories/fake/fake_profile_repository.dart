@@ -17,7 +17,7 @@ class FakeProfileRepository implements ProfileRepository {
     UserProfile? initialProfile,
     List<FamilyMember>? initialFamily,
     CareAccessGrant? initialCaregiver,
-  })  : _profile = initialProfile ?? UserProfile.empty() {
+  }) : _profile = initialProfile ?? UserProfile.empty() {
     if (initialFamily != null) {
       _familyMembers.addAll(initialFamily);
     }
@@ -166,7 +166,9 @@ class FakeProfileRepository implements ProfileRepository {
         NotFoundFailure(message: 'Caregiver grant not found'),
       );
     }
-    final updated = _caregiverGrant!.copyWith(scopes: List.unmodifiable(scopes));
+    final updated = _caregiverGrant!.copyWith(
+      scopes: List.unmodifiable(scopes),
+    );
     _caregiverGrant = updated;
     return Result.success(updated);
   }
@@ -190,4 +192,3 @@ class FakeProfileRepository implements ProfileRepository {
     return const Result.success(null);
   }
 }
-

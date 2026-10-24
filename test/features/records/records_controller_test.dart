@@ -30,36 +30,39 @@ void main() {
   });
 
   group('RecordsController Upload Pipeline', () {
-    test('uploads file, reports progress, and persists metadata upon success', () async {
-      final file = AppPlatformFile(
-        name: 'hba1c_report.pdf',
-        size: pdfBytes.length,
-        bytes: pdfBytes,
-      );
+    test(
+      'uploads file, reports progress, and persists metadata upon success',
+      () async {
+        final file = AppPlatformFile(
+          name: 'hba1c_report.pdf',
+          size: pdfBytes.length,
+          bytes: pdfBytes,
+        );
 
-      final result = await controller.uploadAndSaveRecord(
-        title: 'HbA1c Lab Report',
-        recordType: 'Lab',
-        date: '2026-01-10T10:00:00Z',
-        doctorName: 'Dr. Mehta',
-        hospitalName: 'Apollo Hospital',
-        description: 'HbA1c level 6.8%',
-        file: file,
-      );
+        final result = await controller.uploadAndSaveRecord(
+          title: 'HbA1c Lab Report',
+          recordType: 'Lab',
+          date: '2026-01-10T10:00:00Z',
+          doctorName: 'Dr. Mehta',
+          hospitalName: 'Apollo Hospital',
+          description: 'HbA1c level 6.8%',
+          file: file,
+        );
 
-      expect(result.isSuccess, isTrue);
-      final created = result.dataOrNull!;
-      expect(created.title, 'HbA1c Lab Report');
-      expect(created.recordType, 'Lab');
-      expect(created.storagePath, isNotNull);
-      expect(created.storagePath, contains('hba1c_report.pdf'));
-      expect(created.fileSize, pdfBytes.length);
+        expect(result.isSuccess, isTrue);
+        final created = result.dataOrNull!;
+        expect(created.title, 'HbA1c Lab Report');
+        expect(created.recordType, 'Lab');
+        expect(created.storagePath, isNotNull);
+        expect(created.storagePath, contains('hba1c_report.pdf'));
+        expect(created.fileSize, pdfBytes.length);
 
-      // Confirm persisted in controller
-      expect(controller.records.any((r) => r.id == created.id), isTrue);
-      expect(controller.isUploading, isFalse);
-      expect(controller.uploadProgress, 1.0);
-    });
+        // Confirm persisted in controller
+        expect(controller.records.any((r) => r.id == created.id), isTrue);
+        expect(controller.isUploading, isFalse);
+        expect(controller.uploadProgress, 1.0);
+      },
+    );
 
     test('protects against duplicate upload submission', () async {
       final file = AppPlatformFile(
@@ -91,27 +94,30 @@ void main() {
       await future1;
     });
 
-    test('cleans up orphaned storage object when metadata save fails', () async {
-      fakeRepo.shouldFailRecordSave = true;
+    test(
+      'cleans up orphaned storage object when metadata save fails',
+      () async {
+        fakeRepo.shouldFailRecordSave = true;
 
-      final file = AppPlatformFile(
-        name: 'corrupt_metadata.pdf',
-        size: pdfBytes.length,
-        bytes: pdfBytes,
-      );
+        final file = AppPlatformFile(
+          name: 'corrupt_metadata.pdf',
+          size: pdfBytes.length,
+          bytes: pdfBytes,
+        );
 
-      final result = await controller.uploadAndSaveRecord(
-        title: 'Failing Record',
-        recordType: 'Medical Records',
-        date: '2026-01-10',
-        file: file,
-      );
+        final result = await controller.uploadAndSaveRecord(
+          title: 'Failing Record',
+          recordType: 'Medical Records',
+          date: '2026-01-10',
+          file: file,
+        );
 
-      expect(result.isFailure, isTrue);
-      // Storage file must be cleaned up (no orphaned files left)
-      expect(fakeRepo.storageFiles.isEmpty, isTrue);
-      expect(controller.isUploading, isFalse);
-    });
+        expect(result.isFailure, isTrue);
+        // Storage file must be cleaned up (no orphaned files left)
+        expect(fakeRepo.storageFiles.isEmpty, isTrue);
+        expect(controller.isUploading, isFalse);
+      },
+    );
 
     test('cancels in-flight upload on user cancellation', () async {
       fakeRepo.uploadDelayMs = 200;
@@ -155,7 +161,9 @@ void main() {
       );
 
       final record = result.dataOrNull!;
-      final signedUrlResult = await controller.getSignedUrl(record.storagePath!);
+      final signedUrlResult = await controller.getSignedUrl(
+        record.storagePath!,
+      );
 
       expect(signedUrlResult.isSuccess, isTrue);
       final signedUrl = signedUrlResult.dataOrNull!;
@@ -200,18 +208,23 @@ void main() {
       expect(controller.records.first.title, 'Sugar Test');
     });
 
-    test('soft delete sets deletedAt and removes record from active view', () async {
-      final target = controller.records.first;
-      final delResult = await controller.softDeleteRecord(target.id);
+    test(
+      'soft delete sets deletedAt and removes record from active view',
+      () async {
+        final target = controller.records.first;
+        final delResult = await controller.softDeleteRecord(target.id);
 
-      expect(delResult.isSuccess, isTrue);
-      expect(controller.records.any((r) => r.id == target.id), isFalse);
+        expect(delResult.isSuccess, isTrue);
+        expect(controller.records.any((r) => r.id == target.id), isFalse);
 
-      // Confirm in repo internal list that deletedAt is populated
-      final inRepo = fakeRepo.internalRecords.firstWhere((r) => r.id == target.id);
-      expect(inRepo.isDeleted, isTrue);
-      expect(inRepo.deletedAt, isNotNull);
-    });
+        // Confirm in repo internal list that deletedAt is populated
+        final inRepo = fakeRepo.internalRecords.firstWhere(
+          (r) => r.id == target.id,
+        );
+        expect(inRepo.isDeleted, isTrue);
+        expect(inRepo.deletedAt, isNotNull);
+      },
+    );
   });
 
   group('RecordsController Subject Isolation', () {
@@ -243,7 +256,10 @@ void main() {
       await controller.loadRecords();
 
       // Subject B must have 0 records from Subject A
-      expect(controller.records.any((r) => r.title == "Self's Record"), isFalse);
+      expect(
+        controller.records.any((r) => r.title == "Self's Record"),
+        isFalse,
+      );
 
       // 3. Add record for Subject B
       final fileB = AppPlatformFile(
@@ -258,7 +274,10 @@ void main() {
         file: fileB,
       );
 
-      expect(controller.records.any((r) => r.title == "Uncle's Cardiology Report"), isTrue);
+      expect(
+        controller.records.any((r) => r.title == "Uncle's Cardiology Report"),
+        isTrue,
+      );
 
       // 4. Switch back to Self (Subject A)
       profileController.switchSubjectToSelf();
@@ -266,7 +285,10 @@ void main() {
 
       // Subject A has Self's record, never Subject B's record
       expect(controller.records.any((r) => r.title == "Self's Record"), isTrue);
-      expect(controller.records.any((r) => r.title == "Uncle's Cardiology Report"), isFalse);
+      expect(
+        controller.records.any((r) => r.title == "Uncle's Cardiology Report"),
+        isFalse,
+      );
     });
   });
 }

@@ -49,16 +49,15 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                       return _buildAddMemberCard(context);
 
                     final isCurrentActive =
-                        members[index]['id'] == ProfileController.instance.activeSubjectId;
+                        members[index]['id'] ==
+                        ProfileController.instance.activeSubjectId;
 
                     return FamilyMemberTile(
                       member: members[index],
                       isActive: isCurrentActive,
-                      onTap: () => _onMemberTapped(context, members[index], index),
-                      onDelete: () => _confirmDeletion(
-                        context,
-                        members[index],
-                      ),
+                      onTap: () =>
+                          _onMemberTapped(context, members[index], index),
+                      onDelete: () => _confirmDeletion(context, members[index]),
                     );
                   },
                 ),
@@ -177,7 +176,6 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
       ),
     );
   }
-
 
   Widget _buildHeader(BuildContext context) {
     return Container(

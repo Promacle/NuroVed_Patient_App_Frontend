@@ -9,11 +9,7 @@ class RecordDetailsScreen extends StatefulWidget {
   final MedicalRecord? record;
   final String? recordId;
 
-  const RecordDetailsScreen({
-    super.key,
-    this.record,
-    this.recordId,
-  });
+  const RecordDetailsScreen({super.key, this.record, this.recordId});
 
   @override
   State<RecordDetailsScreen> createState() => _RecordDetailsScreenState();
@@ -62,7 +58,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
     final path = _record.storagePath;
     if (path == null || path.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No storage file attached to this record')),
+        const SnackBar(
+          content: Text('No storage file attached to this record'),
+        ),
       );
       return;
     }
@@ -77,7 +75,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
         },
         failure: (f) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to retrieve secure URL: ${f.message}')),
+            SnackBar(
+              content: Text('Failed to retrieve secure URL: ${f.message}'),
+            ),
           );
         },
       );
@@ -124,7 +124,11 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                 SizedBox(width: 6),
                 Text(
                   'Valid for 10 minutes (authorization-checked)',
-                  style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -163,18 +167,24 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final result = await RecordsController().softDeleteRecord(_record.id);
+              final result = await RecordsController().softDeleteRecord(
+                _record.id,
+              );
               if (mounted) {
                 result.when(
                   success: (_) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Record deleted successfully')),
+                      const SnackBar(
+                        content: Text('Record deleted successfully'),
+                      ),
                     );
                     Navigator.pop(context);
                   },
                   failure: (f) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to delete record: ${f.message}')),
+                      SnackBar(
+                        content: Text('Failed to delete record: ${f.message}'),
+                      ),
                     );
                   },
                 );
@@ -189,9 +199,15 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
 
   void _showEditDialog() {
     final titleController = TextEditingController(text: _record.title);
-    final doctorController = TextEditingController(text: _record.doctorName ?? '');
-    final hospitalController = TextEditingController(text: _record.hospitalName ?? '');
-    final descController = TextEditingController(text: _record.description ?? '');
+    final doctorController = TextEditingController(
+      text: _record.doctorName ?? '',
+    );
+    final hospitalController = TextEditingController(
+      text: _record.hospitalName ?? '',
+    );
+    final descController = TextEditingController(
+      text: _record.description ?? '',
+    );
 
     showDialog(
       context: context,
@@ -214,13 +230,17 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: hospitalController,
-                decoration: const InputDecoration(labelText: 'Hospital / Clinic'),
+                decoration: const InputDecoration(
+                  labelText: 'Hospital / Clinic',
+                ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: descController,
                 maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Notes / Description'),
+                decoration: const InputDecoration(
+                  labelText: 'Notes / Description',
+                ),
               ),
             ],
           ),
@@ -299,7 +319,10 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF2C4E4E)),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Color(0xFF2C4E4E),
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           const Text(
@@ -312,7 +335,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Color(0xFF2C4E4E)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
             onSelected: (value) {
               if (value == 'edit') {
                 _showEditDialog();
@@ -325,7 +350,11 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit_outlined, size: 20, color: Color(0xFF2C4E4E)),
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 20,
+                      color: Color(0xFF2C4E4E),
+                    ),
                     SizedBox(width: 10),
                     Text('Edit Metadata'),
                   ],
@@ -393,7 +422,10 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryTeal.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(6),
@@ -415,7 +447,11 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
           const Divider(height: 30),
           Row(
             children: [
-              const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.grey),
+              const Icon(
+                Icons.calendar_today_outlined,
+                size: 18,
+                color: Colors.grey,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Date: ${displayDate.isNotEmpty ? displayDate : _record.date}',
@@ -436,11 +472,16 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               ],
             ),
           ],
-          if (_record.hospitalName != null && _record.hospitalName!.isNotEmpty) ...[
+          if (_record.hospitalName != null &&
+              _record.hospitalName!.isNotEmpty) ...[
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.local_hospital_outlined, size: 18, color: Colors.grey),
+                const Icon(
+                  Icons.local_hospital_outlined,
+                  size: 18,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   'Hospital: ${_record.hospitalName}',
@@ -458,7 +499,8 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
     final fileName = _record.fileName ?? 'document';
     final mimeType = _record.mimeType ?? 'application/octet-stream';
     final sizeStr = _formatFileSize(_record.fileSize);
-    final hasStorage = _record.storagePath != null && _record.storagePath!.isNotEmpty;
+    final hasStorage =
+        _record.storagePath != null && _record.storagePath!.isNotEmpty;
 
     return Container(
       width: double.infinity,
@@ -495,7 +537,11 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.insert_drive_file_outlined, color: AppColors.primaryTeal, size: 30),
+                const Icon(
+                  Icons.insert_drive_file_outlined,
+                  color: AppColors.primaryTeal,
+                  size: 30,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -503,14 +549,20 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                     children: [
                       Text(
                         fileName,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '$mimeType • $sizeStr',
-                        style: const TextStyle(color: Colors.grey, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -524,22 +576,41 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
             height: 44,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: hasStorage ? const Color(0xFF004445) : Colors.grey,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: hasStorage
+                    ? const Color(0xFF004445)
+                    : Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              onPressed: hasStorage && !_isGeneratingUrl ? _fetchSignedUrl : null,
+              onPressed: hasStorage && !_isGeneratingUrl
+                  ? _fetchSignedUrl
+                  : null,
               icon: _isGeneratingUrl
                   ? const SizedBox(
                       width: 16,
                       height: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Icon(Icons.lock_open_rounded, color: Colors.white, size: 18),
+                  : const Icon(
+                      Icons.lock_open_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
               label: Text(
                 _isGeneratingUrl
                     ? 'Authorizing...'
-                    : (hasStorage ? 'Request Secure Signed URL' : 'No Remote File Available'),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    : (hasStorage
+                          ? 'Request Secure Signed URL'
+                          : 'No Remote File Available'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
               ),
             ),
           ),

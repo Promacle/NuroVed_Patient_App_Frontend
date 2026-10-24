@@ -27,7 +27,16 @@ void main() {
 
     test('accepts valid JPEG with 0xFF, 0xD8, 0xFF header', () {
       final jpegBytes = Uint8List.fromList([
-        0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46,
+        0xFF,
+        0xD8,
+        0xFF,
+        0xE0,
+        0x00,
+        0x10,
+        0x4A,
+        0x46,
+        0x49,
+        0x46,
       ]);
       final file = AppPlatformFile(
         name: 'prescription.jpg',
@@ -45,7 +54,16 @@ void main() {
 
     test('accepts valid PNG with standard 8-byte magic header', () {
       final pngBytes = Uint8List.fromList([
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00,
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+        0x0D,
+        0x0A,
+        0x1A,
+        0x0A,
+        0x00,
+        0x00,
       ]);
       final file = AppPlatformFile(
         name: 'xray.png',

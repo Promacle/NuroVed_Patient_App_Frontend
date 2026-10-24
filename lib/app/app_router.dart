@@ -218,16 +218,24 @@ class AppRouter {
         return _createAnimatedRoute(const AddMedicineScreen());
       case visitDetails:
         if (settings.arguments is Visit) {
-          return _createAnimatedRoute(VisitDetailsScreen(visit: settings.arguments as Visit));
+          return _createAnimatedRoute(
+            VisitDetailsScreen(visit: settings.arguments as Visit),
+          );
         } else if (settings.arguments is String) {
-          return _createAnimatedRoute(VisitDetailsScreen(visitId: settings.arguments as String));
+          return _createAnimatedRoute(
+            VisitDetailsScreen(visitId: settings.arguments as String),
+          );
         }
         return _createAnimatedRoute(const VisitDetailsScreen());
       case recordDetails:
         if (settings.arguments is MedicalRecord) {
-          return _createAnimatedRoute(RecordDetailsScreen(record: settings.arguments as MedicalRecord));
+          return _createAnimatedRoute(
+            RecordDetailsScreen(record: settings.arguments as MedicalRecord),
+          );
         } else if (settings.arguments is String) {
-          return _createAnimatedRoute(RecordDetailsScreen(recordId: settings.arguments as String));
+          return _createAnimatedRoute(
+            RecordDetailsScreen(recordId: settings.arguments as String),
+          );
         }
         return _createAnimatedRoute(const RecordDetailsScreen());
       case healthGoal:

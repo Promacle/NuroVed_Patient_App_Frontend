@@ -22,17 +22,19 @@ class EmergencyCardView extends StatelessWidget {
     final blood = data['blood']?.toString();
     final displayBlood =
         (blood != null && blood.isNotEmpty && blood != 'Not provided')
-            ? blood
-            : 'Not provided';
+        ? blood
+        : 'Not provided';
 
-    final allergies =
-        data['allergies'] is List ? (data['allergies'] as List) : [];
+    final allergies = data['allergies'] is List
+        ? (data['allergies'] as List)
+        : [];
     final displayAllergies = allergies
         .map((e) => e.toString())
         .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
         .join(', ');
-    final finalAllergies =
-        displayAllergies.isEmpty ? 'Not provided' : displayAllergies;
+    final finalAllergies = displayAllergies.isEmpty
+        ? 'Not provided'
+        : displayAllergies;
 
     final conditions = data['chronicConditions'] is List
         ? (data['chronicConditions'] as List)
@@ -41,8 +43,9 @@ class EmergencyCardView extends StatelessWidget {
         .map((e) => e.toString())
         .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
         .join(', ');
-    final finalConditions =
-        displayConditions.isEmpty ? 'Not provided' : displayConditions;
+    final finalConditions = displayConditions.isEmpty
+        ? 'Not provided'
+        : displayConditions;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -206,14 +209,16 @@ class EmergencyCardView extends StatelessWidget {
     final controller = ProfileController.instance;
     // Check for an explicit designated emergency contact
     final members = controller.familyMembersList;
-    final emergencyMember = members.where((m) => m.isEmergencyContact).firstOrNull;
+    final emergencyMember = members
+        .where((m) => m.isEmergencyContact)
+        .firstOrNull;
 
     final contactName = emergencyMember?.name ?? "Not assigned";
     final contactRelation = emergencyMember != null
         ? "${emergencyMember.relation} (Emergency Contact)"
         : "Emergency Contact";
-    final contactPhone = emergencyMember?.phone != null &&
-            emergencyMember!.phone!.isNotEmpty
+    final contactPhone =
+        emergencyMember?.phone != null && emergencyMember!.phone!.isNotEmpty
         ? emergencyMember.phone!
         : "Phone not provided";
 
@@ -233,11 +238,7 @@ class EmergencyCardView extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
-              child: Icon(
-                Icons.person,
-                size: 35,
-                color: Colors.grey.shade400,
-              ),
+              child: Icon(Icons.person, size: 35, color: Colors.grey.shade400),
             ),
           ),
           const SizedBox(width: 15),

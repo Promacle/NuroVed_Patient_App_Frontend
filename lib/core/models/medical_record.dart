@@ -19,7 +19,8 @@ class MedicalRecord {
   final String? fileName;
   final String? mimeType;
   final int? fileSize;
-  final String? fileUrl; // Cached short-lived signed URL (never a public URL or local path)
+  final String?
+  fileUrl; // Cached short-lived signed URL (never a public URL or local path)
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -120,7 +121,10 @@ class MedicalRecord {
     return MedicalRecord(
       id: map['id']?.toString() ?? UuidGenerator.v4(),
       userId: (map['user_id'] ?? map['userId'])?.toString() ?? '',
-      subjectId: (map['subject_id'] ?? map['subjectId'] ?? map['family_member_id'])?.toString() ?? '',
+      subjectId:
+          (map['subject_id'] ?? map['subjectId'] ?? map['family_member_id'])
+              ?.toString() ??
+          '',
       profileName:
           (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
       title: map['title']?.toString() ?? 'Untitled Record',

@@ -320,3 +320,57 @@ This guide provides test procedures for validating the authentication, session s
    - **Expected Result**: Displays notice: "Subscriptions are currently in preview mode. In-app checkout is disabled until store release."
 2. Tap **Continue to Premium** (`/purchase`).
    - **Expected Result**: Displays "In-App Purchases Unavailable in MVP". Fake "Pay", "Demo: Failed", and "Demo: Renew" buttons are completely removed. Provides a single button to return safely to the app.
+
+---
+
+## Test Suite 20: CI Pipeline & Automated Build Verification
+
+### TC-20.1: Full Automated Test Suite Execution
+1. Run the entire test suite locally:
+   ```bash
+   flutter test
+   ```
+   - **Expected Result**: All 168 tests across 21 test suites pass with a 100% pass rate. Zero failed tests.
+2. Run test suite with coverage collection:
+   ```bash
+   flutter test --coverage
+   ```
+   - **Expected Result**: Generates `coverage/lcov.info` without errors.
+
+### TC-20.2: Static Code Analysis Check
+1. Run Flutter analyzer:
+   ```bash
+   flutter analyze --no-fatal-infos
+   ```
+   - **Expected Result**: Exits with code 0. Zero errors, zero warnings.
+
+### TC-20.3: Debug APK & Web Build Compilation
+1. Build Web release bundle:
+   ```bash
+   flutter build web --release
+   ```
+   - **Expected Result**: Compiles cleanly into `build/web/` with zero missing symbols or web-incompatible imports.
+2. Build Android Debug APK:
+   ```bash
+   flutter build apk --debug
+   ```
+   - **Expected Result**: Assembles `build/app/outputs/flutter-apk/app-debug.apk` successfully.
+
+---
+
+## Test Suite 21: End-to-End Critical Journey
+
+### TC-21.1: Automated 8-Step Critical Journey Test
+Run the end-to-end critical journey test:
+```bash
+flutter test test/journeys/critical_journeys_test.dart
+```
+Verifies the complete sequential patient lifecycle:
+1. **Signup**: Step 1 validation, Step 2 full profile, terms acknowledgement requirement.
+2. **Login / Logout**: Clean credential checks, session storage, and restoration.
+3. **Add Family Member & Switch**: Stable UUID generation, subject selection, context switching.
+4. **Upload Medical Record**: Magic bytes validation, private bucket path hierarchy, signed URL generation, strict subject isolation.
+5. **Create Clinical Consultation**: Timezone-safe date parsing, canonical record link deduplication.
+6. **Add Medication Routine**: Self-entered vs verified prescription source attribution, exact dosage preservation, adherence progress calculation.
+7. **Unified Health Timeline**: Merges visits and records chronologically (newest first) without subject cross-contamination.
+8. **Logout & Route Guards**: Session cleanup, active profile reset, route guards redirecting unauthorized access to `/login`.

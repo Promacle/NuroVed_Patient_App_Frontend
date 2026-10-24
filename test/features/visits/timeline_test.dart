@@ -39,48 +39,66 @@ void main() {
   });
 
   group('Timeline Chronological Merging & Edge Dates', () {
-    test('merges visits and records into unified chronological order (newest first)', () async {
-      // Clear initial seed visits to test clean sequence
-      fakeVisitsRepo = FakeVisitsRepository(recordsRepository: fakeRecordsRepo);
-      VisitsController.resetForTesting(repository: fakeVisitsRepo, empty: true);
-      visitsCtrl = VisitsController.instance;
+    test(
+      'merges visits and records into unified chronological order (newest first)',
+      () async {
+        // Clear initial seed visits to test clean sequence
+        fakeVisitsRepo = FakeVisitsRepository(
+          recordsRepository: fakeRecordsRepo,
+        );
+        VisitsController.resetForTesting(
+          repository: fakeVisitsRepo,
+          empty: true,
+        );
+        visitsCtrl = VisitsController.instance;
 
-      // Event 1 (Oldest): Record on 2026-01-05
-      await recordsCtrl.uploadAndSaveRecord(
-        title: 'Initial Fasting Blood Sugar',
-        recordType: 'Lab',
-        date: '2026-01-05T08:00:00Z',
-        file: AppPlatformFile(name: 'fbs.pdf', size: pdfBytes.length, bytes: pdfBytes),
-      );
+        // Event 1 (Oldest): Record on 2026-01-05
+        await recordsCtrl.uploadAndSaveRecord(
+          title: 'Initial Fasting Blood Sugar',
+          recordType: 'Lab',
+          date: '2026-01-05T08:00:00Z',
+          file: AppPlatformFile(
+            name: 'fbs.pdf',
+            size: pdfBytes.length,
+            bytes: pdfBytes,
+          ),
+        );
 
-      // Event 2 (Middle): Visit on 2026-01-10
-      await visitsCtrl.addVisit({
-        'title': 'Consultation with Endocrinologist',
-        'subtitle': 'Quarterly checkup',
-        'date': '2026-01-10T11:00:00Z',
-      });
+        // Event 2 (Middle): Visit on 2026-01-10
+        await visitsCtrl.addVisit({
+          'title': 'Consultation with Endocrinologist',
+          'subtitle': 'Quarterly checkup',
+          'date': '2026-01-10T11:00:00Z',
+        });
 
-      // Event 3 (Newest): Record on 2026-01-20
-      await recordsCtrl.uploadAndSaveRecord(
-        title: 'HbA1c Follow-up Lab',
-        recordType: 'Lab',
-        date: '2026-01-20T09:30:00Z',
-        file: AppPlatformFile(name: 'hba1c.pdf', size: pdfBytes.length, bytes: pdfBytes),
-      );
+        // Event 3 (Newest): Record on 2026-01-20
+        await recordsCtrl.uploadAndSaveRecord(
+          title: 'HbA1c Follow-up Lab',
+          recordType: 'Lab',
+          date: '2026-01-20T09:30:00Z',
+          file: AppPlatformFile(
+            name: 'hba1c.pdf',
+            size: pdfBytes.length,
+            bytes: pdfBytes,
+          ),
+        );
 
-      final timeline = visitsCtrl.getTimelineItems(recordsController: recordsCtrl);
+        final timeline = visitsCtrl.getTimelineItems(
+          recordsController: recordsCtrl,
+        );
 
-      expect(timeline.length, 3);
-      // Newest first
-      expect(timeline[0].title, 'HbA1c Follow-up Lab');
-      expect(timeline[0].type, TimelineItemType.record);
+        expect(timeline.length, 3);
+        // Newest first
+        expect(timeline[0].title, 'HbA1c Follow-up Lab');
+        expect(timeline[0].type, TimelineItemType.record);
 
-      expect(timeline[1].title, 'Consultation with Endocrinologist');
-      expect(timeline[1].type, TimelineItemType.visit);
+        expect(timeline[1].title, 'Consultation with Endocrinologist');
+        expect(timeline[1].type, TimelineItemType.visit);
 
-      expect(timeline[2].title, 'Initial Fasting Blood Sugar');
-      expect(timeline[2].type, TimelineItemType.record);
-    });
+        expect(timeline[2].title, 'Initial Fasting Blood Sugar');
+        expect(timeline[2].type, TimelineItemType.record);
+      },
+    );
 
     test('handles leap day (2024-02-29) and month boundaries accurately', () {
       final leapDateStr = '2024-02-29T10:00:00Z';
@@ -107,45 +125,60 @@ void main() {
       expect(aprilDate.isAfter(marchDate), isTrue);
     });
 
-    test('handles timezone offsets accurately during chronological sorting', () async {
-      fakeVisitsRepo = FakeVisitsRepository(recordsRepository: fakeRecordsRepo);
-      VisitsController.resetForTesting(repository: fakeVisitsRepo, empty: true);
-      visitsCtrl = VisitsController.instance;
+    test(
+      'handles timezone offsets accurately during chronological sorting',
+      () async {
+        fakeVisitsRepo = FakeVisitsRepository(
+          recordsRepository: fakeRecordsRepo,
+        );
+        VisitsController.resetForTesting(
+          repository: fakeVisitsRepo,
+          empty: true,
+        );
+        visitsCtrl = VisitsController.instance;
 
-      // Event A: 2026-05-10 10:00:00 UTC
-      await visitsCtrl.addVisit({
-        'title': 'Event UTC Morning',
-        'date': '2026-05-10T10:00:00Z',
-      });
+        // Event A: 2026-05-10 10:00:00 UTC
+        await visitsCtrl.addVisit({
+          'title': 'Event UTC Morning',
+          'date': '2026-05-10T10:00:00Z',
+        });
 
-      // Event B: 2026-05-10 16:00:00 IST (+05:30) which is 10:30:00 UTC (later than Event A)
-      await visitsCtrl.addVisit({
-        'title': 'Event IST Afternoon',
-        'date': '2026-05-10T16:00:00+05:30',
-      });
+        // Event B: 2026-05-10 16:00:00 IST (+05:30) which is 10:30:00 UTC (later than Event A)
+        await visitsCtrl.addVisit({
+          'title': 'Event IST Afternoon',
+          'date': '2026-05-10T16:00:00+05:30',
+        });
 
-      final timeline = visitsCtrl.getTimelineItems(recordsController: recordsCtrl);
-      expect(timeline.length, 2);
+        final timeline = visitsCtrl.getTimelineItems(
+          recordsController: recordsCtrl,
+        );
+        expect(timeline.length, 2);
 
-      // Event B is 10:30 UTC, Event A is 10:00 UTC -> Event B is newer
-      expect(timeline[0].title, 'Event IST Afternoon');
-      expect(timeline[1].title, 'Event UTC Morning');
-    });
+        // Event B is 10:30 UTC, Event A is 10:00 UTC -> Event B is newer
+        expect(timeline[0].title, 'Event IST Afternoon');
+        expect(timeline[1].title, 'Event UTC Morning');
+      },
+    );
 
-    test('returns empty timeline when subject has no visits or records', () async {
-      await profileCtrl.addFamilyMember(
-        const FamilyMember(
-          id: 'member-baby-uuid',
-          name: 'Fresh Baby',
-          relation: 'Child',
-        ),
-      );
-      profileCtrl.switchSubjectByName('Fresh Baby');
-      await visitsCtrl.loadVisits();
-      await recordsCtrl.loadRecords();
+    test(
+      'returns empty timeline when subject has no visits or records',
+      () async {
+        await profileCtrl.addFamilyMember(
+          const FamilyMember(
+            id: 'member-baby-uuid',
+            name: 'Fresh Baby',
+            relation: 'Child',
+          ),
+        );
+        profileCtrl.switchSubjectByName('Fresh Baby');
+        await visitsCtrl.loadVisits();
+        await recordsCtrl.loadRecords();
 
-      final timeline = visitsCtrl.getTimelineItems(recordsController: recordsCtrl);
-      expect(timeline.isEmpty, isTrue);
-    });
+        final timeline = visitsCtrl.getTimelineItems(
+          recordsController: recordsCtrl,
+        );
+        expect(timeline.isEmpty, isTrue);
+      },
+    );
   });
 }

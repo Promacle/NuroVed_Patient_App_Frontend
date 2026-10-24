@@ -52,7 +52,9 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       "subtitle": _visitDescController.text,
       "icon": Icons.local_hospital_rounded,
       "relatedRecord": _selectedRecordTitle,
-      "relatedRecordIds": _selectedRecordId != null ? [_selectedRecordId!] : <String>[],
+      "relatedRecordIds": _selectedRecordId != null
+          ? [_selectedRecordId!]
+          : <String>[],
     };
 
     VisitsController().addVisit(newVisit);
@@ -133,7 +135,8 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                           if (result != null) {
                             if (result is Map) {
                               setState(() {
-                                _selectedRecordTitle = result['title']?.toString() ?? '';
+                                _selectedRecordTitle =
+                                    result['title']?.toString() ?? '';
                                 _selectedRecordId = result['id']?.toString();
                               });
                             } else if (result is String) {

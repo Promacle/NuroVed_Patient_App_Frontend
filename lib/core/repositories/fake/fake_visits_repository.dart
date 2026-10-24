@@ -76,8 +76,11 @@ class FakeVisitsRepository implements VisitsRepository {
             relatedRecordIds: dedupedRelated,
           )
         : (visit.createdAt == null
-            ? visit.copyWith(createdAt: DateTime.now(), relatedRecordIds: dedupedRelated)
-            : visit.copyWith(relatedRecordIds: dedupedRelated));
+              ? visit.copyWith(
+                  createdAt: DateTime.now(),
+                  relatedRecordIds: dedupedRelated,
+                )
+              : visit.copyWith(relatedRecordIds: dedupedRelated));
 
     _visits.insert(0, created);
     return Result.success(created);
@@ -93,9 +96,7 @@ class FakeVisitsRepository implements VisitsRepository {
 
     final index = _visits.indexWhere((v) => v.id == visit.id);
     if (index == -1) {
-      return const Result.failure(
-        ServerFailure(message: 'Visit not found'),
-      );
+      return const Result.failure(ServerFailure(message: 'Visit not found'));
     }
 
     final dedupedRelated = visit.relatedRecordIds.toSet().toList();
@@ -131,7 +132,9 @@ class FakeVisitsRepository implements VisitsRepository {
       );
     }
 
-    final visit = _visits.where((v) => v.id == visitId && !v.isDeleted).firstOrNull;
+    final visit = _visits
+        .where((v) => v.id == visitId && !v.isDeleted)
+        .firstOrNull;
     if (visit == null) {
       return const Result.failure(
         ServerFailure(message: 'Visit not found or has been deleted'),

@@ -32,8 +32,9 @@ class AppBinding extends StatelessWidget {
     AppRouter.authRepository = effectiveAuthRepo;
 
     final effectiveProfileRepo = FakeProfileRepository();
-    final effectiveProfileController =
-        ProfileController(repository: effectiveProfileRepo);
+    final effectiveProfileController = ProfileController(
+      repository: effectiveProfileRepo,
+    );
 
     return MultiProvider(
       providers: [

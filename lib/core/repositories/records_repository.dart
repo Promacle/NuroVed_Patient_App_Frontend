@@ -2,12 +2,7 @@ import '../models/medical_record.dart';
 import '../utils/platform_file.dart';
 import '../utils/result.dart';
 
-enum RecordSortOrder {
-  newestFirst,
-  oldestFirst,
-  titleAsc,
-  titleDesc,
-}
+enum RecordSortOrder { newestFirst, oldestFirst, titleAsc, titleDesc }
 
 abstract class RecordsRepository {
   Future<Result<List<MedicalRecord>>> getRecords({
@@ -39,7 +34,10 @@ abstract class RecordsRepository {
   Future<Result<MedicalRecord>> updateRecord(MedicalRecord record);
 
   /// Generates a short-lived signed URL for file access after verifying caller authorization.
-  Future<Result<String>> getSignedUrl(String recordId, {Duration expiresIn = const Duration(minutes: 15)});
+  Future<Result<String>> getSignedUrl(
+    String recordId, {
+    Duration expiresIn = const Duration(minutes: 15),
+  });
 
   /// Soft deletes a medical record by ID.
   Future<Result<void>> deleteRecord(String recordId);

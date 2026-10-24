@@ -18,7 +18,8 @@ class Visit {
   final String? hospitalName;
   final String? notes;
   final DateTime? followUpDate;
-  final List<String> relatedRecordIds; // Canonical MedicalRecord IDs (never duplicates)
+  final List<String>
+  relatedRecordIds; // Canonical MedicalRecord IDs (never duplicates)
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -120,18 +121,25 @@ class Visit {
       parsedDate = DateTime.tryParse(map['date'].toString());
     }
 
-    final rawRelated = map['related_record_ids'] ?? map['relatedRecords'] ?? map['relatedRecordIds'];
+    final rawRelated =
+        map['related_record_ids'] ??
+        map['relatedRecords'] ??
+        map['relatedRecordIds'];
     List<String> relatedList = [];
     if (rawRelated is List) {
       relatedList = rawRelated.map((e) => e.toString()).toList();
-    } else if (map['relatedRecord'] != null && map['relatedRecord'].toString().isNotEmpty) {
+    } else if (map['relatedRecord'] != null &&
+        map['relatedRecord'].toString().isNotEmpty) {
       relatedList = [map['relatedRecord'].toString()];
     }
 
     return Visit(
       id: map['id']?.toString() ?? UuidGenerator.v4(),
       userId: (map['user_id'] ?? map['userId'])?.toString() ?? '',
-      subjectId: (map['subject_id'] ?? map['subjectId'] ?? map['family_member_id'])?.toString() ?? '',
+      subjectId:
+          (map['subject_id'] ?? map['subjectId'] ?? map['family_member_id'])
+              ?.toString() ??
+          '',
       profileName:
           (map['profile'] ?? map['profile_name'])?.toString() ?? 'Self',
       date: map['date']?.toString() ?? '',

@@ -344,20 +344,23 @@ class _EditFamilyMemberScreenState extends State<EditFamilyMemberScreen> {
       height: 52,
       child: ElevatedButton(
         onPressed: () {
-          _controller.updateFamilyMember(widget.memberData['id'] ?? widget.index, {
-            'name': _nameController.text,
-            'relation': _relationController.text,
-            'dob': _dobController.text,
-            'gender': _selectedGender,
-            'blood': _selectedBloodGroup,
-            'height': _heightController.text,
-            'weight': _weightController.text,
-            'imageFile': _selectedImage, // ADD THIS: Save the selected image
-            'allergies': _allergyControllers.map((c) => c.text).toList(),
-            'chronicConditions': _chronicControllers
-                .map((c) => c.text)
-                .toList(),
-          });
+          _controller.updateFamilyMember(
+            widget.memberData['id'] ?? widget.index,
+            {
+              'name': _nameController.text,
+              'relation': _relationController.text,
+              'dob': _dobController.text,
+              'gender': _selectedGender,
+              'blood': _selectedBloodGroup,
+              'height': _heightController.text,
+              'weight': _weightController.text,
+              'imageFile': _selectedImage, // ADD THIS: Save the selected image
+              'allergies': _allergyControllers.map((c) => c.text).toList(),
+              'chronicConditions': _chronicControllers
+                  .map((c) => c.text)
+                  .toList(),
+            },
+          );
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(

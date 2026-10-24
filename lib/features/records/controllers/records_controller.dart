@@ -24,7 +24,7 @@ class RecordsController extends ChangeNotifier {
   RecordsRepository get repository => _repository;
 
   RecordsController._internal({RecordsRepository? repository})
-      : _repository = repository ?? FakeRecordsRepository() {
+    : _repository = repository ?? FakeRecordsRepository() {
     _attachProfileListener();
     loadRecords();
   }
@@ -87,15 +87,17 @@ class RecordsController extends ChangeNotifier {
     final activeId = _profileController.activeSubjectId;
     _currentSubjectId = activeId;
     _records.clear();
-    _records.addAll(_allRecords.where((r) {
-      if (r.isDeleted) return false;
-      if (r.subjectId == activeId) return true;
-      if (_profileController.isMainPatientActive &&
-          (r.profileName.toLowerCase() == 'self' || r.subjectId.isEmpty)) {
-        return true;
-      }
-      return false;
-    }));
+    _records.addAll(
+      _allRecords.where((r) {
+        if (r.isDeleted) return false;
+        if (r.subjectId == activeId) return true;
+        if (_profileController.isMainPatientActive &&
+            (r.profileName.toLowerCase() == 'self' || r.subjectId.isEmpty)) {
+          return true;
+        }
+        return false;
+      }),
+    );
     notifyListeners();
   }
 
@@ -234,7 +236,9 @@ class RecordsController extends ChangeNotifier {
       profileName: _profileController.activeProfileName,
       title: title.trim().isEmpty ? 'Untitled Record' : title.trim(),
       recordType: recordType.trim().isEmpty ? 'Other' : recordType.trim(),
-      date: date.isNotEmpty ? date : DateTime.now().toIso8601String().split('T')[0],
+      date: date.isNotEmpty
+          ? date
+          : DateTime.now().toIso8601String().split('T')[0],
       doctorName: doctorName?.trim(),
       hospitalName: hospitalName?.trim(),
       description: description?.trim(),
@@ -252,7 +256,8 @@ class RecordsController extends ChangeNotifier {
       // Clean up orphaned storage object on partial failure
       await _repository.deleteStorageFile(storagePath);
       _isUploading = false;
-      _uploadError = saveResult.failureOrNull?.message ?? 'Failed to save record metadata';
+      _uploadError =
+          saveResult.failureOrNull?.message ?? 'Failed to save record metadata';
       notifyListeners();
       return Result.failure(saveResult.failureOrNull!);
     }
@@ -291,7 +296,8 @@ class RecordsController extends ChangeNotifier {
   }
 
   /// Alias for softDeleteRecord
-  Future<Result<void>> deleteRecordById(String recordId) => softDeleteRecord(recordId);
+  Future<Result<void>> deleteRecordById(String recordId) =>
+      softDeleteRecord(recordId);
 
   /// Updates an existing medical record's metadata
   Future<Result<MedicalRecord>> updateRecord(MedicalRecord record) async {
@@ -329,4 +335,3 @@ class RecordsController extends ChangeNotifier {
     super.dispose();
   }
 }
-

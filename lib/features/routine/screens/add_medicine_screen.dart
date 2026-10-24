@@ -507,7 +507,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   }
 
   Future<void> _onSaveReminderPressed() async {
-    if (_selectedProfileName.isEmpty || _medicineNameController.text.trim().isEmpty) {
+    if (_selectedProfileName.isEmpty ||
+        _medicineNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please select profile and enter medicine name"),
@@ -540,7 +541,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     final scheduleResult = await _controller.scheduler.scheduleReminder(
       id: reminderId,
       title: "Medication Reminder: $medName",
-      body: "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}".trim(),
+      body:
+          "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}"
+              .trim(),
       scheduledTime: _selectedTime,
       exact: true,
     );
@@ -550,7 +553,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              scheduleResult.failureOrNull?.message ?? "Failed to schedule notification reminder",
+              scheduleResult.failureOrNull?.message ??
+                  "Failed to schedule notification reminder",
             ),
             backgroundColor: const Color(0xFFE11D48),
           ),
@@ -563,7 +567,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     _controller.addMedicine({
       "id": reminderId,
       "name": medName,
-      "instruction": "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}".trim(),
+      "instruction":
+          "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}"
+              .trim(),
       "dosage": "1 tablet",
       "time": timeStr,
       "source": RoutineSource.selfEntered.name,
@@ -574,7 +580,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Medication reminder scheduled and saved successfully!"),
+          content: Text(
+            "Medication reminder scheduled and saved successfully!",
+          ),
           backgroundColor: AppColors.primaryTeal,
         ),
       );
@@ -591,7 +599,10 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           children: [
             Icon(Icons.notifications_off_outlined, color: Color(0xFFE11D48)),
             SizedBox(width: 10),
-            Text('Permission Denied', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Permission Denied',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         content: const Text(
@@ -606,10 +617,15 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryTeal,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Understood', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Understood',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

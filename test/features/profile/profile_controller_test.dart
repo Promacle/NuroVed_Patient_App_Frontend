@@ -127,23 +127,29 @@ void main() {
       expect(controller.profile.allergies, equals(beforeAllergies));
     });
 
-    test('addChronicCondition and removeChronicCondition with rollback on failure', () async {
-      final controller = ProfileController.instance;
-      expect(controller.profile.chronicConditions, ['Type 2 Diabetes']);
+    test(
+      'addChronicCondition and removeChronicCondition with rollback on failure',
+      () async {
+        final controller = ProfileController.instance;
+        expect(controller.profile.chronicConditions, ['Type 2 Diabetes']);
 
-      // Add condition
-      await controller.addChronicCondition('Hypertension');
-      expect(controller.profile.chronicConditions, contains('Hypertension'));
+        // Add condition
+        await controller.addChronicCondition('Hypertension');
+        expect(controller.profile.chronicConditions, contains('Hypertension'));
 
-      // Failure rollback
-      fakeRepo.shouldFail = true;
-      final beforeConditions =
-          List<String>.from(controller.profile.chronicConditions);
-      final failResult = await controller.removeChronicCondition('Hypertension');
+        // Failure rollback
+        fakeRepo.shouldFail = true;
+        final beforeConditions = List<String>.from(
+          controller.profile.chronicConditions,
+        );
+        final failResult = await controller.removeChronicCondition(
+          'Hypertension',
+        );
 
-      expect(failResult.isFailure, isTrue);
-      expect(controller.profile.chronicConditions, equals(beforeConditions));
-    });
+        expect(failResult.isFailure, isTrue);
+        expect(controller.profile.chronicConditions, equals(beforeConditions));
+      },
+    );
   });
 
   group('ProfileController - Photo Validation (Size & Extension)', () {
@@ -176,7 +182,8 @@ void main() {
       expect(result.isFailure, isTrue);
       result.when(
         success: (_) => fail('Should have failed'),
-        failure: (f) => expect(f.message, contains('format .pdf is not allowed')),
+        failure: (f) =>
+            expect(f.message, contains('format .pdf is not allowed')),
       );
     });
 
@@ -191,7 +198,10 @@ void main() {
       expect(result.isFailure, isTrue);
       result.when(
         success: (_) => fail('Should have failed'),
-        failure: (f) => expect(f.message, contains('exceeds maximum allowed limit of 10.0MB')),
+        failure: (f) => expect(
+          f.message,
+          contains('exceeds maximum allowed limit of 10.0MB'),
+        ),
       );
     });
   });

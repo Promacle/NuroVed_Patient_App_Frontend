@@ -3,10 +3,7 @@ import '../utils/uuid_generator.dart';
 
 /// Indicates whether a medication routine was entered directly by the patient
 /// or was verified through an authorized clinical prescription.
-enum RoutineSource {
-  selfEntered,
-  verifiedPrescription,
-}
+enum RoutineSource { selfEntered, verifiedPrescription }
 
 /// Strongly-typed immutable domain model for medication schedule and routines.
 @immutable

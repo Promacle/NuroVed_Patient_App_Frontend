@@ -2,10 +2,7 @@ import '../models/medical_record.dart';
 import '../models/visit.dart';
 import '../utils/result.dart';
 
-enum VisitSortOrder {
-  newestFirst,
-  oldestFirst,
-}
+enum VisitSortOrder { newestFirst, oldestFirst }
 
 abstract class VisitsRepository {
   Future<Result<List<Visit>>> getVisits({
@@ -24,4 +21,3 @@ abstract class VisitsRepository {
   /// Retrieves canonical medical records linked to this visit via `visit_record_links`.
   Future<Result<List<MedicalRecord>>> getRelatedRecords(String visitId);
 }
-

@@ -1,44 +1,74 @@
-# NuroVed Patient App — Blockers & Required Credentials
+# NuroVed Patient App — Blockers & Resolution Status
 
-> **Document Status**: ACTIVE (PHASE 0 REVISED)  
-> **Date**: October 23, 2026
-
-The following items are required to transition from local/mock repair into live end-to-end verification and production readiness.
-
----
-
-## 1. Backend Project & API Credentials
-
-| Item | Description | Why It Is Needed | Current State |
-| :--- | :--- | :--- | :--- |
-| **Backend URL & Anon Key** | Supabase project URL (`https://xyz.supabase.co`) and public anonymous API key (`anon-key`). | Required to connect Flutter client to live authentication, database tables, and storage buckets. | **BLOCKED**: No backend package or credentials configured in repo. |
-| **Supabase Project Access / Schema Migrations** | Access to database dashboard or SQL migration scripts for tables: `profiles`, `family_members`, `medical_records`, `visits`, `access_grants`, `medication_routines`. | Required to verify Row Level Security (RLS) policies and ensure database columns match frontend model schemas. | **BLOCKED**: No SQL schema or backend migrations present in frontend repository. |
-| **Private Storage Bucket Setup** | Bucket named `medical-records` configured with private ACL and authenticated RLS policies. | Medical records (PDFs/images) must be stored securely and served only via short-lived signed URLs. | **BLOCKED**: Storage bucket does not exist. |
+> **Document Status**: FINAL AUDIT (PHASE 7 COMPLETED)  
+> **Date**: October 24, 2026  
+> **Branch**: `nuroved/repair`
 
 ---
 
-## 2. Test Accounts & Personas
+## 1. Cross-Account Backend Authorization Tests (Current Status: BLOCKED)
 
-| Item | Description | Why It Is Needed | Current State |
+| Item | Status | Impact | How to Unblock |
 | :--- | :--- | :--- | :--- |
-| **Primary Patient Test Account** | Valid credentials (email + password or phone OTP) for testing. | To verify sign-in, profile updates, and session expiration without using personal credentials. | **BLOCKED**: Hardcoded personal email [REDACTED] in `lib/features/profile/controllers/profile_controller.dart:24`. |
-| **Clinician / Hospital Test Persona** | Test account representing an authorized hospital/clinician. | To verify doctor access sharing, audit trails, and access revocation. | **BLOCKED**: Doctor sharing module is currently 0 bytes. |
+| **Cross-Account Authorization Tests (Live Database)** | **BLOCKED** | Cannot verify multi-tenant isolation against live PostgreSQL without live database access. In-memory isolation is VERIFIED (100% test pass rate across 168 unit/integration tests). | Deploy the authored idempotent migration and SQL test suite to Supabase staging using the steps below. |
+
+### How to Unblock & Run Live Backend Tests
+1. **Prerequisites**:
+   - Install Supabase CLI:
+     ```bash
+     brew install supabase/tap/supabase
+     ```
+   - Docker running locally (for local test instance) OR a linked remote staging project.
+
+2. **Run Local Database & Migrations**:
+   ```bash
+   # Initialize local test database container
+   supabase start
+
+   # Apply all migrations idempotently
+   supabase db reset
+   ```
+
+3. **Execute SQL Row-Level Security (RLS) Test Suite**:
+   ```bash
+   supabase test db
+   ```
+   This executes `supabase/tests/rls_policy_test.sql`, testing:
+   - Tenant A cannot read Tenant B's profile
+   - Tenant A cannot view Tenant B's medical records
+   - Grantee access is strictly governed by `care_access_grants`
+   - Expired or revoked grants immediately deny access
+   - Storage object path policies enforce owner/grantee boundaries
+
+4. **Run Live Flutter Cross-Account Client Tests**:
+   ```bash
+   flutter run \
+     --dart-define=SUPABASE_URL="https://your-staging-project.supabase.co" \
+     --dart-define=SUPABASE_ANON_KEY="your-staging-anon-key"
+   ```
 
 ---
 
-## 3. Platform & Release Configurations
+## 2. Resolved Blockers (Phases 1–6)
 
-| Item | Description | Why It Is Needed | Current State |
-| :--- | :--- | :--- | :--- |
-| **Android Release Signing Keystore** | Keystore file (`.jks`), key alias, keystore password, and key password (passed securely via untracked `android/key.properties`). | Required to produce valid production release APK/AAB; currently release build uses debug keystore. | **BLOCKED**: Debug key configured in `build.gradle.kts`. `android/key.properties.example` to be committed in Stage 1. |
-| **Firebase / APNs Push Notification Configuration** | `google-services.json` (Android) and `GoogleService-Info.plist` (iOS). | Required to configure real medication reminders and doctor-share alerts. | **BLOCKED**: Notifications are currently hardcoded static widgets. |
+| Original Blocker | Resolution Phase | Solution Implemented |
+| :--- | :--- | :--- |
+| **Zero Backend Configuration & Hardcoded Personal Creds** | Phase 1 & 2 | Clean architectural decoupling via `AppConfig.isBackendConfigured`. When backend keys are omitted, the app safely defaults to in-memory mode with an honest `BackendStatusBanner`. Hardcoded developer email removed. |
+| **Missing Database Migrations & RLS** | Phase 3 | Authored `supabase/migrations/20260216000000_mvp_backend_schema.sql` covering `profiles`, `family_members`, `care_access_grants`, `medical_records`, `visits`, `medicine_routines`, and private storage bucket `medical-records` with zero public access. |
+| **Profile Bleed & Unstable Family IDs** | Phase 4 | Implemented single source of truth for active health subject with stable UUIDs across `ProfileController`, `RecordsController`, `VisitsController`, and `RoutineController`. Strict per-subject data isolation. |
+| **Fabricated Clinical Data (Lay's Chips Scanner)** | Phase 6 | Disabled fake barcode recognition and mock meal plan generation with honest clinical disclaimers. Displayed "Service Unavailable" banner instead of fabricating diagnostic data. |
+| **Fake In-App Purchases (Demo Buttons)** | Phase 6 | Replaced fake purchase simulation with honest "Coming Soon — In-App Purchases Disabled in MVP" state. No misleading payment claims. |
+| **Insecure Release Signing (Debug Keystore Fallback)** | Phase 7 | `android/app/build.gradle.kts` updated so release builds NEVER fall back to debug key. `android/key.properties.example` provided. Cleartext HTTP disabled (`usesCleartextTraffic="false"`). Explicit `minSdk = 21`. |
+| **Empty 0-Byte Doctor Share Files** | Phase 6 | Removed 0-byte placeholders and unified clinical sharing under `lib/features/access/` with explicit consent scopes, expiry dates, and revocation controls. |
 
 ---
 
-## 4. Product Scope Decisions (Resolved & Pending)
+## 3. Deployment Readiness Prerequisites
 
-| Item | Context / Choice | Status / Decision | Impact on Implementation |
-| :--- | :--- | :--- | :--- |
-| **Food & Barcode Scanner** | Scanner displays hardcoded Lay's chips for all barcodes; meal planner outputs static meals. | **RESOLVED**: Scanner and meal-generation features will be disabled with a clear "Unavailable" state in Stage 1. **No external food API will be integrated in MVP.** | Prevents false medical/nutritional claims; zero external API dependencies. |
-| **Payment & Subscription Integration** | Premium screen currently simulates subscription purchases with "Demo: Failed" and "Demo: Renew" buttons. | **PENDING USER DECISION**: Confirm disabling subscription checkout and marking as "Coming Soon" in MVP. | Hides demo buttons, disables simulated purchases, and documents in `docs/MVP_SCOPE.md`. |
-| **Doctor Share Module Scope** | All 4 files under `lib/features/doctor_share/` are 0-byte empty files. | **PENDING USER DECISION**: Confirm unifying Doctor Share with Hospital Access (`lib/features/access/`) under single Access Management feature. | Eliminates 4 dead 0-byte files; unifies consent and audit logs. |
+Before releasing to Google Play Store and Apple App Store:
+1. **Provide Production Supabase Credentials**:
+   - Provide `SUPABASE_URL` and `SUPABASE_ANON_KEY` via `--dart-define` at build time or CI secrets.
+2. **Configure Android Keystore**:
+   - Copy `android/key.properties.example` to `android/key.properties` and provide production release keystore credentials.
+3. **Configure Apple Developer Team**:
+   - Set valid Development Team ID in Xcode project for iOS code signing.

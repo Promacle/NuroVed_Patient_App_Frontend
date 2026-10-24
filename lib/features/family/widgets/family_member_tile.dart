@@ -69,8 +69,10 @@ class FamilyMemberTile extends StatelessWidget {
                 if (isActive)
                   Container(
                     margin: const EdgeInsets.only(top: 4),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primaryTeal,
                       borderRadius: BorderRadius.circular(8),
@@ -127,12 +129,9 @@ class FamilyMemberTile extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
-        child: avatarImage ??
-            const Icon(
-              Icons.person,
-              color: Color(0xFF7CB9A8),
-              size: 30,
-            ),
+        child:
+            avatarImage ??
+            const Icon(Icons.person, color: Color(0xFF7CB9A8), size: 30),
       ),
     );
   }

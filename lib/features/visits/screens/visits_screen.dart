@@ -52,11 +52,18 @@ class _VisitsScreenState extends State<VisitsScreen> {
                           alignment: Alignment.center,
                           child: Column(
                             children: [
-                              Icon(Icons.event_note_outlined, size: 50, color: Colors.grey[400]),
+                              Icon(
+                                Icons.event_note_outlined,
+                                size: 50,
+                                color: Colors.grey[400],
+                              ),
                               const SizedBox(height: 12),
                               const Text(
                                 "No visits recorded for this profile yet",
-                                style: TextStyle(color: Colors.grey, fontSize: 14),
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
                               ),
                             ],
                           ),
@@ -83,7 +90,8 @@ class _VisitsScreenState extends State<VisitsScreen> {
                             subtitle: visit['subtitle'],
                             icon: visit['icon'],
                             isFirst: index == 0,
-                            isLast: index == _controller.filteredVisits.length - 1,
+                            isLast:
+                                index == _controller.filteredVisits.length - 1,
                             onTap: () {
                               Navigator.pushNamed(
                                 context,

@@ -32,35 +32,36 @@ void main() {
     RecordsController.resetForTesting(repository: fakeRecordsRepo);
     recordsController = RecordsController.instance;
 
-    fakeVisitsRepo = FakeVisitsRepository(
-      recordsRepository: fakeRecordsRepo,
-    );
+    fakeVisitsRepo = FakeVisitsRepository(recordsRepository: fakeRecordsRepo);
     VisitsController.resetForTesting(repository: fakeVisitsRepo);
     controller = VisitsController.instance;
   });
 
   group('VisitsController CRUD & Canonical Linking', () {
-    test('creates visit with timezone-safe date and persists properly', () async {
-      final result = await controller.addVisit({
-        'title': 'Consultation with Dr. Sharma',
-        'subtitle': 'Quarterly diabetic neuropathy review',
-        'doctor': 'Dr. Sharma',
-        'specialty': 'Neurologist',
-        'hospital': 'Max Healthcare',
-        'date': '2026-02-15T14:30:00+05:30',
-        'notes': 'Vibration perception threshold normal in lower limbs.',
-      });
+    test(
+      'creates visit with timezone-safe date and persists properly',
+      () async {
+        final result = await controller.addVisit({
+          'title': 'Consultation with Dr. Sharma',
+          'subtitle': 'Quarterly diabetic neuropathy review',
+          'doctor': 'Dr. Sharma',
+          'specialty': 'Neurologist',
+          'hospital': 'Max Healthcare',
+          'date': '2026-02-15T14:30:00+05:30',
+          'notes': 'Vibration perception threshold normal in lower limbs.',
+        });
 
-      expect(result.isSuccess, isTrue);
-      final created = result.dataOrNull!;
-      expect(created.title, 'Consultation with Dr. Sharma');
-      expect(created.doctorName, 'Dr. Sharma');
-      expect(created.safeVisitDate.year, 2026);
-      expect(created.safeVisitDate.month, 2);
-      expect(created.safeVisitDate.day, 15);
+        expect(result.isSuccess, isTrue);
+        final created = result.dataOrNull!;
+        expect(created.title, 'Consultation with Dr. Sharma');
+        expect(created.doctorName, 'Dr. Sharma');
+        expect(created.safeVisitDate.year, 2026);
+        expect(created.safeVisitDate.month, 2);
+        expect(created.safeVisitDate.day, 15);
 
-      expect(controller.visits.any((v) => v.id == created.id), isTrue);
-    });
+        expect(controller.visits.any((v) => v.id == created.id), isTrue);
+      },
+    );
 
     test('deduplicates canonical related record IDs upon linking', () async {
       // 1. Upload a canonical record
@@ -118,24 +119,29 @@ void main() {
       expect(fetched.notes, 'Updated clinical observations');
     });
 
-    test('soft delete sets deletedAt and removes visit from active list', () async {
-      final addRes = await controller.addVisit({
-        'title': 'Visit to Delete',
-        'subtitle': 'Will be deleted',
-        'date': '2026-01-10',
-      });
-      final visit = addRes.dataOrNull!;
-      expect(controller.visits.any((v) => v.id == visit.id), isTrue);
+    test(
+      'soft delete sets deletedAt and removes visit from active list',
+      () async {
+        final addRes = await controller.addVisit({
+          'title': 'Visit to Delete',
+          'subtitle': 'Will be deleted',
+          'date': '2026-01-10',
+        });
+        final visit = addRes.dataOrNull!;
+        expect(controller.visits.any((v) => v.id == visit.id), isTrue);
 
-      final delRes = await controller.deleteVisit(visit.id);
-      expect(delRes.isSuccess, isTrue);
-      expect(controller.visits.any((v) => v.id == visit.id), isFalse);
+        final delRes = await controller.deleteVisit(visit.id);
+        expect(delRes.isSuccess, isTrue);
+        expect(controller.visits.any((v) => v.id == visit.id), isFalse);
 
-      // In repository internal visits, deletedAt is set
-      final inRepo = fakeVisitsRepo.internalVisits.firstWhere((v) => v.id == visit.id);
-      expect(inRepo.isDeleted, isTrue);
-      expect(inRepo.deletedAt, isNotNull);
-    });
+        // In repository internal visits, deletedAt is set
+        final inRepo = fakeVisitsRepo.internalVisits.firstWhere(
+          (v) => v.id == visit.id,
+        );
+        expect(inRepo.isDeleted, isTrue);
+        expect(inRepo.deletedAt, isNotNull);
+      },
+    );
   });
 
   group('VisitsController Subject Isolation', () {
@@ -147,7 +153,9 @@ void main() {
         'date': '2026-01-10',
       });
       expect(
-        controller.visits.any((v) => v.title == "Self's Endocrinologist Consultation"),
+        controller.visits.any(
+          (v) => v.title == "Self's Endocrinologist Consultation",
+        ),
         isTrue,
       );
 
@@ -164,7 +172,9 @@ void main() {
 
       // Subject B active: Self's visit must NOT appear
       expect(
-        controller.visits.any((v) => v.title == "Self's Endocrinologist Consultation"),
+        controller.visits.any(
+          (v) => v.title == "Self's Endocrinologist Consultation",
+        ),
         isFalse,
       );
 
@@ -175,7 +185,9 @@ void main() {
         'date': '2026-01-15',
       });
       expect(
-        controller.visits.any((v) => v.title == "Aunt May's Ophthalmologist Exam"),
+        controller.visits.any(
+          (v) => v.title == "Aunt May's Ophthalmologist Exam",
+        ),
         isTrue,
       );
 
@@ -184,11 +196,15 @@ void main() {
       await controller.loadVisits();
 
       expect(
-        controller.visits.any((v) => v.title == "Self's Endocrinologist Consultation"),
+        controller.visits.any(
+          (v) => v.title == "Self's Endocrinologist Consultation",
+        ),
         isTrue,
       );
       expect(
-        controller.visits.any((v) => v.title == "Aunt May's Ophthalmologist Exam"),
+        controller.visits.any(
+          (v) => v.title == "Aunt May's Ophthalmologist Exam",
+        ),
         isFalse,
       );
     });

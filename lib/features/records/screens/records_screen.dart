@@ -66,11 +66,20 @@ class _RecordsScreenState extends State<RecordsScreen> {
                     children: [
                       const Text(
                         "Previous Records",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       PopupMenuButton<RecordSortOrder>(
-                        icon: const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2C4E4E)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        icon: const Icon(
+                          Icons.sort_rounded,
+                          size: 20,
+                          color: Color(0xFF2C4E4E),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         onSelected: (order) {
                           _controller.setSortOrder(order);
                           setState(() {});
@@ -192,7 +201,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[700],
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             onPressed: () {
               Navigator.pop(dialogCtx);
@@ -214,7 +225,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
         id: recordId ?? '',
         profileName: record is Map ? (record['profile'] ?? '') : '',
         title: record is Map ? (record['title'] ?? 'Record') : 'Record',
-        recordType: record is Map ? (record['type'] ?? 'Medical Record') : 'Medical Record',
+        recordType: record is Map
+            ? (record['type'] ?? 'Medical Record')
+            : 'Medical Record',
         date: record is Map ? (record['date'] ?? '') : '',
       ),
     );

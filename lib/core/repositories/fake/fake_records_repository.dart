@@ -9,7 +9,7 @@ import '../records_repository.dart';
 class FakeRecordsRepository implements RecordsRepository {
   final List<MedicalRecord> _records = [];
   final Map<String, List<int>> _storageObjects = {}; // storagePath -> bytes
-  
+
   bool shouldFail = false;
   bool shouldFailUpload = false;
   bool shouldFailSaveMetadata = false;
@@ -27,7 +27,8 @@ class FakeRecordsRepository implements RecordsRepository {
   }
 
   List<MedicalRecord> get internalRecords => List.unmodifiable(_records);
-  Map<String, List<int>> get internalStorage => Map.unmodifiable(_storageObjects);
+  Map<String, List<int>> get internalStorage =>
+      Map.unmodifiable(_storageObjects);
 
   @override
   Future<Result<String>> uploadFile({
@@ -137,10 +138,14 @@ class FakeRecordsRepository implements RecordsRepository {
         });
         break;
       case RecordSortOrder.titleAsc:
-        list.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+        list.sort(
+          (a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()),
+        );
         break;
       case RecordSortOrder.titleDesc:
-        list.sort((a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()));
+        list.sort(
+          (a, b) => b.title.toLowerCase().compareTo(a.title.toLowerCase()),
+        );
         break;
     }
 
@@ -156,7 +161,9 @@ class FakeRecordsRepository implements RecordsRepository {
     }
     final created = record.id.isEmpty
         ? record.copyWith(id: UuidGenerator.v4(), createdAt: DateTime.now())
-        : (record.createdAt == null ? record.copyWith(createdAt: DateTime.now()) : record);
+        : (record.createdAt == null
+              ? record.copyWith(createdAt: DateTime.now())
+              : record);
     _records.insert(0, created);
     return Result.success(created);
   }
@@ -180,13 +187,21 @@ class FakeRecordsRepository implements RecordsRepository {
   }
 
   @override
-  Future<Result<String>> getSignedUrl(String recordId, {Duration expiresIn = const Duration(minutes: 15)}) async {
+  Future<Result<String>> getSignedUrl(
+    String recordId, {
+    Duration expiresIn = const Duration(minutes: 15),
+  }) async {
     if (shouldFail) {
       return const Result.failure(
         ServerFailure(message: 'Failed to generate signed URL'),
       );
     }
-    final record = _records.where((r) => (r.id == recordId || r.storagePath == recordId) && !r.isDeleted).firstOrNull;
+    final record = _records
+        .where(
+          (r) =>
+              (r.id == recordId || r.storagePath == recordId) && !r.isDeleted,
+        )
+        .firstOrNull;
     if (record == null) {
       return const Result.failure(
         ServerFailure(message: 'Medical record not found or has been deleted'),
@@ -199,7 +214,8 @@ class FakeRecordsRepository implements RecordsRepository {
     }
 
     // In a live environment, this calls authorize_medical_file_access RPC then creates signed URL
-    final signedUrl = 'https://fake.supabase.co/storage/v1/object/sign/medical-records/${record.storagePath}?token=fake_signed_${UuidGenerator.v4().substring(0, 8)}&expires=${expiresIn.inSeconds}';
+    final signedUrl =
+        'https://fake.supabase.co/storage/v1/object/sign/medical-records/${record.storagePath}?token=fake_signed_${UuidGenerator.v4().substring(0, 8)}&expires=${expiresIn.inSeconds}';
     return Result.success(signedUrl);
   }
 

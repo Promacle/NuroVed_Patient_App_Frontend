@@ -34,7 +34,8 @@ class ProfileController extends ChangeNotifier {
   }) {
     _instance.dispose();
     _instance = ProfileController._internal(
-      repository: repository ??
+      repository:
+          repository ??
           FakeProfileRepository(
             initialProfile: initialProfile,
             initialFamily: initialFamily,
@@ -62,8 +63,8 @@ class ProfileController extends ChangeNotifier {
     ProfileRepository? repository,
     UserProfile? initialProfile,
     List<FamilyMember>? initialFamily,
-  })  : _repository = repository ?? FakeProfileRepository(),
-        _profile = initialProfile ?? UserProfile.empty() {
+  }) : _repository = repository ?? FakeProfileRepository(),
+       _profile = initialProfile ?? UserProfile.empty() {
     _activeSubjectId = _profile.id;
     if (initialFamily != null) {
       _familyMemberList.addAll(initialFamily);
@@ -332,8 +333,9 @@ class ProfileController extends ChangeNotifier {
     if (!_profile.chronicConditions.contains(condition)) {
       return Result.success(_profile);
     }
-    final updatedList =
-        _profile.chronicConditions.where((c) => c != condition).toList();
+    final updatedList = _profile.chronicConditions
+        .where((c) => c != condition)
+        .toList();
     return updateProfile(_profile.copyWith(chronicConditions: updatedList));
   }
 

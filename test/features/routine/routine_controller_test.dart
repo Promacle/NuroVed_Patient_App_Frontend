@@ -36,74 +36,89 @@ void main() {
       controller = RoutineController();
     });
 
-    test('initial primary user has default verified prescription routines and accurate progress', () {
-      expect(controller.medicines.length, 3);
-      // Default: 1 of 3 is completed
-      expect(controller.progress, closeTo(1 / 3, 0.001));
-      expect(controller.progressText, '1/3 Completed');
+    test(
+      'initial primary user has default verified prescription routines and accurate progress',
+      () {
+        expect(controller.medicines.length, 3);
+        // Default: 1 of 3 is completed
+        expect(controller.progress, closeTo(1 / 3, 0.001));
+        expect(controller.progressText, '1/3 Completed');
 
-      // Verify default sources are verifiedPrescription
-      for (final med in controller.medicines) {
-        expect(med['source'], RoutineSource.verifiedPrescription.name);
-        expect(med['source_display'], 'Verified Prescription');
-      }
-    });
+        // Verify default sources are verifiedPrescription
+        for (final med in controller.medicines) {
+          expect(med['source'], RoutineSource.verifiedPrescription.name);
+          expect(med['source_display'], 'Verified Prescription');
+        }
+      },
+    );
 
-    test('progress calculation handles 0 total items cleanly without NaN or division by zero', () {
-      controller.setSubject('subject-family-001');
-      expect(controller.medicines.isEmpty, isTrue);
-      expect(controller.progress, 0.0);
-      expect(controller.progressText, '0/0 Completed');
-    });
+    test(
+      'progress calculation handles 0 total items cleanly without NaN or division by zero',
+      () {
+        controller.setSubject('subject-family-001');
+        expect(controller.medicines.isEmpty, isTrue);
+        expect(controller.progress, 0.0);
+        expect(controller.progressText, '0/0 Completed');
+      },
+    );
 
-    test('toggleMedicine updates completion status and recalculates progress', () {
-      // Index 0 is initially false
-      expect(controller.medicines[0]['isCompleted'], isFalse);
-      controller.toggleMedicine(0);
-      expect(controller.medicines[0]['isCompleted'], isTrue);
-      expect(controller.progress, closeTo(2 / 3, 0.001));
-      expect(controller.progressText, '2/3 Completed');
+    test(
+      'toggleMedicine updates completion status and recalculates progress',
+      () {
+        // Index 0 is initially false
+        expect(controller.medicines[0]['isCompleted'], isFalse);
+        controller.toggleMedicine(0);
+        expect(controller.medicines[0]['isCompleted'], isTrue);
+        expect(controller.progress, closeTo(2 / 3, 0.001));
+        expect(controller.progressText, '2/3 Completed');
 
-      // Toggle index 1 to true -> 3/3
-      controller.toggleMedicine(1);
-      expect(controller.progress, 1.0);
-      expect(controller.progressText, '3/3 Completed');
+        // Toggle index 1 to true -> 3/3
+        controller.toggleMedicine(1);
+        expect(controller.progress, 1.0);
+        expect(controller.progressText, '3/3 Completed');
 
-      // Toggle back
-      controller.toggleMedicine(0);
-      expect(controller.progress, closeTo(2 / 3, 0.001));
-    });
+        // Toggle back
+        controller.toggleMedicine(0);
+        expect(controller.progress, closeTo(2 / 3, 0.001));
+      },
+    );
 
-    test('addMedicine tags user-entered routines as selfEntered and preserves exact dosage', () {
-      controller.addMedicine({
-        'name': 'Glimepiride 2mg',
-        'dosage': '2mg',
-        'instruction': '1 tablet before breakfast',
-        'time': '07:30',
-      });
+    test(
+      'addMedicine tags user-entered routines as selfEntered and preserves exact dosage',
+      () {
+        controller.addMedicine({
+          'name': 'Glimepiride 2mg',
+          'dosage': '2mg',
+          'instruction': '1 tablet before breakfast',
+          'time': '07:30',
+        });
 
-      expect(controller.medicines.length, 4);
-      final added = controller.medicines.last;
-      expect(added['name'], 'Glimepiride 2mg');
-      expect(added['dosage'], '2mg');
-      expect(added['source'], RoutineSource.selfEntered.name);
-      expect(added['source_display'], 'Self-Entered');
-      expect(added['isCompleted'], isFalse);
-    });
+        expect(controller.medicines.length, 4);
+        final added = controller.medicines.last;
+        expect(added['name'], 'Glimepiride 2mg');
+        expect(added['dosage'], '2mg');
+        expect(added['source'], RoutineSource.selfEntered.name);
+        expect(added['source_display'], 'Self-Entered');
+        expect(added['isCompleted'], isFalse);
+      },
+    );
 
-    test('updateMedicine preserves subjectId and updates details without altering dose format', () {
-      controller.updateMedicine(0, {
-        'name': 'Atorvastatin 20mg',
-        'dosage': '20mg',
-        'instruction': '1 tablet at bedtime',
-      });
+    test(
+      'updateMedicine preserves subjectId and updates details without altering dose format',
+      () {
+        controller.updateMedicine(0, {
+          'name': 'Atorvastatin 20mg',
+          'dosage': '20mg',
+          'instruction': '1 tablet at bedtime',
+        });
 
-      final updated = controller.medicines[0];
-      expect(updated['name'], 'Atorvastatin 20mg');
-      expect(updated['dosage'], '20mg');
-      expect(updated['instruction'], '1 tablet at bedtime');
-      expect(updated['subjectId'], 'subject-patient-001');
-    });
+        final updated = controller.medicines[0];
+        expect(updated['name'], 'Atorvastatin 20mg');
+        expect(updated['dosage'], '20mg');
+        expect(updated['instruction'], '1 tablet at bedtime');
+        expect(updated['subjectId'], 'subject-patient-001');
+      },
+    );
 
     test('deleteMedicine removes routine by index and updates progress', () {
       // Initially 3 medicines, 1 completed (index 2)
@@ -140,7 +155,10 @@ void main() {
       // Switch back to primary patient
       ProfileController.instance.switchSubject('subject-patient-001');
       expect(controller.medicines.length, 3);
-      expect(controller.medicines.any((m) => m['name'] == 'Multivitamin'), isFalse);
+      expect(
+        controller.medicines.any((m) => m['name'] == 'Multivitamin'),
+        isFalse,
+      );
     });
   });
 }

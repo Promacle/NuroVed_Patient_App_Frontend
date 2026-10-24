@@ -31,7 +31,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _completePhoneNumber = "";
 
   Future<void> _pickImage() async {
-
     final ImagePicker picker = ImagePicker();
     try {
       final XFile? pickedFile = await picker.pickImage(
@@ -43,8 +42,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (pickedFile != null) {
         final platformFile = await AppPlatformFile.fromXFile(pickedFile);
-        final validationResult =
-            ProfileController.instance.validateProfilePhoto(platformFile);
+        final validationResult = ProfileController.instance
+            .validateProfilePhoto(platformFile);
 
         validationResult.when(
           success: (validFile) {
@@ -202,7 +201,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // This returns the Map back to the ProfileController/ProfileScreen
     Navigator.of(context).pop(updatedData);
   }
-
 
   @override
   Widget build(BuildContext context) {

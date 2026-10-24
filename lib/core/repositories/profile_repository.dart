@@ -37,4 +37,3 @@ abstract class ProfileRepository {
 
   Future<Result<void>> revokeCaregiver(String grantId);
 }
-

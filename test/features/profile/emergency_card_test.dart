@@ -16,15 +16,15 @@ void main() {
   Widget createWidgetUnderTest(Map<String, dynamic> data) {
     return MaterialApp(
       home: Scaffold(
-        body: SingleChildScrollView(
-          child: EmergencyCardView(data: data),
-        ),
+        body: SingleChildScrollView(child: EmergencyCardView(data: data)),
       ),
     );
   }
 
   group('EmergencyCardView - Empty State & No Hardcoded Defaults', () {
-    testWidgets('renders unverified badge and "Not provided" for empty data', (tester) async {
+    testWidgets('renders unverified badge and "Not provided" for empty data', (
+      tester,
+    ) async {
       ProfileController.resetForTesting(
         initialProfile: UserProfile.empty(),
         initialFamily: [],
@@ -43,7 +43,10 @@ void main() {
       expect(find.text('PATIENT-ENTERED, UNVERIFIED'), findsOneWidget);
 
       // 2. Verify "Not provided" appears for missing fields
-      expect(find.text('Not provided'), findsNWidgets(3)); // Blood, Allergies, Conditions
+      expect(
+        find.text('Not provided'),
+        findsNWidgets(3),
+      ); // Blood, Allergies, Conditions
 
       // 3. Verify hardcoded "B+" or "None" NEVER appears
       expect(find.text('B+'), findsNothing);
@@ -55,75 +58,81 @@ void main() {
   });
 
   group('EmergencyCardView - Partial State', () {
-    testWidgets('renders provided blood group and "Not provided" for absent allergies', (tester) async {
-      ProfileController.resetForTesting(
-        initialProfile: UserProfile.empty(),
-        initialFamily: [],
-      );
+    testWidgets(
+      'renders provided blood group and "Not provided" for absent allergies',
+      (tester) async {
+        ProfileController.resetForTesting(
+          initialProfile: UserProfile.empty(),
+          initialFamily: [],
+        );
 
-      final partialData = <String, dynamic>{
-        'blood': 'AB-',
-        'allergies': <String>[],
-        'chronicConditions': <String>['Asthma'],
-      };
+        final partialData = <String, dynamic>{
+          'blood': 'AB-',
+          'allergies': <String>[],
+          'chronicConditions': <String>['Asthma'],
+        };
 
-      await tester.pumpWidget(createWidgetUnderTest(partialData));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(createWidgetUnderTest(partialData));
+        await tester.pumpAndSettle();
 
-      expect(find.text('AB-'), findsOneWidget);
-      expect(find.text('Asthma'), findsOneWidget);
-      expect(find.text('Not provided'), findsOneWidget); // For allergies
-    });
+        expect(find.text('AB-'), findsOneWidget);
+        expect(find.text('Asthma'), findsOneWidget);
+        expect(find.text('Not provided'), findsOneWidget); // For allergies
+      },
+    );
   });
 
   group('EmergencyCardView - Full State with Emergency Contact', () {
-    testWidgets('renders complete clinical data and designated emergency contact', (tester) async {
-      const emergencyContact = FamilyMember(
-        id: 'contact-uuid-1',
-        name: 'Sarah Connor',
-        relation: 'Sister',
-        isEmergencyContact: true,
-        phone: '+919876500000',
-      );
+    testWidgets(
+      'renders complete clinical data and designated emergency contact',
+      (tester) async {
+        const emergencyContact = FamilyMember(
+          id: 'contact-uuid-1',
+          name: 'Sarah Connor',
+          relation: 'Sister',
+          isEmergencyContact: true,
+          phone: '+919876500000',
+        );
 
-      ProfileController.resetForTesting(
-        initialProfile: const UserProfile(
-          id: 'u1',
-          name: 'John Connor',
-          email: 'john@sky.net',
-          phone: '+919876511111',
-          dateOfBirth: '28/02/1985',
-          gender: 'male',
-          height: '180',
-          weight: '80',
-          bloodGroup: 'O-',
-          allergies: ['Peanuts', 'Sulfa'],
-          chronicConditions: ['Hypertension'],
-        ),
-        initialFamily: [emergencyContact],
-      );
+        ProfileController.resetForTesting(
+          initialProfile: const UserProfile(
+            id: 'u1',
+            name: 'John Connor',
+            email: 'john@sky.net',
+            phone: '+919876511111',
+            dateOfBirth: '28/02/1985',
+            gender: 'male',
+            height: '180',
+            weight: '80',
+            bloodGroup: 'O-',
+            allergies: ['Peanuts', 'Sulfa'],
+            chronicConditions: ['Hypertension'],
+          ),
+          initialFamily: [emergencyContact],
+        );
 
-      final fullData = <String, dynamic>{
-        'blood': 'O-',
-        'allergies': ['Peanuts', 'Sulfa'],
-        'chronicConditions': ['Hypertension'],
-      };
+        final fullData = <String, dynamic>{
+          'blood': 'O-',
+          'allergies': ['Peanuts', 'Sulfa'],
+          'chronicConditions': ['Hypertension'],
+        };
 
-      await tester.pumpWidget(createWidgetUnderTest(fullData));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(createWidgetUnderTest(fullData));
+        await tester.pumpAndSettle();
 
-      // Clinical info
-      expect(find.text('O-'), findsOneWidget);
-      expect(find.text('Peanuts, Sulfa'), findsOneWidget);
-      expect(find.text('Hypertension'), findsOneWidget);
+        // Clinical info
+        expect(find.text('O-'), findsOneWidget);
+        expect(find.text('Peanuts, Sulfa'), findsOneWidget);
+        expect(find.text('Hypertension'), findsOneWidget);
 
-      // Emergency Contact
-      expect(find.text('Sarah Connor'), findsOneWidget);
-      expect(find.text('Sister (Emergency Contact)'), findsOneWidget);
-      expect(find.text('+919876500000'), findsOneWidget);
+        // Emergency Contact
+        expect(find.text('Sarah Connor'), findsOneWidget);
+        expect(find.text('Sister (Emergency Contact)'), findsOneWidget);
+        expect(find.text('+919876500000'), findsOneWidget);
 
-      // Badge
-      expect(find.text('PATIENT-ENTERED, UNVERIFIED'), findsOneWidget);
-    });
+        // Badge
+        expect(find.text('PATIENT-ENTERED, UNVERIFIED'), findsOneWidget);
+      },
+    );
   });
 }

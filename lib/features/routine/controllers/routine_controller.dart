@@ -51,11 +51,13 @@ class RoutineController extends ChangeNotifier {
   String progressText = "0/0 Completed";
 
   List<Map<String, dynamic>> get medicines =>
-      _medicinesPerSubject[_currentSubjectId ?? _profileController.activeSubjectId] ??
+      _medicinesPerSubject[_currentSubjectId ??
+          _profileController.activeSubjectId] ??
       [];
 
   List<Map<String, dynamic>> get meals =>
-      _mealsPerSubject[_currentSubjectId ?? _profileController.activeSubjectId] ??
+      _mealsPerSubject[_currentSubjectId ??
+          _profileController.activeSubjectId] ??
       [];
 
   void _onProfileChanged() {
@@ -166,7 +168,8 @@ class RoutineController extends ChangeNotifier {
       map['id'] ??= UuidGenerator.v4();
       map['subjectId'] = subjectId;
       map['source'] ??= RoutineSource.selfEntered.name;
-      map['source_display'] ??= (map['source'] == RoutineSource.verifiedPrescription.name
+      map['source_display'] ??=
+          (map['source'] == RoutineSource.verifiedPrescription.name
           ? "Verified Prescription"
           : "Self-Entered");
       map['isCompleted'] ??= false;
@@ -192,11 +195,7 @@ class RoutineController extends ChangeNotifier {
     final list = _medicinesPerSubject[subjectId];
     if (list != null && index >= 0 && index < list.length) {
       final existing = list[index];
-      list[index] = {
-        ...existing,
-        ...updated,
-        'subjectId': subjectId,
-      };
+      list[index] = {...existing, ...updated, 'subjectId': subjectId};
       _recalculateProgress();
       notifyListeners();
     }

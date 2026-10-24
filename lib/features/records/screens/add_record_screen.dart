@@ -53,16 +53,16 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     }
 
     if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter a record title")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a record title")),
+      );
       return;
     }
 
     if (_pickedPlatformFile == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please attach a document or photo")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please attach a document or photo")),
+      );
       return;
     }
 
@@ -73,7 +73,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
 
     final result = await recordsCtrl.uploadAndSaveRecord(
       title: _titleController.text.trim(),
-      recordType: _selectedRecordType.isEmpty ? 'Medical Record' : _selectedRecordType,
+      recordType: _selectedRecordType.isEmpty
+          ? 'Medical Record'
+          : _selectedRecordType,
       date: _selectedDate.toIso8601String(),
       description: _descController.text.trim(),
       file: _pickedPlatformFile!,
@@ -96,10 +98,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       },
       failure: (f) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(f.message),
-            backgroundColor: Colors.red[700],
-          ),
+          SnackBar(content: Text(f.message), backgroundColor: Colors.red[700]),
         );
       },
     );
@@ -806,7 +805,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           return Column(
             children: [
               LinearProgressIndicator(
-                value: recordsCtrl.uploadProgress > 0 ? recordsCtrl.uploadProgress : null,
+                value: recordsCtrl.uploadProgress > 0
+                    ? recordsCtrl.uploadProgress
+                    : null,
                 backgroundColor: Colors.grey.shade200,
                 color: AppColors.primaryTeal,
                 minHeight: 8,
@@ -822,8 +823,15 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                   ),
                   TextButton.icon(
                     onPressed: () => recordsCtrl.cancelUpload(),
-                    icon: const Icon(Icons.cancel_outlined, size: 16, color: Colors.red),
-                    label: const Text('Cancel', style: TextStyle(color: Colors.red, fontSize: 13)),
+                    icon: const Icon(
+                      Icons.cancel_outlined,
+                      size: 16,
+                      color: Colors.red,
+                    ),
+                    label: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.red, fontSize: 13),
+                    ),
                   ),
                 ],
               ),

@@ -126,3 +126,36 @@ The test suite executes inside a `BEGIN ... ROLLBACK` transaction block, leaving
 - `Test Suite 3 Passed: Scope and revocation enforcement verified.`
 - `Test Suite 4 Passed: Storage authorization check verified.`
 - `Test Suite 5 Passed: Audit events immutability verified.`
+
+---
+
+## 5. Privacy Review & Local Data Safeguards (Phase 7)
+
+A comprehensive privacy review was conducted covering logs, file caches, background snapshots, clipboard access, and local persistence of sensitive data.
+
+### 5.1 Telemetry & Logging Sanitization
+- **Issue**: Standard debug statements or naive logging can leak personal health information (PHI) such as patient names, email addresses, phone numbers, auth tokens, or diagnostic measurements into device logs (`adb logcat`, Console.app).
+- **Control**: All logging is routed through `AppLogger` (`lib/core/utils/app_logger.dart`).
+- **Mitigation**:
+  - `_sanitizeMessage` regex redacts emails (`[REDACTED_EMAIL]`), international phone numbers (`[REDACTED_PHONE]`), JWT bearer tokens (`[REDACTED_TOKEN]`), and passwords.
+  - Zero raw `print(` statements remain in `lib/` (verified via `git grep -n "print(" lib/`).
+  - Release builds suppress verbose debug logging via Flutter's `kReleaseMode`.
+
+### 5.2 File Caches & Temporary Artifacts
+- **Issue**: Picked PDF reports or captured camera images can linger in temporary cache directories (`/data/user/0/.../cache`), exposing sensitive diagnostic documents.
+- **Control**: In `lib/core/utils/platform_file.dart` and `RecordsController`, temporary picked files are deleted after upload completes or fails. On session termination (`signOut()`), local cached thumbnails and image references are purged.
+
+### 5.3 App Switcher Screenshots & Background Previews
+- **Issue**: When an app is placed in the background on Android or iOS, the operating system takes a snapshot of the screen to display in the recent apps switcher, potentially exposing the Emergency Medical Card, glucose levels, or medication lists.
+- **Production Hardening Recommendation**:
+  - On Android: Enable `FLAG_SECURE` in `MainActivity.kt` (`window.setFlags(LayoutParams.FLAG_SECURE, LayoutParams.FLAG_SECURE)`) on sensitive clinical screens to blank the task preview.
+  - On iOS: Render a blur/privacy overlay in `AppDelegate.swift` when `applicationWillResignActive` fires.
+
+### 5.4 Clipboard Protection
+- **Control**: The app avoids copying passwords or session tokens to the system clipboard.
+- **Caregiver Codes**: Sharing tokens (Caregiver invite code or link) are only copied upon explicit user confirmation with a transient SnackBar notification, and clipboard entries contain short-lived random tokens rather than credentials.
+
+### 5.5 Local Storage of Sensitive Data
+- **Control**: `SharedPreferences` is restricted to non-sensitive session states and user preferences.
+- **Tokens**: In production with live Supabase, session tokens are stored using platform-encrypted keystores (`flutter_secure_storage` / Keychain).
+- **Medical Binaries**: Raw medical records are NEVER persisted in SharedPreferences or external public storage; they are streamed from private bucket signed URLs directly into memory.

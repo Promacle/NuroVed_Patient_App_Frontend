@@ -67,9 +67,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
           // lib/features/routine/screens/routine_screen.dart
           floatingActionButton: _controller.selectedTab == "Medicines"
               ? Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 100,
-                  ),
+                  padding: const EdgeInsets.only(bottom: 100),
                   child: FloatingActionButton(
                     onPressed: () =>
                         Navigator.pushNamed(context, AppRouter.addMedicine),

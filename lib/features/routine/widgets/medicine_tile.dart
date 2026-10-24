@@ -116,7 +116,11 @@ class MedicineTile extends StatelessWidget {
               children: [
                 if (onDelete != null)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.black38, size: 20),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.black38,
+                      size: 20,
+                    ),
                     onPressed: onDelete,
                   ),
                 Icon(

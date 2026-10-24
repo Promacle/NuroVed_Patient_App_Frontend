@@ -11,11 +11,7 @@ class VisitDetailsScreen extends StatefulWidget {
   final Visit? visit;
   final String? visitId;
 
-  const VisitDetailsScreen({
-    super.key,
-    this.visit,
-    this.visitId,
-  });
+  const VisitDetailsScreen({super.key, this.visit, this.visitId});
 
   @override
   State<VisitDetailsScreen> createState() => _VisitDetailsScreenState();
@@ -57,7 +53,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
 
   Future<void> _loadRelatedRecords() async {
     setState(() => _isLoadingRecords = true);
-    final records = await VisitsController.instance.getRelatedRecords(_visit.id);
+    final records = await VisitsController.instance.getRelatedRecords(
+      _visit.id,
+    );
     if (mounted) {
       setState(() {
         _relatedRecords = records;
@@ -89,18 +87,24 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
             ),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              final result = await VisitsController.instance.deleteVisit(_visit.id);
+              final result = await VisitsController.instance.deleteVisit(
+                _visit.id,
+              );
               if (mounted) {
                 result.when(
                   success: (_) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Visit deleted successfully')),
+                      const SnackBar(
+                        content: Text('Visit deleted successfully'),
+                      ),
                     );
                     Navigator.pop(context);
                   },
                   failure: (f) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to delete visit: ${f.message}')),
+                      SnackBar(
+                        content: Text('Failed to delete visit: ${f.message}'),
+                      ),
                     );
                   },
                 );
@@ -115,9 +119,15 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
 
   void _showEditDialog() {
     final titleController = TextEditingController(text: _visit.title);
-    final doctorController = TextEditingController(text: _visit.doctorName ?? '');
-    final hospitalController = TextEditingController(text: _visit.hospitalName ?? '');
-    final notesController = TextEditingController(text: _visit.notes ?? _visit.subtitle);
+    final doctorController = TextEditingController(
+      text: _visit.doctorName ?? '',
+    );
+    final hospitalController = TextEditingController(
+      text: _visit.hospitalName ?? '',
+    );
+    final notesController = TextEditingController(
+      text: _visit.notes ?? _visit.subtitle,
+    );
 
     showDialog(
       context: context,
@@ -140,7 +150,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
               const SizedBox(height: 10),
               TextField(
                 controller: hospitalController,
-                decoration: const InputDecoration(labelText: 'Hospital / Clinic'),
+                decoration: const InputDecoration(
+                  labelText: 'Hospital / Clinic',
+                ),
               ),
               const SizedBox(height: 10),
               TextField(
@@ -172,7 +184,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                 subtitle: notesController.text.trim(),
               );
               Navigator.pop(ctx);
-              final result = await VisitsController.instance.updateVisit(updated);
+              final result = await VisitsController.instance.updateVisit(
+                updated,
+              );
               if (mounted && result.isSuccess) {
                 setState(() => _visit = updated);
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -228,7 +242,10 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF2C4E4E)),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Color(0xFF2C4E4E),
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           const Text(
@@ -241,7 +258,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Color(0xFF2C4E4E)),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
             onSelected: (value) {
               if (value == 'edit') {
                 _showEditDialog();
@@ -254,7 +273,11 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit_outlined, size: 20, color: Color(0xFF2C4E4E)),
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 20,
+                      color: Color(0xFF2C4E4E),
+                    ),
                     SizedBox(width: 10),
                     Text('Edit Details'),
                   ],
@@ -302,7 +325,10 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
               CircleAvatar(
                 backgroundColor: const Color(0xFF7CB9A8).withOpacity(0.2),
                 radius: 24,
-                child: const Icon(Icons.local_hospital_rounded, color: Color(0xFF7CB9A8)),
+                child: const Icon(
+                  Icons.local_hospital_rounded,
+                  color: Color(0xFF7CB9A8),
+                ),
               ),
               const SizedBox(width: 15),
               Expanded(
@@ -331,22 +357,34 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
             const Divider(height: 30),
             Row(
               children: [
-                const Icon(Icons.person_outline, size: 20, color: Color(0xFF7CB9A8)),
+                const Icon(
+                  Icons.person_outline,
+                  size: 20,
+                  color: Color(0xFF7CB9A8),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     '${_visit.doctorName}${_visit.specialty != null && _visit.specialty!.isNotEmpty ? " • ${_visit.specialty}" : ""}',
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ],
             ),
           ],
-          if (_visit.hospitalName != null && _visit.hospitalName!.isNotEmpty) ...[
+          if (_visit.hospitalName != null &&
+              _visit.hospitalName!.isNotEmpty) ...[
             const SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.location_on_outlined, size: 20, color: Color(0xFF7CB9A8)),
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: 20,
+                  color: Color(0xFF7CB9A8),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -392,7 +430,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            notes.isNotEmpty ? notes : 'No detailed notes recorded for this visit.',
+            notes.isNotEmpty
+                ? notes
+                : 'No detailed notes recorded for this visit.',
             style: TextStyle(
               fontSize: 14,
               color: notes.isNotEmpty ? Colors.black87 : Colors.grey,
@@ -406,7 +446,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
 
   Widget _buildFollowUpCard() {
     final hasFollowUp = _visit.followUpDate != null;
-    final displayFollowUp = hasFollowUp ? DateParser.formatDisplay(_visit.followUpDate) : null;
+    final displayFollowUp = hasFollowUp
+        ? DateParser.formatDisplay(_visit.followUpDate)
+        : null;
 
     return Container(
       width: double.infinity,
@@ -445,10 +487,14 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  hasFollowUp ? displayFollowUp! : 'No follow-up appointment scheduled',
+                  hasFollowUp
+                      ? displayFollowUp!
+                      : 'No follow-up appointment scheduled',
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight: hasFollowUp ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: hasFollowUp
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     color: hasFollowUp ? Colors.black87 : Colors.grey,
                   ),
                 ),
@@ -497,17 +543,23 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           ),
           const SizedBox(height: 15),
           if (_isLoadingRecords)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(),
-            ))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(),
+              ),
+            )
           else if (_relatedRecords.isEmpty)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               alignment: Alignment.center,
               child: Column(
                 children: [
-                  Icon(Icons.folder_open_outlined, color: Colors.grey[400], size: 40),
+                  Icon(
+                    Icons.folder_open_outlined,
+                    color: Colors.grey[400],
+                    size: 40,
+                  ),
                   const SizedBox(height: 8),
                   const Text(
                     'No medical records attached to this visit',
@@ -532,11 +584,18 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                       color: const Color(0xFFB3D7E8),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Image.asset(AppAssets.docIcon, height: 24, width: 24),
+                    child: Image.asset(
+                      AppAssets.docIcon,
+                      height: 24,
+                      width: 24,
+                    ),
                   ),
                   title: Text(
                     record.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                   subtitle: Text(
                     '${record.recordType} • ${record.date}',
@@ -545,7 +604,10 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                   trailing: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryTeal,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
                       minimumSize: Size.zero,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -555,11 +617,15 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RecordDetailsScreen(record: record),
+                          builder: (context) =>
+                              RecordDetailsScreen(record: record),
                         ),
                       );
                     },
-                    child: const Text('View', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    child: const Text(
+                      'View',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 );
               },

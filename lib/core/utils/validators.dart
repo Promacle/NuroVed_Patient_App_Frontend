@@ -217,14 +217,13 @@ class AppValidators {
     required double max,
     String fieldName = 'Value',
     String? unit,
-  }) =>
-      numericMeasurement(
-        value,
-        min: min,
-        max: max,
-        fieldName: fieldName,
-        unit: unit,
-      );
+  }) => numericMeasurement(
+    value,
+    min: min,
+    max: max,
+    fieldName: fieldName,
+    unit: unit,
+  );
 
   static String? validateFileType(String fileName, List<String> allowed) {
     final dotIndex = fileName.lastIndexOf('.');
@@ -320,4 +319,3 @@ class AppValidators {
 }
 
 typedef Validators = AppValidators;
-

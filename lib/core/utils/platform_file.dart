@@ -42,7 +42,8 @@ class AppPlatformFile {
   }
 
   bool get isPdf => extension == 'pdf';
-  bool get isImage => extension == 'jpg' || extension == 'jpeg' || extension == 'png';
+  bool get isImage =>
+      extension == 'jpg' || extension == 'jpeg' || extension == 'png';
 
   /// Factory creating [AppPlatformFile] asynchronously from an [XFile] (from ImagePicker or Camera).
   static Future<AppPlatformFile> fromXFile(XFile file) async {
@@ -90,4 +91,3 @@ class UploadCancelToken {
     _isCancelled = true;
   }
 }
-

@@ -13,7 +13,8 @@ class CareAccessGrant {
   final String granteeEmail;
   final String granteeName;
   final String accessType; // 'view_only' | 'view_and_edit'
-  final List<String> scopes; // 'full_profile', 'medical_records', 'health_timeline', 'medications'
+  final List<String>
+  scopes; // 'full_profile', 'medical_records', 'health_timeline', 'medications'
   final String purpose;
   final String status; // 'pending' | 'active' | 'revoked' | 'expired'
   final DateTime createdAt;
@@ -148,7 +149,7 @@ class CareAccessGrant {
           : DateTime.now(),
       expiresAt: map['expires_at'] != null
           ? DateTime.tryParse(map['expires_at'].toString()) ??
-              DateTime.now().add(const Duration(days: 30))
+                DateTime.now().add(const Duration(days: 30))
           : DateTime.now().add(const Duration(days: 30)),
       revokedAt: map['revoked_at'] != null
           ? DateTime.tryParse(map['revoked_at'].toString())

@@ -46,7 +46,10 @@ class HospitalDetailsScreen extends StatelessWidget {
                       icon: const Icon(Icons.cancel_outlined),
                       label: const Text(
                         "Revoke Access",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       onPressed: () => _confirmRevoke(context),
                     ),
@@ -83,9 +86,7 @@ class HospitalDetailsScreen extends StatelessWidget {
               Navigator.pop(ctx);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Access revoked for $hospitalName"),
-                ),
+                SnackBar(content: Text("Access revoked for $hospitalName")),
               );
             },
             child: const Text("Revoke", style: TextStyle(color: Colors.red)),
