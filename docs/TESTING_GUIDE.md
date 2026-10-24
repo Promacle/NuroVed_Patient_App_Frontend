@@ -197,3 +197,61 @@ This guide provides test procedures for validating the authentication, session s
 6. Confirm revocation dialog.
    - **Expected Result**: Grant status updates immediately to `revoked` with timestamp `revoked_at`. All resource checks for this caregiver fail immediately.
 
+---
+
+## Test Suite 14: Health Records Management & Secure Upload Pipeline
+
+### TC-14.1: Multi-Platform Document Picking & Magic Byte Validation
+1. Navigate to **Records** (`/records`) and tap the floating **+** button (`/add-record`).
+2. Attempt picking or capturing a file with invalid magic bytes (e.g. an `.exe` renamed to `.pdf` or corrupted file header).
+   - **Expected Result**: Validation fails with `File content does not match a valid PDF, JPEG, or PNG signature`. Upload is blocked.
+3. Pick a file exceeding 10MB limit.
+   - **Expected Result**: Validation fails with `File size exceeds the 10MB limit`.
+4. Pick a valid PDF, JPG, or PNG under 10MB.
+   - **Expected Result**: File is accepted. Details card displays filename, MIME type, and formatted size.
+
+### TC-14.2: Upload Progress, In-Flight Cancellation, and Duplicate Submission Guard
+1. Fill in record title, category chip ("Medical Records", "Lab", "Bills", "Vaccination's"), and valid date.
+2. Tap **Upload Record**.
+   - **Expected Result**: Progress bar appears displaying live percentage. Button disables to prevent duplicate submissions.
+3. Tap **Cancel** during upload.
+   - **Expected Result**: In-flight upload is aborted via cancellation token. Any partial storage object is purged. Controller state returns to idle.
+4. Re-upload and allow completion.
+   - **Expected Result**: Private bucket upload succeeds (`medical-records/{owner_id}/{subject_id}/{record_id}/{filename}`). Metadata is persisted only after upload completes. Record is added to active subject list.
+
+### TC-14.3: Short-Lived Signed URLs & Soft-Delete with Confirmation
+1. On `/records`, tap any record card or tap **View** (`/record-details`).
+2. Tap **Request Secure Access Link** / preview document.
+   - **Expected Result**: Generates a temporary signed URL with a 10-minute expiry notice. Never exposes a public or unauthenticated URL.
+3. Tap the delete icon.
+   - **Expected Result**: Confirmation dialog appears ("Are you sure you want to delete this record?").
+4. Confirm deletion.
+   - **Expected Result**: Record is soft-deleted (`deleted_at` timestamp set) and removed from the active subject view.
+
+---
+
+## Test Suite 15: Clinical Visits & Canonical Record Linking
+
+### TC-15.1: Timezone-Safe Date Parsing & Edge Dates
+1. Navigate to **Visits** (`/visits`) and tap **Add Visit** (`/add-visit`).
+2. Enter consultation on leap day `2024-02-29` or month boundary `2026-03-31`.
+   - **Expected Result**: `DateParser` correctly parses the calendar date without timezone shift or off-by-one errors.
+
+### TC-15.2: Canonical Record Linking (Deduplicated)
+1. On `/add-visit`, tap **Select Related Records** (`/select-related-records`).
+   - **Expected Result**: Loads canonical records for the active subject only.
+2. Select a record and save visit.
+   - **Expected Result**: `related_record_ids` contains unique IDs without duplication.
+3. Open visit details (`/visit-details`).
+   - **Expected Result**: Attached canonical record card appears with a working **View** button that navigates to `/record-details`.
+
+---
+
+## Test Suite 16: Unified Chronological Timeline
+
+### TC-16.1: Merged Chronological Ordering (Newest First)
+1. View the Timeline on the home/visits screen for the active patient.
+   - **Expected Result**: Clinical visits and diagnostic records are merged into a single chronological stream sorted newest first.
+2. Verify that visits with timezone offsets (e.g., UTC morning vs IST afternoon) sort according to absolute UTC timestamp.
+3. Switch health subject to another family member.
+   - **Expected Result**: Entire timeline updates immediately to display only the newly selected subject's visits and records.

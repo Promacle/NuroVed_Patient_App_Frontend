@@ -251,37 +251,50 @@
 
 ---
 
-## Stage 5: Feature Repair & Dead-Control Elimination
+## Stage 5: Health Records, Timeline and Visits
 
 ### Goals
-1. Fix all broken navigation routes (e.g. `ChangeEmailScreen` navigating to `ChangePasswordScreen`).
-2. Eliminate all 7 empty callback closures identified in the Dead-Control Sweep:
-   - `lib/features/home/widgets/record_card.dart:59` ("View" record)
-   - `lib/features/records/widgets/records_widgets.dart:79` (Filter button)
-   - `lib/features/visits/screens/select_related_records.dart:122` ("View" related record)
-   - `lib/features/visits/widgets/visit_timeline_item.dart:135` ("View Related Record")
-   - `lib/features/settings/screens/settings_screen.dart:47, 55` (Privacy policy, Terms of service)
-   - `lib/features/settings/screens/data_privacy_screen.dart:58` (Privacy policy)
-3. Connect `RoutineScreen` FAB to navigate to `AddMedicineScreen`.
-4. Fix non-interactive contact tiles in `CustomerSupportScreen` to launch WhatsApp (`whatsapp://send`), website (`https://`), and dialer (`tel:`).
-5. Address out-of-scope / simulated features:
-   - Disable or clearly mark simulated "Demo: Failed" / "Demo: Renew" buttons in `PurchaseScreen` and document in `docs/MVP_SCOPE.md`.
+1. Multi-platform document picking and camera capture with web safety (no `dart:io` on web).
+2. Document validation: PDF, JPG, PNG signatures (magic bytes inspection: `%PDF-`, JPEG `0xFF, 0xD8, 0xFF`, PNG 8-byte header) and 10MB limit with user-friendly errors.
+3. Private storage bucket pipeline (`medical-records/{owner_id}/{subject_id}/{record_id}/{filename}`) with live progress, cancellation, retry, duplicate submission prevention, and automatic cleanup of orphaned storage objects on partial metadata failures.
+4. Security: Zero local file paths stored as remote records; no public URLs exposed; short-lived signed URLs generated with authorization check.
+5. Records features: Search by keyword, filter chips ("All", "Medical Records", "Vaccination's", "Bills", "Lab"), sort orders, subject (family member) selection, edit metadata, and soft delete with confirmation dialog.
+6. Visits & Timeline: Timezone-safe date parsing supporting edge dates (leap day `2024-02-29`, month boundary, timezone offsets), deduplicated canonical record linking, visit details view with notes and follow-up tracking, soft delete with confirmation dialog, and unified chronological timeline merging visits and records (newest first).
+7. Strict active subject isolation: Records, visits, and timeline reload for active subject UUID and never bleed data across profile switches.
+8. Elimination of dead controls in records, visits, and timeline screens (`record_card.dart`, `visit_timeline_item.dart`, `select_related_records.dart`).
 
-### Files Likely to Change
-- `lib/features/settings/screens/change_email_screen.dart`
-- `lib/features/settings/screens/change_password_screen.dart`
-- `lib/features/settings/screens/settings_screen.dart`
-- `lib/features/settings/screens/data_privacy_screen.dart`
-- `lib/features/settings/screens/customer_support_screen.dart`
-- `lib/features/routine/screens/routine_screen.dart`
-- `lib/features/routine/screens/add_medicine_screen.dart`
-- `lib/features/home/widgets/record_card.dart`
-- `lib/features/visits/widgets/visit_timeline_item.dart`
-- `lib/features/premium/screens/purchase_screen.dart`
-- `docs/MVP_SCOPE.md` (NEW)
+### Files Created & Modified
+- `lib/core/models/medical_record.dart`: Added storage path, size, MIME type, soft-delete (`deletedAt`), `safeRecordDate`.
+- `lib/core/models/visit.dart`: Added doctor name, specialty, hospital, notes, follow-up date, `relatedRecordIds`, soft-delete (`deletedAt`), `safeVisitDate`.
+- `lib/core/utils/date_parser.dart` [NEW]: Timezone-safe ISO 8601, month name, slash dates, leap year and timezone offset parser.
+- `lib/core/utils/platform_file.dart`: Multi-platform file abstraction with `AppPlatformFile.fromPlatformFile()`, `fromXFile()`, `mimeType`, and `UploadCancelToken`.
+- `lib/core/utils/validators.dart`: Added `validateContentSignature` (magic bytes) and `validateMedicalDocument`.
+- `lib/core/repositories/records_repository.dart` & `fake_records_repository.dart`: Upload with progress, cancel token, orphan cleanup, signed URL generation, soft delete.
+- `lib/core/repositories/visits_repository.dart` & `fake_visits_repository.dart`: Visit CRUD, deduplicating `relatedRecordIds`, `getRelatedRecords`.
+- `lib/features/records/controllers/records_controller.dart`: Upload pipeline, cancellation, signed URLs, filter chips, search, soft delete.
+- `lib/features/visits/controllers/visits_controller.dart`: Timezone-safe sorting, deduplication, `getTimelineItems()`.
+- `lib/features/records/screens/record_details_screen.dart` [NEW]: Document viewer, signed URL generator with 10-minute expiry notice, edit metadata, soft-delete confirmation.
+- `lib/features/records/screens/add_record_screen.dart`: Multi-platform picking, magic bytes check, upload progress bar, cancel, and zero-local-path remote saving.
+- `lib/features/records/screens/records_screen.dart`: Wired recent card onView, sort order popup menu, soft delete confirmation.
+- `lib/features/visits/screens/visit_details_screen.dart`: Attached canonical records viewer, edit dialog, soft-delete confirmation.
+- `lib/features/visits/screens/add_visit_screen.dart`: Wired `relatedRecordIds`, timezone-safe `visit_date` saving.
+- `lib/features/visits/screens/select_related_records.dart`: Canonical `RecordsController` records, wired view button to `RecordDetailsScreen`.
+- `lib/features/visits/screens/visits_screen.dart`: Wired navigation to `VisitDetailsScreen`.
+- `lib/features/visits/widgets/visit_timeline_item.dart`: Wired dead "View Related Record" button.
+- `lib/features/home/widgets/record_card.dart` & `home_screen.dart`: Wired "View" button to `/records`.
+- `test/features/records/records_controller_test.dart` [NEW]: 9 unit tests for upload, cancellation, retry, duplicate guard, signed URLs, search, soft delete, and subject isolation.
+- `test/features/visits/visits_controller_test.dart` [NEW]: 5 unit tests for visit CRUD, canonical deduplication, edit, soft delete, and subject isolation.
+- `test/features/visits/timeline_test.dart` [NEW]: 4 unit tests for unified chronological merging, leap day/month boundaries, and timezone offsets.
 
-### Exit Gate
-- Dead-control grep sweep returns 0 hits in `lib/`.
+### Phase 5 Verification Results
+- `flutter test`: **VERIFIED** (126/126 tests passing; 18 new tests added for Phase 5; 100% pass rate).
+- `flutter analyze --no-fatal-infos`: **VERIFIED** (0 errors, 0 warnings).
+- Dead-Control Sweep: **VERIFIED** (0 dead callback closures in records, visits, and timeline).
+- Zero Local File Paths Stored as Remote Records: **VERIFIED**.
+- Short-Lived Signed URLs (No Public URLs): **VERIFIED**.
+- Timezone & Leap Year Safety (`2024-02-29`, month boundaries, timezone offsets): **VERIFIED**.
+- Multi-Platform Picking (Web & Mobile safe): **VERIFIED**.
+- Documentation: **VERIFIED** (`docs/TESTING_GUIDE.md` updated with Suites 14-16).
 
 ---
 
