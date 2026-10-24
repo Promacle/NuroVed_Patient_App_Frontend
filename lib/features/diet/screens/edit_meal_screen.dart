@@ -104,7 +104,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isExpanded
-            ? const Color(0xFFE8F2EF).withOpacity(0.6)
+            ? const Color(0xFFE8F2EF).withValues(alpha: 0.6)
             : Colors.transparent,
         borderRadius: BorderRadius.circular(30),
       ),
@@ -160,7 +160,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFF7CB9A8).withOpacity(0.8),
+        color: const Color(0xFF7CB9A8).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
@@ -170,7 +170,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.5)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
@@ -186,7 +186,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
 
           // Editable Title with Dashed Border
           CustomPaint(
-            painter: DashedBorderPainter(color: Colors.white.withOpacity(0.6)),
+            painter: DashedBorderPainter(color: Colors.white.withValues(alpha: 0.6)),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: TextFormField(
@@ -215,7 +215,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
 
           // Editable Ingredients List with Dashed Border
           CustomPaint(
-            painter: DashedBorderPainter(color: Colors.white.withOpacity(0.6)),
+            painter: DashedBorderPainter(color: Colors.white.withValues(alpha: 0.6)),
             child: Container(
               padding: const EdgeInsets.all(10),
               width: double.infinity,

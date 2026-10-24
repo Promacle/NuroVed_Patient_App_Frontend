@@ -53,7 +53,7 @@ class MedicineTile extends StatelessWidget {
               ),
               child: Transform.rotate(
                 angle: -0.5,
-                child: const Icon(
+                child: const FaIcon(
                   FontAwesomeIcons.pills,
                   color: Color(0xFF397D71),
                   size: 24,

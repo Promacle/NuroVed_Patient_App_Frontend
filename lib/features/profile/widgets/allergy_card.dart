@@ -12,12 +12,12 @@ class AllergyCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.7),
+        color: AppColors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: AppColors.white.withOpacity(0.5)),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 25,
             offset: const Offset(0, 12),
           ),

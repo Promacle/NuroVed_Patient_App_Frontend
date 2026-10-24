@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/widgets/section_header.dart';
 
 import '../../../app/app_router.dart';
 
@@ -15,59 +16,69 @@ class SettingsScreen extends StatelessWidget {
           _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
+                  const SectionHeader(
+                    title: "Preferences",
+                    subtitle: "Customize your tracking experience",
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  _buildSettingCard(
+                    title: "App Settings",
+                    subtitle: "Units, time format, and clinical display",
+                    icon: Icons.tune_rounded,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.appSettings),
-                    child: _buildSettingCard(
-                      "App Settings",
-                      "Personalize Your Health Management",
-                    ),
                   ),
-                  GestureDetector(
+                  _buildSettingCard(
+                    title: "Data & Privacy",
+                    subtitle: "Row Level Security, permissions & account data",
+                    icon: Icons.shield_outlined,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.dataPrivacy),
-                    child: _buildSettingCard(
-                      "Data & Privacy",
-                      "Set Permission For Your Important Analysis",
-                    ),
                   ),
-
-                  GestureDetector(
+                  const SizedBox(height: 16),
+                  const SectionHeader(
+                    title: "Support & Feedback",
+                    subtitle: "Assistance from care coordinators",
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  _buildSettingCard(
+                    title: "Customer Support",
+                    subtitle: "Direct care coordination and helpdesk",
+                    icon: Icons.support_agent_rounded,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.customerSupport),
-                    child: _buildSettingCard(
-                      "Customer Support",
-                      "How Can We Help You ?",
-                    ),
                   ),
-                  GestureDetector(
-                    onTap: () => _showPrivacyPolicy(context),
-                    child: _buildSettingCard(
-                      "Privacy Policy",
-                      "Must check our Privacy policy.",
-                    ),
-                  ),
-
-                  GestureDetector(
-                    onTap: () => _showTermsOfService(context),
-                    child: _buildSettingCard(
-                      "Terms of Service",
-                      "Must check our terms of service.",
-                    ),
-                  ),
-
-                  GestureDetector(
+                  _buildSettingCard(
+                    title: "Report a Problem",
+                    subtitle: "Report bugs or sync anomalies",
+                    icon: Icons.bug_report_outlined,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.reportProblem),
-                    child: _buildSettingCard(
-                      "Report a problem",
-                      "How Can We Help You ?",
-                    ),
                   ),
-                  const SizedBox(height: 150),
+                  const SizedBox(height: 16),
+                  const SectionHeader(
+                    title: "Legal & Compliance",
+                    subtitle: "Clinical boundaries and privacy safeguards",
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  _buildSettingCard(
+                    title: "Privacy Policy",
+                    subtitle: "Zero third-party monetization & RLS sovereignty",
+                    icon: Icons.policy_outlined,
+                    onTap: () => _showPrivacyPolicy(context),
+                  ),
+                  _buildSettingCard(
+                    title: "Terms of Service",
+                    subtitle:
+                        "Continuity of care guidelines and emergency terms",
+                    icon: Icons.gavel_outlined,
+                    onTap: () => _showTermsOfService(context),
+                  ),
+                  const SizedBox(height: 90),
                 ],
               ),
             ),
@@ -78,46 +89,58 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final topPad = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+      padding: EdgeInsets.fromLTRB(20, topPad + 14, 20, 24),
       decoration: const BoxDecoration(
-        color: Color(0xFFF3F3F3), // Updated color
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
+        color: AppColors.kTopBg,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF769E93),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
+          Semantics(
+            button: true,
+            label: "Back",
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryTeal.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.primaryTeal,
+                    size: 22,
+                  ),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 16),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Setting",
+                  "Settings",
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
+                SizedBox(height: 2),
                 Text(
-                  "Manage Your App Setting",
+                  "Manage Your App Settings & Preferences",
                   style: TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],
@@ -128,57 +151,80 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // lib/features/settings/screens/settings_screen.dart
-
-  // ... update the _buildSettingCard method:
-  Widget _buildSettingCard(String title, String subtitle) {
+  Widget _buildSettingCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F3F3), // Tile color
-        borderRadius: BorderRadius.circular(22),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12), // Deeper shadow
-            blurRadius: 12,
-            offset: const Offset(0, 10), // More depth
-            spreadRadius: -5, // Less spread
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF2C4E4E),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceMint,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: AppColors.primaryTeal, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.textGrey,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.black45,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textMuted,
+                  size: 20,
                 ),
               ],
             ),
           ),
-          const Icon(
-            Icons.arrow_forward_rounded,
-            color: Color(0xFF2C4E4E),
-            size: 18,
-          ),
-        ],
+        ),
       ),
     );
   }

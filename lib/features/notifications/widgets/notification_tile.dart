@@ -25,7 +25,7 @@ class NotificationTile extends StatelessWidget {
         // 3D Shadow Effect
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -35,7 +35,7 @@ class NotificationTile extends StatelessWidget {
             offset: Offset(-2, -2),
           ),
         ],
-        border: Border.all(color: Colors.white.withOpacity(0.5)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -82,7 +82,7 @@ class NotificationTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     fontSize: 13,
                   ),
                 ),

@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 25),
                 _buildAnimatedContent(),
-                const SizedBox(height: 150),
+                const SizedBox(height: 90),
               ],
             ),
           ),

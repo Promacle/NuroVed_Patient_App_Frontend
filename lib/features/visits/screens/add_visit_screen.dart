@@ -393,7 +393,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -485,7 +485,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 6,
               offset: const Offset(0, 6),
             ),

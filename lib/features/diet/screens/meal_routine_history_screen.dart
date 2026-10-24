@@ -52,11 +52,11 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F2EF).withOpacity(0.6),
+        color: const Color(0xFFE8F2EF).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 15),
             spreadRadius: -10,
@@ -134,7 +134,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                     spreadRadius: -2,
@@ -188,11 +188,11 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: const Color(0xFF7CB9A8).withOpacity(0.8),
+        color: const Color(0xFF7CB9A8).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 12,
             offset: const Offset(0, 8),
             spreadRadius: -4,
@@ -205,7 +205,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withOpacity(0.5)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
@@ -271,7 +271,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
             onPressed: null, // Done button disabled/non-working as requested
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2C4E4E),
-              disabledBackgroundColor: const Color(0xFF2C4E4E).withOpacity(0.5),
+              disabledBackgroundColor: const Color(0xFF2C4E4E).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
@@ -295,7 +295,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
             width: double.infinity,
             height: 55,
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: Colors.grey.shade400),
             ),

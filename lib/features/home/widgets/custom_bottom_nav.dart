@@ -15,29 +15,36 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Removed Stack and Positioned to eliminate the pop-out effect
     return ClipRRect(
-      borderRadius: BorderRadius.circular(45),
+      borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
-          height:
-              80, // Slightly taller to accommodate the larger middle icon comfortably
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: 72,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-            color: const Color(0xFFE2EDEA).withOpacity(0.5),
-            borderRadius: BorderRadius.circular(45),
+            color: Colors.white.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: Colors.white.withOpacity(0.4),
-              width: 1.5,
+              color: AppColors.borderSubtle.withValues(alpha: 0.8),
+              width: 1.2,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
                 child: _NavItem(
-                  icon: Icons.home_rounded,
+                  icon: currentIndex == 0
+                      ? Icons.home_rounded
+                      : Icons.home_outlined,
                   label: "Home",
                   isActive: currentIndex == 0,
                   onTap: () => onTap(0),
@@ -45,40 +52,55 @@ class CustomBottomNav extends StatelessWidget {
               ),
               Expanded(
                 child: _NavItem(
-                  icon: Icons.account_balance_wallet_rounded,
+                  icon: currentIndex == 1
+                      ? Icons.description_rounded
+                      : Icons.description_outlined,
                   label: "Records",
                   isActive: currentIndex == 1,
                   onTap: () => onTap(1),
                 ),
               ),
-              // Middle circular button integrated directly into the Row
-              GestureDetector(
-                onTap: () => onTap(2),
-                child: Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF9DC9BC), // Mint green circle
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
+              Semantics(
+                button: true,
+                label: "Food Scanner",
+                child: Tooltip(
+                  message: "Food Scanner",
+                  child: InkWell(
+                    onTap: () => onTap(2),
+                    customBorder: const CircleBorder(),
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primaryTeal, AppColors.sageGreen],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryTeal.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.filter_center_focus_rounded,
-                    color: Colors.white,
-                    size: 40,
+                      child: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
                   ),
                 ),
               ),
               Expanded(
                 child: _NavItem(
-                  icon: Icons.pending_actions_rounded,
+                  icon: currentIndex == 3
+                      ? Icons.calendar_month_rounded
+                      : Icons.calendar_month_outlined,
                   label: "Visits",
                   isActive: currentIndex == 3,
                   onTap: () => onTap(3),
@@ -86,7 +108,9 @@ class CustomBottomNav extends StatelessWidget {
               ),
               Expanded(
                 child: _NavItem(
-                  icon: Icons.person_rounded,
+                  icon: currentIndex == 4
+                      ? Icons.person_rounded
+                      : Icons.person_outline_rounded,
                   label: "Profile",
                   isActive: currentIndex == 4,
                   onTap: () => onTap(4),
@@ -115,24 +139,36 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primaryTeal : Colors.grey.shade600;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-            ),
+    final color = isActive ? AppColors.primaryTeal : AppColors.textGrey;
+    return Semantics(
+      button: true,
+      selected: isActive,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 24),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11,
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

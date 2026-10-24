@@ -38,7 +38,7 @@ class VisitTimelineItem extends StatelessWidget {
                 height: 20,
                 color: isFirst
                     ? Colors.transparent
-                    : const Color(0xFF7CB9A8).withOpacity(0.4),
+                    : const Color(0xFF7CB9A8).withValues(alpha: 0.4),
               ),
               Container(
                 width: 20,
@@ -53,7 +53,7 @@ class VisitTimelineItem extends StatelessWidget {
                   width: 2,
                   color: isLast
                       ? Colors.transparent
-                      : const Color(0xFF7CB9A8).withOpacity(0.4),
+                      : const Color(0xFF7CB9A8).withValues(alpha: 0.4),
                 ),
               ),
             ],
@@ -90,7 +90,7 @@ class VisitTimelineItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -103,7 +103,7 @@ class VisitTimelineItem extends StatelessWidget {
                             CircleAvatar(
                               backgroundColor: const Color(
                                 0xFF7CB9A8,
-                              ).withOpacity(0.2),
+                              ).withValues(alpha: 0.2),
                               child: Icon(icon, color: const Color(0xFF7CB9A8)),
                             ),
                             const SizedBox(width: 15),

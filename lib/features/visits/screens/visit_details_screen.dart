@@ -311,7 +311,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -323,7 +323,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           Row(
             children: [
               CircleAvatar(
-                backgroundColor: const Color(0xFF7CB9A8).withOpacity(0.2),
+                backgroundColor: const Color(0xFF7CB9A8).withValues(alpha: 0.2),
                 radius: 24,
                 child: const Icon(
                   Icons.local_hospital_rounded,
@@ -411,7 +411,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -459,7 +459,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         border: hasFollowUp ? Border.all(color: Colors.green.shade200) : null,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -515,7 +515,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

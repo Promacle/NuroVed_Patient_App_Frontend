@@ -310,7 +310,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -479,7 +479,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   Widget _buildRecordTypeSelectionCard() {
     final List<String> types = [
       "Medical Records",
-      "Vaccination's",
+      "Vaccinations",
       "Bills",
       "Lab",
     ];
@@ -492,7 +492,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -514,7 +514,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withValues(alpha: 0.08),
                           blurRadius: 4,
                           offset: const Offset(0, 3),
                         ),
@@ -590,7 +590,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -628,7 +628,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -650,7 +650,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withValues(alpha: 0.08),
                           blurRadius: 4,
                           offset: const Offset(0, 3),
                         ),
@@ -707,7 +707,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -894,7 +894,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -917,7 +917,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withValues(alpha: 0.08),
                           blurRadius: 4,
                           offset: const Offset(0, 3),
                         ),
@@ -1004,7 +1004,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -1036,7 +1036,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 6,
             offset: const Offset(0, 6),
           ),
@@ -1141,7 +1141,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),

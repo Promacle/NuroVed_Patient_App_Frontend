@@ -45,8 +45,9 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                   ),
                   itemCount: members.length + 1,
                   itemBuilder: (context, index) {
-                    if (index == members.length)
+                    if (index == members.length) {
                       return _buildAddMemberCard(context);
+                    }
 
                     final isCurrentActive =
                         members[index]['id'] ==

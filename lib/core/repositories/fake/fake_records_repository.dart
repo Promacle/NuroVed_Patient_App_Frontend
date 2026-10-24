@@ -106,8 +106,13 @@ class FakeRecordsRepository implements RecordsRepository {
     if (recordType != null &&
         recordType.isNotEmpty &&
         recordType.toLowerCase() != 'all') {
+      final normalizedFilter = recordType.toLowerCase().replaceAll("'", "");
       list = list
-          .where((r) => r.recordType.toLowerCase() == recordType.toLowerCase())
+          .where(
+            (r) =>
+                r.recordType.toLowerCase().replaceAll("'", "") ==
+                normalizedFilter,
+          )
           .toList();
     }
 

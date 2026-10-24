@@ -201,12 +201,13 @@ class _AccessScreenState extends State<AccessScreen> {
                       firstDate: DateTime.now(),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
                     );
-                    if (date != null)
+                    if (date != null) {
                       setState(() {
                         _selectedDuration =
                             "${date.day}/${date.month}/${date.year}";
                         _expandedIndex = null;
                       });
+                    }
                   },
                 ),
               ],

@@ -46,9 +46,30 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   final List<Map<String, dynamic>> contactOptions = [
     {"icon": Icons.headset_mic_outlined, "title": "Customer Service"},
     {"icon": Icons.language, "title": "Website"},
-    {"icon": FontAwesomeIcons.whatsapp, "title": "Whatsapp"},
-    {"icon": FontAwesomeIcons.facebook, "title": "Facebook"},
-    {"icon": FontAwesomeIcons.instagram, "title": "Instagram"},
+    {
+      "icon": const FaIcon(
+        FontAwesomeIcons.whatsapp,
+        color: Color(0xFF2C4E4E),
+        size: 22,
+      ),
+      "title": "Whatsapp"
+    },
+    {
+      "icon": const FaIcon(
+        FontAwesomeIcons.facebook,
+        color: Color(0xFF2C4E4E),
+        size: 22,
+      ),
+      "title": "Facebook"
+    },
+    {
+      "icon": const FaIcon(
+        FontAwesomeIcons.instagram,
+        color: Color(0xFF2C4E4E),
+        size: 22,
+      ),
+      "title": "Instagram"
+    },
   ];
 
   @override
@@ -257,7 +278,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 12,
               offset: const Offset(0, 10),
               spreadRadius: -5,
@@ -304,7 +325,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
-  Widget _buildExpandableTile(IconData icon, String title) {
+  Widget _buildExpandableTile(Widget icon, String title) {
     return GestureDetector(
       onTap: () => _handleContactAction(context, title),
       child: Container(
@@ -315,7 +336,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.12),
+              color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 12,
               offset: const Offset(0, 10),
               spreadRadius: -5,
@@ -330,7 +351,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFF2C4E4E), width: 1.5),
               ),
-              child: Icon(icon, color: const Color(0xFF2C4E4E), size: 22),
+              child: icon,
             ),
             const SizedBox(width: 20),
             Expanded(

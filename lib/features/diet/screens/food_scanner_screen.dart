@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/app/app_router.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:nuroved_patient/core/widgets/feature_unavailable_card.dart';
 import 'package:nuroved_patient/features/home/controllers/home_controller.dart';
 
 class FoodScannerScreen extends StatelessWidget {
@@ -14,117 +16,24 @@ class FoodScannerScreen extends StatelessWidget {
           children: [
             _buildHeader(context),
             Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(28),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFFE8F4F0),
-                          ),
-                          child: const Icon(
-                            Icons.qr_code_scanner_rounded,
-                            size: 42,
-                            color: AppColors.primaryTeal,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Food Scanner Unavailable",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C4E4E),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "Barcode nutritional scanning is currently unavailable in the MVP.\n\nIn accordance with NuroVed clinical honesty principles, simulated or unverified nutritional data has been disabled until verified clinical database integration is complete.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textGrey,
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F6F4),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFD2E4DD)),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.verified_user_outlined,
-                                size: 16,
-                                color: AppColors.primaryTeal,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                "Safety First — No Mock Nutritional Claims",
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryTeal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryTeal,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            onPressed: () {
-                              HomeController().setTab(0);
-                            },
-                            child: const Text(
-                              "Return to Home",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              child: FeatureUnavailableCard(
+                icon: Icons.qr_code_scanner_rounded,
+                title: "Food Scanner Unavailable",
+                explanation:
+                    "Barcode nutritional scanning is currently unavailable in the MVP.\n\nIn accordance with NuroVed clinical honesty principles, simulated or unverified nutritional data has been disabled until verified clinical database integration is complete.",
+                safetyRationale:
+                    "Safety First — No Mock Nutritional Claims\nBarcode scanning is disabled until verified clinical database integration is completed to protect diabetic health.",
+                primaryButtonLabel: "Return to Home",
+                onPrimaryPressed: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  } else {
+                    HomeController().setTab(0);
+                  }
+                },
+                secondaryButtonLabel: "Browse Diet Overview",
+                onSecondaryPressed: () =>
+                    Navigator.pushNamed(context, AppRouter.diet),
               ),
             ),
           ],
@@ -136,33 +45,47 @@ class FoodScannerScreen extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 20, bottom: 25, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 16, bottom: 20, left: 20, right: 20),
       decoration: const BoxDecoration(
         color: AppColors.mintBackground,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(35),
-          bottomRight: Radius.circular(35),
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
       ),
-      child: const Column(
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Text(
-            "Food Scanner",
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryTeal,
+          if (Navigator.canPop(context))
+            Positioned(
+              left: 0,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-          ),
-          SizedBox(height: 4),
-          Text(
-            "Barcode Nutritional Analysis",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.textGrey,
-              fontWeight: FontWeight.w500,
-            ),
+          const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Food Scanner",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryTeal,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                "Barcode Nutritional Analysis",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textGrey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -17,7 +17,7 @@ class AuthButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.buttonTeal,
-          disabledBackgroundColor: AppColors.buttonTeal.withOpacity(0.5),
+          disabledBackgroundColor: AppColors.buttonTeal.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

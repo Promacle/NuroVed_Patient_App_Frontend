@@ -85,21 +85,26 @@ class _MainLayoutState extends State<MainLayout> {
                 _buildTabNavigator(4, const ProfileScreen()),
               ],
             ),
-            // Floating navigation bar with blur effect
-            bottomNavigationBar: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 25),
-              child: CustomBottomNav(
-                currentIndex: _homeController.currentIndex,
-                onTap: (index) {
-                  if (index == _homeController.currentIndex) {
-                    // Smart Reset: Tapping active icon returns to root
-                    _navigatorKeys[index].currentState?.popUntil(
-                      (route) => route.isFirst,
-                    );
-                  } else {
-                    _homeController.setTab(index);
-                  }
-                },
+            // Floating navigation bar with blur effect and safe area insets
+            bottomNavigationBar: SafeArea(
+              top: false,
+              bottom: true,
+              minimum: const EdgeInsets.only(bottom: 12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: CustomBottomNav(
+                  currentIndex: _homeController.currentIndex,
+                  onTap: (index) {
+                    if (index == _homeController.currentIndex) {
+                      // Smart Reset: Tapping active icon returns to root
+                      _navigatorKeys[index].currentState?.popUntil(
+                        (route) => route.isFirst,
+                      );
+                    } else {
+                      _homeController.setTab(index);
+                    }
+                  },
+                ),
               ),
             ),
           ),

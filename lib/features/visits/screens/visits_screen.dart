@@ -40,8 +40,12 @@ class _VisitsScreenState extends State<VisitsScreen> {
                   const GraphCard(), // Reused from Home
                   const SizedBox(height: 30),
                   const Text(
-                    "Recent Visit's",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    "Recent Visits",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C4E4E),
+                    ),
                   ),
                   ListenableBuilder(
                     listenable: _controller,
@@ -111,7 +115,7 @@ class _VisitsScreenState extends State<VisitsScreen> {
                       );
                     },
                   ),
-                  const SizedBox(height: 150),
+                  const SizedBox(height: 90),
                 ],
               ),
             ),
@@ -121,11 +125,11 @@ class _VisitsScreenState extends State<VisitsScreen> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 100),
         child: FloatingActionButton(
-          // Inside VisitsScreen's floatingActionButton:
+          tooltip: "Add doctor visit",
           onPressed: () => Navigator.pushNamed(context, AppRouter.addVisit),
-          backgroundColor: const Color(0xFF7CB9A8),
+          backgroundColor: AppColors.primaryTeal,
           shape: const CircleBorder(),
-          child: const Icon(Icons.add, color: Colors.white, size: 30),
+          child: const Icon(Icons.add, color: Colors.white, size: 28),
         ),
       ),
     );
@@ -144,8 +148,9 @@ class _VisitsScreenState extends State<VisitsScreen> {
           orElse: () => profileController.userData,
         );
 
+        final topPad = MediaQuery.of(context).padding.top;
         return Container(
-          padding: const EdgeInsets.fromLTRB(25, 60, 25, 30),
+          padding: EdgeInsets.fromLTRB(25, topPad + 16, 25, 26),
           decoration: const BoxDecoration(
             color: AppColors.kTopBg,
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),

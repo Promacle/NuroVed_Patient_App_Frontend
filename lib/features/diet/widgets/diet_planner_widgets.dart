@@ -89,11 +89,11 @@ class DietPlannerCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F2EF).withOpacity(0.6),
+        color: const Color(0xFFE8F2EF).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(35),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 15,
             offset: const Offset(0, 15),
             spreadRadius: -10,
@@ -232,7 +232,7 @@ class DietPlannerSelectionList extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -251,7 +251,7 @@ class DietPlannerSelectionList extends StatelessWidget {
                 color: isSelected ? const Color(0xFF7CB9A8) : Colors.white,
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -399,7 +399,7 @@ class DietPlannerActionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
           ),
           elevation: 5,
-          shadowColor: const Color(0xFF7CB9A8).withOpacity(0.3),
+          shadowColor: const Color(0xFF7CB9A8).withValues(alpha: 0.3),
         ),
         child: Text(
           label,

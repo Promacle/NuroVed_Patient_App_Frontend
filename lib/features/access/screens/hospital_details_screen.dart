@@ -159,12 +159,12 @@ class HospitalDetailsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
@@ -228,9 +228,9 @@ class HospitalDetailsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
-        color: AppColors.kTopBg.withOpacity(0.5),
+        color: AppColors.kTopBg.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(35),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,7 +294,7 @@ class HospitalDetailsScreen extends StatelessWidget {
                 Expanded(
                   child: Container(
                     width: 2,
-                    color: const Color(0xFF7CB9A8).withOpacity(0.5),
+                    color: const Color(0xFF7CB9A8).withValues(alpha: 0.5),
                   ),
                 ),
             ],
@@ -308,7 +308,7 @@ class HospitalDetailsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF7CB9A8).withOpacity(0.3),
+                        color: const Color(0xFF7CB9A8).withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(icon, color: Colors.white, size: 24),

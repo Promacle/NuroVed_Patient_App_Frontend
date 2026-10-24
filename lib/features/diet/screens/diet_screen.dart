@@ -128,11 +128,11 @@ class DietScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.navyGreen.withOpacity(0.8),
+        color: AppColors.navyGreen.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 25,
             offset: const Offset(0, 15),
             spreadRadius: -10,
@@ -145,9 +145,9 @@ class DietScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
@@ -276,7 +276,7 @@ class DietScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: -12,
@@ -300,12 +300,20 @@ class DietScreen extends StatelessWidget {
             children: [
               QuickActionButton(
                 label: "Diet Planner",
-                icon: FontAwesomeIcons.appleWhole,
+                icon: const FaIcon(
+                  FontAwesomeIcons.appleWhole,
+                  color: AppColors.sageGreen,
+                  size: 35,
+                ),
                 onTap: () => Navigator.pushNamed(context, '/ai-diet-planner'),
               ),
               QuickActionButton(
                 label: "Food Scanner",
-                icon: Icons.qr_code_scanner,
+                icon: const Icon(
+                  Icons.qr_code_scanner,
+                  color: AppColors.sageGreen,
+                  size: 35,
+                ),
                 onTap: () {
                   Navigator.pushAndRemoveUntil(
                     context,
@@ -318,7 +326,11 @@ class DietScreen extends StatelessWidget {
               ),
               QuickActionButton(
                 label: "Meal Routine History",
-                icon: Icons.timer_outlined,
+                icon: const Icon(
+                  Icons.timer_outlined,
+                  color: AppColors.sageGreen,
+                  size: 35,
+                ),
                 onTap: () => Navigator.pushNamed(
                   context,
                   '/meal-routine-history',
@@ -334,7 +346,7 @@ class DietScreen extends StatelessWidget {
 
 class QuickActionButton extends StatefulWidget {
   final String label;
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onTap;
 
   const QuickActionButton({
@@ -393,7 +405,7 @@ class _QuickActionButtonState extends State<QuickActionButton>
                   color: const Color(0xFFF0F6F4),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(widget.icon, color: AppColors.sageGreen, size: 35),
+                child: widget.icon,
               ),
               const SizedBox(height: 8),
               Text(
@@ -422,7 +434,7 @@ class ConcentricRingsPainter extends CustomPainter {
     const strokeWidth = 10.0;
 
     final bgPaint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
+      ..color = Colors.white.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
@@ -486,11 +498,11 @@ class MiniBarChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dashPaint = Paint()
-      ..color = Colors.grey.withOpacity(0.3)
+      ..color = Colors.grey.withValues(alpha: 0.3)
       ..strokeWidth = 1;
 
     final axisPaint = Paint()
-      ..color = Colors.grey.withOpacity(0.5)
+      ..color = Colors.grey.withValues(alpha: 0.5)
       ..strokeWidth = 1;
 
     // Draw grid

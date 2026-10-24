@@ -39,7 +39,7 @@ class AuthForm extends StatelessWidget {
               authController.isPasswordVisible
                   ? Icons.visibility_outlined
                   : Icons.visibility_off_outlined,
-              color: Colors.grey.withOpacity(0.6),
+              color: Colors.grey.withValues(alpha: 0.6),
             ),
             onPressed: authController.togglePasswordVisibility,
           ),
@@ -88,7 +88,7 @@ class AuthForm extends StatelessWidget {
                 authController.isConfirmPasswordVisible
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: Colors.grey.withOpacity(0.6),
+                color: Colors.grey.withValues(alpha: 0.6),
               ),
               onPressed: authController.toggleConfirmPasswordVisibility,
             ),

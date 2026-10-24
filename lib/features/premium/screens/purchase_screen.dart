@@ -183,7 +183,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               Switch(
                 value: _isOfferApplied,
                 onChanged: (val) => setState(() => _isOfferApplied = val),
-                activeColor: const Color(0xFF2E7D32),
+                activeThumbColor: const Color(0xFF2E7D32),
               ),
             ],
           ),

@@ -130,7 +130,7 @@ class AppRouter {
     }
 
     // Helper function to create an animated route that triggers the skeleton
-    Route _createAnimatedRoute(Widget child) {
+    Route createAnimatedRoute(Widget child) {
       return PageRouteBuilder(
         settings: settings, // <--- THIS IS THE CRITICAL FIX
         // Setting maintainState to false forces the skeleton to re-run on 'back'
@@ -152,7 +152,7 @@ class AppRouter {
         );
 
       case splash:
-        return _createAnimatedRoute(const SplashScreen());
+        return createAnimatedRoute(const SplashScreen());
 
       case login:
         return MaterialPageRoute(
@@ -185,88 +185,88 @@ class AppRouter {
         );
 
       case records:
-        return _createAnimatedRoute(const RecordsScreen());
+        return createAnimatedRoute(const RecordsScreen());
 
       case visits:
-        return _createAnimatedRoute(const VisitsScreen());
+        return createAnimatedRoute(const VisitsScreen());
 
       case profile:
-        return _createAnimatedRoute(const ProfileScreen());
+        return createAnimatedRoute(const ProfileScreen());
 
       case notifications:
-        return _createAnimatedRoute(const NotificationsScreen());
+        return createAnimatedRoute(const NotificationsScreen());
 
       case access:
-        return _createAnimatedRoute(const AccessScreen());
+        return createAnimatedRoute(const AccessScreen());
 
       case diet:
-        return _createAnimatedRoute(const DietScreen());
+        return createAnimatedRoute(const DietScreen());
 
       case routine:
-        return _createAnimatedRoute(const RoutineScreen());
+        return createAnimatedRoute(const RoutineScreen());
       case premium: // Handle premium route
-        return _createAnimatedRoute(const PremiumScreen());
+        return createAnimatedRoute(const PremiumScreen());
 
       case aiDietPlanner:
-        return _createAnimatedRoute(const AiDietPlannerScreen());
+        return createAnimatedRoute(const AiDietPlannerScreen());
       // Inside generateRoute switch:
       case dietPreference:
-        return _createAnimatedRoute(const DietPreferenceScreen());
+        return createAnimatedRoute(const DietPreferenceScreen());
       case addVisit:
         return MaterialPageRoute(builder: (_) => const AddVisitScreen());
       case addMedicine:
-        return _createAnimatedRoute(const AddMedicineScreen());
+        return createAnimatedRoute(const AddMedicineScreen());
       case visitDetails:
         if (settings.arguments is Visit) {
-          return _createAnimatedRoute(
+          return createAnimatedRoute(
             VisitDetailsScreen(visit: settings.arguments as Visit),
           );
         } else if (settings.arguments is String) {
-          return _createAnimatedRoute(
+          return createAnimatedRoute(
             VisitDetailsScreen(visitId: settings.arguments as String),
           );
         }
-        return _createAnimatedRoute(const VisitDetailsScreen());
+        return createAnimatedRoute(const VisitDetailsScreen());
       case recordDetails:
         if (settings.arguments is MedicalRecord) {
-          return _createAnimatedRoute(
+          return createAnimatedRoute(
             RecordDetailsScreen(record: settings.arguments as MedicalRecord),
           );
         } else if (settings.arguments is String) {
-          return _createAnimatedRoute(
+          return createAnimatedRoute(
             RecordDetailsScreen(recordId: settings.arguments as String),
           );
         }
-        return _createAnimatedRoute(const RecordDetailsScreen());
+        return createAnimatedRoute(const RecordDetailsScreen());
       case healthGoal:
-        return _createAnimatedRoute(const HealthGoalScreen());
+        return createAnimatedRoute(const HealthGoalScreen());
       case familyProfiles:
-        return _createAnimatedRoute(const FamilyProfilesScreen());
+        return createAnimatedRoute(const FamilyProfilesScreen());
       case timeAndContext:
-        return _createAnimatedRoute(const TimeAndContextScreen());
+        return createAnimatedRoute(const TimeAndContextScreen());
       case dietOutput:
-        return _createAnimatedRoute(const DietOutputScreen());
+        return createAnimatedRoute(const DietOutputScreen());
       case foodScannerHistory:
-        return _createAnimatedRoute(const FoodScannerHistoryScreen());
+        return createAnimatedRoute(const FoodScannerHistoryScreen());
       case editMeal:
-        return _createAnimatedRoute(const EditMealScreen());
+        return createAnimatedRoute(const EditMealScreen());
       case settingsRoute:
-        return _createAnimatedRoute(const SettingsScreen());
+        return createAnimatedRoute(const SettingsScreen());
       case appSettings:
-        return _createAnimatedRoute(const AppSettingsScreen());
+        return createAnimatedRoute(const AppSettingsScreen());
       case dataPrivacy:
-        return _createAnimatedRoute(const DataPrivacyScreen());
+        return createAnimatedRoute(const DataPrivacyScreen());
       case customerSupport:
-        return _createAnimatedRoute(const CustomerSupportScreen());
+        return createAnimatedRoute(const CustomerSupportScreen());
       case changeEmail:
-        return _createAnimatedRoute(const ChangeEmailScreen());
+        return createAnimatedRoute(const ChangeEmailScreen());
       case changePassword:
-        return _createAnimatedRoute(const ChangePasswordScreen());
+        return createAnimatedRoute(const ChangePasswordScreen());
       case calorieSuccess:
         final timestamp = settings.arguments as DateTime;
-        return _createAnimatedRoute(CalorieSuccessScreen(timestamp: timestamp));
+        return createAnimatedRoute(CalorieSuccessScreen(timestamp: timestamp));
       case reportProblem:
-        return _createAnimatedRoute(const ReportProblemScreen());
+        return createAnimatedRoute(const ReportProblemScreen());
       case '/diet-success':
         final timestamp = settings.arguments as DateTime;
         return MaterialPageRoute(
@@ -276,7 +276,7 @@ class AppRouter {
 
       case purchase:
         final args = settings.arguments as Map<String, dynamic>;
-        return _createAnimatedRoute(
+        return createAnimatedRoute(
           PurchaseScreen(
             planName: args['planName'],
             price: args['price'],
@@ -285,7 +285,7 @@ class AppRouter {
         );
       case premiumStatus:
         final args = settings.arguments as Map<String, dynamic>;
-        return _createAnimatedRoute(
+        return createAnimatedRoute(
           PremiumStatusScreen(
             status: args['status'],
             amount: args['amount'],
@@ -296,7 +296,7 @@ class AppRouter {
           ),
         );
       case mealRoutineHistory:
-        return _createAnimatedRoute(const MealRoutineHistoryScreen());
+        return createAnimatedRoute(const MealRoutineHistoryScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

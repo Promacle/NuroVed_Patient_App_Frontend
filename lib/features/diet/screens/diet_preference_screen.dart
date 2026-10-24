@@ -42,15 +42,27 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                       children: [
                         _buildPreferenceOption(
                           "Vegetarian",
-                          Icons.eco_outlined,
+                          const Icon(
+                            Icons.eco_outlined,
+                            color: Color(0xFF2C4E4E),
+                            size: 30,
+                          ),
                         ),
                         _buildPreferenceOption(
                           "Non-veg",
-                          FontAwesomeIcons.drumstickBite,
+                          const FaIcon(
+                            FontAwesomeIcons.drumstickBite,
+                            color: Color(0xFF2C4E4E),
+                            size: 30,
+                          ),
                         ),
                         _buildPreferenceOption(
                           "Both (Veg & Non-Veg)",
-                          Icons.rice_bowl_outlined,
+                          const Icon(
+                            Icons.rice_bowl_outlined,
+                            color: Color(0xFF2C4E4E),
+                            size: 30,
+                          ),
                         ),
                       ],
                     ),
@@ -117,7 +129,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 5),
               ),
@@ -188,7 +200,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
     );
   }
 
-  Widget _buildPreferenceOption(String label, IconData icon) {
+  Widget _buildPreferenceOption(String label, Widget icon) {
     final isSelected = _selectedType == label;
     return GestureDetector(
       onTap: () => setState(() => _selectedType = label),
@@ -205,7 +217,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -215,7 +227,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: const Color(0xFF2C4E4E), size: 30),
+            SizedBox(width: 30, height: 30, child: icon),
             const SizedBox(height: 10),
             Text(
               label,

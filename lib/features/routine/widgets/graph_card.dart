@@ -65,7 +65,7 @@ class _GraphCardState extends State<GraphCard>
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -152,7 +152,7 @@ class _DetailedChartPainter extends CustomPainter {
       ..strokeWidth = 3.0
       ..style = PaintingStyle.stroke;
     final fillPaint = Paint()
-      ..color = const Color(0xFF7CB9A8).withOpacity(0.1)
+      ..color = const Color(0xFF7CB9A8).withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
     final gridPaint = Paint()
       ..color = Colors.grey.shade200
@@ -210,7 +210,7 @@ class _DetailedChartPainter extends CustomPainter {
           Offset(x, y),
           8,
           Paint()
-            ..color = const Color(0xFF004D40).withOpacity(0.2)
+            ..color = const Color(0xFF004D40).withValues(alpha: 0.2)
             ..style = PaintingStyle.stroke
             ..strokeWidth = 4,
         );

@@ -53,7 +53,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                             _buildTabSwitcher(),
                             const SizedBox(height: 25),
                             _buildRoutineSection(),
-                            const SizedBox(height: 150),
+                            const SizedBox(height: 90),
                           ],
                         ),
                       ),
@@ -64,16 +64,16 @@ class _RoutineScreenState extends State<RoutineScreen> {
             ),
           ),
 
-          // lib/features/routine/screens/routine_screen.dart
           floatingActionButton: _controller.selectedTab == "Medicines"
               ? Padding(
                   padding: const EdgeInsets.only(bottom: 100),
                   child: FloatingActionButton(
+                    tooltip: "Add routine medicine",
                     onPressed: () =>
                         Navigator.pushNamed(context, AppRouter.addMedicine),
-                    backgroundColor: AppColors.sageGreen,
+                    backgroundColor: AppColors.primaryTeal,
                     shape: const CircleBorder(),
-                    child: const Icon(Icons.add, color: Colors.white, size: 35),
+                    child: const Icon(Icons.add, color: Colors.white, size: 30),
                   ),
                 )
               : null,

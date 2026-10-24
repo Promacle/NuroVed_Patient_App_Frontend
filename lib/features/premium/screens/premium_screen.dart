@@ -31,37 +31,61 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   _buildSectionDivider("Everything is Free, plus"),
                   const SizedBox(height: 15),
                   _buildFeatureCard(
-                    icon: Icons.ios_share_outlined,
+                    icon: const Icon(
+                      Icons.ios_share_outlined,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "Share with Doctors",
                     subtitle:
                         "Share your complete health profile with doctors in one tap.",
                   ),
                   _buildFeatureCard(
-                    icon: FontAwesomeIcons.brain,
+                    icon: const FaIcon(
+                      FontAwesomeIcons.brain,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "AI Health Insights",
                     subtitle:
                         "Get intelligent insights and risk alerts from your health data.",
                   ),
                   _buildFeatureCard(
-                    icon: Icons.trending_up_rounded,
+                    icon: const Icon(
+                      Icons.trending_up_rounded,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "Advanced Timeline",
                     subtitle:
                         "Track trends and patterns with advanced health timeline.",
                   ),
                   _buildFeatureCard(
-                    icon: Icons.groups_outlined,
+                    icon: const Icon(
+                      Icons.groups_outlined,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "Family Profiles",
                     subtitle:
                         "Add and manage your family's health in one secure place.",
                   ),
                   _buildFeatureCard(
-                    icon: Icons.qr_code_scanner_rounded,
+                    icon: const Icon(
+                      Icons.qr_code_scanner_rounded,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "Unlimited Scanner",
                     subtitle:
                         "Scan and store unlimited reports with smart auto-tagging.",
                   ),
                   _buildFeatureCard(
-                    icon: Icons.restaurant_menu_outlined,
+                    icon: const Icon(
+                      Icons.restaurant_menu_outlined,
+                      color: Color(0xFF397D71),
+                      size: 24,
+                    ),
                     title: "Context Aware Diet Plans",
                     subtitle:
                         "Personalized diet recommendations based on your goals.",
@@ -198,7 +222,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 size: 80,
                 color: const Color(0xFF7CB9A8).withValues(alpha: 0.6),
               ),
-              const Icon(FontAwesomeIcons.crown, size: 30, color: Colors.white),
+              const FaIcon(
+                FontAwesomeIcons.crown,
+                size: 30,
+                color: Colors.white,
+              ),
             ],
           ),
         ],
@@ -224,7 +252,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildFeatureCard({
-    required IconData icon,
+    required Widget icon,
     required String title,
     required String subtitle,
   }) {
@@ -251,7 +279,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               color: const Color(0xFFDCEAE5),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF397D71), size: 24),
+            child: icon,
           ),
           const SizedBox(width: 15),
           Expanded(

@@ -19,47 +19,95 @@ class AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(top: 60, bottom: 0),
-      decoration: const BoxDecoration(
-        color: AppColors.lightGrey, // Using your specific theme color
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(50)),
-      ),
-      child: Column(
-        children: [
-          // This PageView only slides the Text, NOT the whole header/dog
-          SizedBox(
-            height: 75,
-            child: PageView.builder(
-              controller: controller,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: titles.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    Text(
-                      titles[index],
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.heading1,
-                    ),
-                    if (subTitles != null && subTitles![index].isNotEmpty)
-                      Text(
-                        subTitles![index],
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 16,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isConstrained =
+            constraints.maxHeight.isFinite && constraints.maxHeight < 280;
+        final bool showImage =
+            !constraints.maxHeight.isFinite || constraints.maxHeight >= 220;
+        final double topPadding = isConstrained ? 0 : 50;
+        final double bottomPadding = isConstrained ? 0 : 8;
+        final double textHeight = isConstrained
+            ? (showImage ? 60.0 : constraints.maxHeight.clamp(40.0, 96.0))
+            : 96.0;
+
+        Widget content = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: textHeight,
+              child: PageView.builder(
+                controller: controller,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: titles.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            titles[index],
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.heading1,
+                          ),
                         ),
-                      ),
-                  ],
-                );
-              },
+                        if (subTitles != null &&
+                            index < subTitles!.length &&
+                            subTitles![index].isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Flexible(
+                            child: Text(
+                              subTitles![index],
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
+            if (showImage) ...[
+              const SizedBox(height: 10),
+              Flexible(
+                child: Image.asset(
+                  imageAsset,
+                  height: 160,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ],
+          ],
+        );
+
+        return Container(
+          width: double.infinity,
+          height: constraints.maxHeight.isFinite ? constraints.maxHeight : null,
+          padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
+          decoration: const BoxDecoration(
+            color: AppColors.lightGrey,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(50)),
           ),
-          const SizedBox(height: 10),
-          Image.asset(imageAsset, height: 160, fit: BoxFit.contain),
-        ],
-      ),
+          child: isConstrained
+              ? SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: content,
+                )
+              : content,
+        );
+      },
     );
   }
 }

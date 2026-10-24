@@ -138,8 +138,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
           orElse: () => profileController.userData,
         );
 
+        final topPad = MediaQuery.of(context).padding.top;
         return Container(
-          padding: const EdgeInsets.fromLTRB(25, 60, 25, 30),
+          padding: EdgeInsets.fromLTRB(25, topPad + 16, 25, 26),
           decoration: const BoxDecoration(
             color: AppColors.kTopBg,
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(45)),
@@ -244,39 +245,80 @@ class _RecordsScreenState extends State<RecordsScreen> {
   Widget _buildRecordsGrid() {
     final records = _controller.filteredRecords;
     if (records.isEmpty) {
+      final isSearching = _searchController.text.trim().isNotEmpty;
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 40),
+        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 16),
         alignment: Alignment.center,
         child: Column(
           children: [
-            Icon(Icons.folder_open_outlined, size: 45, color: Colors.grey[400]),
-            const SizedBox(height: 10),
-            const Text(
-              "No medical records found for this profile",
-              style: TextStyle(color: Colors.grey, fontSize: 13),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceMint,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSearching
+                    ? Icons.search_off_rounded
+                    : Icons.folder_open_outlined,
+                size: 36,
+                color: AppColors.primaryTeal,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              isSearching
+                  ? "No records matching '${_searchController.text}'"
+                  : "No medical records found for this profile",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+                fontSize: 15,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isSearching
+                  ? "Check for typos or try clearing your search filter"
+                  : "Tap '+' below to add your first diagnostic report or prescription",
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
             ),
           ],
         ),
       );
     }
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 15,
-        childAspectRatio: 0.62,
-      ),
-      itemCount: records.length,
-      itemBuilder: (context, index) {
-        final record = records[index];
-        return RecordCard(
-          title: record["title"] ?? "Untitled",
-          subtitle: record["sub"] ?? record["description"] ?? "No description",
-          onTap: () => _openRecordDetails(record),
-          onDelete: () => _confirmDeleteRecord(record),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth > 720
+            ? 4
+            : (constraints.maxWidth > 480 ? 3 : 2);
+        final childAspectRatio = crossAxisCount == 2
+            ? 0.84
+            : (crossAxisCount == 3 ? 0.76 : 0.72);
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 14,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: records.length,
+          itemBuilder: (context, index) {
+            final record = records[index];
+            return RecordCard(
+              title: record["title"] ?? "Untitled",
+              subtitle:
+                  record["sub"] ?? record["description"] ?? "No description",
+              onTap: () => _openRecordDetails(record),
+              onDelete: () => _confirmDeleteRecord(record),
+            );
+          },
         );
       },
     );
@@ -286,11 +328,12 @@ class _RecordsScreenState extends State<RecordsScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 100, right: 10),
       child: FloatingActionButton(
+        tooltip: "Add medical record",
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (c) => const AddRecordScreen()),
         ),
-        backgroundColor: AppColors.kPrimary,
+        backgroundColor: AppColors.primaryTeal,
         elevation: 6,
         shape: const CircleBorder(),
         child: const Icon(
@@ -303,7 +346,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ["All", "Medical Records", "Vaccination's", "Bills", "Lab"];
+    final filters = ["All", "Medical Records", "Vaccinations", "Bills", "Lab"];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

@@ -201,7 +201,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 12,
             offset: const Offset(0, 10),
             spreadRadius: -5,
