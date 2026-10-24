@@ -246,6 +246,77 @@ class AppValidators {
     }
     return null;
   }
+
+  /// Validates file content signature (magic bytes) against its declared extension.
+  static String? validateContentSignature(String fileName, List<int>? bytes) {
+    if (bytes == null || bytes.isEmpty) {
+      return 'File data cannot be empty';
+    }
+
+    final dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex == -1 || dotIndex == fileName.length - 1) {
+      return 'File has no extension';
+    }
+    final ext = fileName.substring(dotIndex + 1).toLowerCase();
+
+    switch (ext) {
+      case 'pdf':
+        if (bytes.length < 4 ||
+            bytes[0] != 0x25 ||
+            bytes[1] != 0x50 ||
+            bytes[2] != 0x44 ||
+            bytes[3] != 0x46) {
+          return 'Invalid PDF: file content signature does not match PDF format';
+        }
+        break;
+      case 'jpg':
+      case 'jpeg':
+        if (bytes.length < 3 ||
+            bytes[0] != 0xFF ||
+            bytes[1] != 0xD8 ||
+            bytes[2] != 0xFF) {
+          return 'Invalid JPEG: file content signature does not match JPEG format';
+        }
+        break;
+      case 'png':
+        if (bytes.length < 8 ||
+            bytes[0] != 0x89 ||
+            bytes[1] != 0x50 ||
+            bytes[2] != 0x4E ||
+            bytes[3] != 0x47 ||
+            bytes[4] != 0x0D ||
+            bytes[5] != 0x0A ||
+            bytes[6] != 0x1A ||
+            bytes[7] != 0x0A) {
+          return 'Invalid PNG: file content signature does not match PNG format';
+        }
+        break;
+      default:
+        return 'Unsupported file format .$ext';
+    }
+    return null;
+  }
+
+  /// Full medical document validation checking extension, size limit (10MB), and content signature.
+  static String? validateMedicalDocument({
+    required String fileName,
+    required int byteLength,
+    List<int>? bytes,
+    int maxBytes = 10485760, // 10MB
+  }) {
+    final typeAndSizeErr = fileTypeAndSize(
+      fileName: fileName,
+      byteLength: byteLength,
+      allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png'],
+      maxBytes: maxBytes,
+    );
+    if (typeAndSizeErr != null) return typeAndSizeErr;
+
+    if (bytes != null && bytes.isNotEmpty) {
+      return validateContentSignature(fileName, bytes);
+    }
+    return null;
+  }
 }
 
 typedef Validators = AppValidators;

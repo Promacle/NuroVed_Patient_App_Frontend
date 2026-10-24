@@ -181,6 +181,9 @@ class ProfileController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Switches active subject back to primary user ('Self')
+  void switchSubjectToSelf() => switchSubject(_profile.id);
+
   void switchSubjectByName(String name) {
     if (name == 'Self' || name == _profile.name) {
       switchSubject(_profile.id);

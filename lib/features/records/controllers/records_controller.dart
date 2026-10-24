@@ -1,13 +1,39 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/errors/failures.dart';
+import '../../../core/models/medical_record.dart';
+import '../../../core/repositories/fake/fake_records_repository.dart';
+import '../../../core/repositories/records_repository.dart';
+import '../../../core/utils/platform_file.dart';
+import '../../../core/utils/result.dart';
+import '../../../core/utils/uuid_generator.dart';
+import '../../../core/utils/validators.dart';
 import '../../profile/controllers/profile_controller.dart';
 
 class RecordsController extends ChangeNotifier {
-  static final RecordsController _instance = RecordsController._internal();
-  factory RecordsController() => _instance;
+  static RecordsController _instance = RecordsController._internal();
+  static RecordsController get instance => _instance;
+  factory RecordsController({RecordsRepository? repository}) {
+    if (repository != null) {
+      _instance._repository = repository;
+    }
+    return _instance;
+  }
 
-  RecordsController._internal() {
+  RecordsRepository _repository;
+  RecordsRepository get repository => _repository;
+
+  RecordsController._internal({RecordsRepository? repository})
+      : _repository = repository ?? FakeRecordsRepository() {
     _attachProfileListener();
+    loadRecords();
+  }
+
+  static void resetForTesting({RecordsRepository? repository}) {
+    ProfileController.instance.removeListener(_instance._onProfileChanged);
+    _instance = RecordsController._internal(
+      repository: repository ?? FakeRecordsRepository(),
+    );
   }
 
   void _attachProfileListener() {
@@ -15,92 +41,286 @@ class RecordsController extends ChangeNotifier {
     ProfileController.instance.addListener(_onProfileChanged);
   }
 
-  static void resetForTesting() {
-    _instance.filteredRecords = [];
-    _instance._recordsBySubjectId.clear();
-    _instance.selectedFilter = "All";
-    _instance._currentSubjectId = null;
-    _instance._attachProfileListener();
-  }
-
   ProfileController get _profileController => ProfileController.instance;
 
-  // Records isolated strictly by subject UUID
-  final Map<String, List<Map<String, dynamic>>> _recordsBySubjectId = {};
-
-  List<Map<String, dynamic>> filteredRecords = [];
+  final List<MedicalRecord> _allRecords = [];
+  final List<MedicalRecord> _records = [];
   String selectedFilter = "All";
+  RecordSortOrder selectedSortOrder = RecordSortOrder.newestFirst;
+  String _currentSearch = "";
   String? _currentSubjectId;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  bool _isUploading = false;
+  bool get isUploading => _isUploading;
+
+  double _uploadProgress = 0.0;
+  double get uploadProgress => _uploadProgress;
+
+  String? _uploadError;
+  String? get uploadError => _uploadError;
+
+  UploadCancelToken? _cancelToken;
+
+  /// Canonical records typed list
+  List<MedicalRecord> get records => List.unmodifiable(_records);
+
+  /// Backward-compatible list of maps for existing UI widgets
+  List<Map<String, dynamic>> get filteredRecords {
+    return _records.map((r) {
+      final map = r.toMap();
+      map['sub'] = r.description ?? r.recordType;
+      return map;
+    }).toList();
+  }
+
   Map<String, dynamic>? get recentRecord {
-    return filteredRecords.isNotEmpty ? filteredRecords.last : null;
+    if (filteredRecords.isNotEmpty) {
+      return filteredRecords.first;
+    }
+    return null;
+  }
+
+  void _filterRecordsSynchronously() {
+    final activeId = _profileController.activeSubjectId;
+    _currentSubjectId = activeId;
+    _records.clear();
+    _records.addAll(_allRecords.where((r) {
+      if (r.isDeleted) return false;
+      if (r.subjectId == activeId) return true;
+      if (_profileController.isMainPatientActive &&
+          (r.profileName.toLowerCase() == 'self' || r.subjectId.isEmpty)) {
+        return true;
+      }
+      return false;
+    }));
+    notifyListeners();
   }
 
   void _onProfileChanged() {
     final activeId = _profileController.activeSubjectId;
     if (_currentSubjectId != activeId) {
-      // Immediately purge previous subject's records to prevent stale data flash
-      filteredRecords = [];
-      _currentSubjectId = activeId;
-      runFilter("");
+      _filterRecordsSynchronously();
+      loadRecords();
     }
   }
 
-  /// Reloads records strictly for the active subject ID
-  void runFilter(String query) {
+  /// Loads records from the repository for the active subject ID
+  Future<void> loadRecords([String query = ""]) async {
     final activeId = _profileController.activeSubjectId;
+    _currentSubjectId = activeId;
+    _currentSearch = query;
+    _isLoading = true;
+    notifyListeners();
 
-    if (_currentSubjectId != activeId) {
-      // Purge previous subject records
-      filteredRecords = [];
-      _currentSubjectId = activeId;
-    }
+    final result = await _repository.getRecords(
+      subjectId: activeId,
+      profileName: _profileController.activeProfileName,
+      searchQuery: query,
+      recordType: selectedFilter == "All" ? null : selectedFilter,
+      sortOrder: selectedSortOrder,
+    );
 
-    final allSubjectRecords = _recordsBySubjectId[activeId] ?? [];
+    _isLoading = false;
+    result.when(
+      success: (data) {
+        _records.clear();
+        _records.addAll(data);
+        for (final d in data) {
+          if (!_allRecords.any((r) => r.id == d.id)) {
+            _allRecords.add(d);
+          }
+        }
+        notifyListeners();
+      },
+      failure: (f) {
+        notifyListeners();
+      },
+    );
+  }
 
-    filteredRecords = allSubjectRecords
-        .map((e) => Map<String, dynamic>.from(e))
-        .where((record) {
-          final bool matchesSearch = query.isEmpty ||
-              (record["title"] ?? "").toString().toLowerCase().contains(
-                    query.toLowerCase(),
-                  ) ||
-              (record["sub"] ?? "").toString().toLowerCase().contains(
-                    query.toLowerCase(),
-                  );
+  void runFilter(String query) {
+    loadRecords(query);
+  }
 
-          final bool matchesFilter =
-              selectedFilter == "All" || record["type"] == selectedFilter;
+  void setFilter(String filter) {
+    selectedFilter = filter;
+    loadRecords(_currentSearch);
+  }
 
-          return matchesSearch && matchesFilter;
-        })
-        .toList();
+  void setSortOrder(RecordSortOrder sortOrder) {
+    selectedSortOrder = sortOrder;
+    loadRecords(_currentSearch);
+  }
 
+  /// Cancels in-flight upload
+  void cancelUpload() {
+    _cancelToken?.cancel();
+    _isUploading = false;
+    _uploadProgress = 0.0;
     notifyListeners();
   }
 
-  void addRecord(Map<String, dynamic> record, [String currentSearch = ""]) {
-    final activeId = _profileController.activeSubjectId;
-    if (!_recordsBySubjectId.containsKey(activeId)) {
-      _recordsBySubjectId[activeId] = [];
-    }
-    final newRecord = Map<String, dynamic>.from(record);
-    newRecord['subjectId'] = activeId;
-    _recordsBySubjectId[activeId]!.add(newRecord);
-    runFilter(currentSearch);
-  }
-
-  void deleteRecord(Map<String, dynamic> record, String currentSearch) {
-    final activeId = _profileController.activeSubjectId;
-    final records = _recordsBySubjectId[activeId];
-    if (records != null) {
-      records.removeWhere(
-        (r) =>
-            r['id'] == record['id'] ||
-            (r['title'] == record['title'] && r['date'] == record['date']),
+  /// Uploads file to private storage bucket `medical-records` with progress/cancel/retry/duplicate protection,
+  /// then persists record metadata only after upload succeeds.
+  /// Cleans up orphaned storage file if metadata persistence fails.
+  Future<Result<MedicalRecord>> uploadAndSaveRecord({
+    required String title,
+    required String recordType,
+    required String date,
+    String? doctorName,
+    String? hospitalName,
+    String? description,
+    required AppPlatformFile file,
+  }) async {
+    // 1. Duplicate-submission protection
+    if (_isUploading) {
+      return const Result.failure(
+        ValidationFailure(message: 'Upload already in progress. Please wait.'),
       );
     }
-    runFilter(currentSearch);
+
+    // 2. Validate file (type, size <= 10MB, and magic bytes content signature)
+    final validationError = Validators.validateMedicalDocument(
+      fileName: file.name,
+      byteLength: file.size,
+      bytes: file.bytes,
+    );
+    if (validationError != null) {
+      return Result.failure(ValidationFailure(message: validationError));
+    }
+
+    _isUploading = true;
+    _uploadProgress = 0.0;
+    _uploadError = null;
+    _cancelToken = UploadCancelToken();
+    notifyListeners();
+
+    final ownerId = _profileController.profile.id.isNotEmpty
+        ? _profileController.profile.id
+        : 'patient-primary-uuid';
+    final subjectId = _profileController.activeSubjectId;
+    final recordId = UuidGenerator.v4();
+
+    // 3. Upload file to private storage bucket
+    final uploadResult = await _repository.uploadFile(
+      ownerId: ownerId,
+      subjectId: subjectId,
+      recordId: recordId,
+      file: file,
+      onProgress: (p) {
+        _uploadProgress = p;
+        notifyListeners();
+      },
+      isCancelled: () => _cancelToken?.isCancelled ?? false,
+    );
+
+    if (uploadResult.isFailure) {
+      _isUploading = false;
+      _uploadError = uploadResult.failureOrNull?.message ?? 'Upload failed';
+      notifyListeners();
+      return Result.failure(uploadResult.failureOrNull!);
+    }
+
+    final storagePath = uploadResult.dataOrNull!;
+
+    // 4. Construct canonical record metadata (NO local file paths stored)
+    final record = MedicalRecord(
+      id: recordId,
+      userId: ownerId,
+      subjectId: subjectId,
+      profileName: _profileController.activeProfileName,
+      title: title.trim().isEmpty ? 'Untitled Record' : title.trim(),
+      recordType: recordType.trim().isEmpty ? 'Other' : recordType.trim(),
+      date: date.isNotEmpty ? date : DateTime.now().toIso8601String().split('T')[0],
+      doctorName: doctorName?.trim(),
+      hospitalName: hospitalName?.trim(),
+      description: description?.trim(),
+      storagePath: storagePath,
+      fileName: file.name,
+      mimeType: file.mimeType,
+      fileSize: file.size,
+      createdAt: DateTime.now(),
+    );
+
+    // 5. Persist record metadata
+    final saveResult = await _repository.addRecord(record);
+
+    if (saveResult.isFailure) {
+      // Clean up orphaned storage object on partial failure
+      await _repository.deleteStorageFile(storagePath);
+      _isUploading = false;
+      _uploadError = saveResult.failureOrNull?.message ?? 'Failed to save record metadata';
+      notifyListeners();
+      return Result.failure(saveResult.failureOrNull!);
+    }
+
+    final savedRecord = saveResult.dataOrNull!;
+    _isUploading = false;
+    _uploadProgress = 1.0;
+    _allRecords.insert(0, savedRecord);
+    _records.insert(0, savedRecord);
+    notifyListeners();
+
+    return Result.success(savedRecord);
+  }
+
+  /// Backward-compatible addRecord method
+  void addRecord(Map<String, dynamic> recordMap, [String currentSearch = ""]) {
+    final record = MedicalRecord.fromMap(recordMap).copyWith(
+      subjectId: _profileController.activeSubjectId,
+      profileName: _profileController.activeProfileName,
+    );
+    _allRecords.insert(0, record);
+    _records.insert(0, record);
+    _repository.addRecord(record);
+    notifyListeners();
+  }
+
+  /// Soft deletes record by ID and refreshes view
+  Future<Result<void>> softDeleteRecord(String recordId) async {
+    final result = await _repository.deleteRecord(recordId);
+    if (result.isSuccess) {
+      _allRecords.removeWhere((r) => r.id == recordId);
+      _records.removeWhere((r) => r.id == recordId);
+      notifyListeners();
+    }
+    return result;
+  }
+
+  /// Alias for softDeleteRecord
+  Future<Result<void>> deleteRecordById(String recordId) => softDeleteRecord(recordId);
+
+  /// Updates an existing medical record's metadata
+  Future<Result<MedicalRecord>> updateRecord(MedicalRecord record) async {
+    final result = await _repository.updateRecord(record);
+    if (result.isSuccess) {
+      final index = _records.indexWhere((r) => r.id == record.id);
+      if (index != -1) {
+        _records[index] = result.dataOrNull!;
+        notifyListeners();
+      }
+    }
+    return result;
+  }
+
+  /// Backward-compatible deleteRecord method
+  void deleteRecord(Map<String, dynamic> recordMap, String currentSearch) {
+    final id = recordMap['id']?.toString() ?? '';
+    if (id.isNotEmpty) {
+      softDeleteRecord(id);
+    }
+  }
+
+  /// Retrieves short-lived signed URL for file preview or download
+  Future<Result<String>> getSignedUrl(String recordId) async {
+    return _repository.getSignedUrl(recordId);
+  }
+
+  MedicalRecord? getRecordById(String id) {
+    return _records.where((r) => r.id == id).firstOrNull;
   }
 
   @override
@@ -109,3 +329,4 @@ class RecordsController extends ChangeNotifier {
     super.dispose();
   }
 }
+
