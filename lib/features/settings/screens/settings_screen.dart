@@ -44,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => _showPrivacyPolicy(context),
                     child: _buildSettingCard(
                       "Privacy Policy",
                       "Must check our Privacy policy.",
@@ -52,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
 
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => _showTermsOfService(context),
                     child: _buildSettingCard(
                       "Terms of Service",
                       "Must check our terms of service.",
@@ -177,6 +177,59 @@ class SettingsScreen extends StatelessWidget {
             Icons.arrow_forward_rounded,
             color: Color(0xFF2C4E4E),
             size: 18,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPrivacyPolicy(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Privacy Policy'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'NuroVed Privacy & Data Protection\n\n'
+            '1. Patient Data Sovereignty: You own and control your health records, glucose logs, and medical history.\n\n'
+            '2. Access Control: Patient data is protected by Row Level Security (RLS) policies. Only you and explicitly authorized caregivers can view or edit your records.\n\n'
+            '3. Medical Records Security: Uploaded clinical documents are stored in private cloud storage and accessed solely through short-lived signed URLs.\n\n'
+            '4. No Data Monetization: NuroVed does not sell, rent, or share personal health information with third parties or advertisers.\n\n'
+            '5. Account Erasure: You may delete your account and all associated health data at any time from App Settings.',
+            style: TextStyle(fontSize: 13, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTermsOfService(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Terms of Service'),
+        content: const SingleChildScrollView(
+          child: Text(
+            'NuroVed Terms of Service\n\n'
+            '1. Continuity of Care Companion: NuroVed is designed as a patient tracking and continuity-of-care tool. It does not replace professional medical advice, diagnosis, or clinical judgment.\n\n'
+            '2. Medication & Routine Tracking: Medicine reminders and schedule entries are patient-entered tools. Always follow your prescribing clinician\'s instructions and verified prescription labels.\n\n'
+            '3. Emergency Situations: If you experience a medical emergency, acute hypoglycaemia, or any severe symptoms, contact emergency medical services or visit the nearest emergency facility immediately.\n\n'
+            '4. Caregiver Authorization: Delegated access grants permit appointed caregivers to view or manage records on your behalf. You retain full authority to revoke delegated access at any time.',
+            style: TextStyle(fontSize: 13, height: 1.5),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
           ),
         ],
       ),

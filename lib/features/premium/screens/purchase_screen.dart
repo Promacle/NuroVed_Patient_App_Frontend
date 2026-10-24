@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
-import 'package:nuroved_patient/features/premium/screens/premium_status_screen.dart';
-
-import '../../../app/app_router.dart';
+import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 class PurchaseScreen extends StatefulWidget {
   final String planName;
@@ -390,104 +388,86 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     );
   }
 
-  // Update _buildPayButton method
   Widget _buildPayButton(
     double total,
     double serviceCharge,
     double discount,
     double gst,
   ) {
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          height: 55,
-          child: ElevatedButton(
-            onPressed: () => _navigateToStatus(
-              context,
-              PremiumPurchaseStatus.success,
-              total,
-              serviceCharge,
-              discount,
-              gst,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFD2E4DD)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFFE8F4F0),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2F8F6B),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            child: const Icon(
+              Icons.credit_card_off_rounded,
+              size: 26,
+              color: AppColors.primaryTeal,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            "In-App Purchases Unavailable in MVP",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2C4E4E),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Payment checkout is disabled in this MVP release.\n\nIn accordance with NuroVed safety guidelines, subscription entitlement requires server-side receipt validation with Apple StoreKit and Google Play Billing, which is not yet configured.\n\nAll current core continuity-of-care tools remain accessible in free preview mode.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textGrey,
+              height: 1.45,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2C4E4E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
               ),
-            ),
-            child: const Text(
-              "Pay",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+              child: const Text(
+                "Return to App",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 15),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _navigateToStatus(
-                  context,
-                  PremiumPurchaseStatus.failed,
-                  total,
-                  serviceCharge,
-                  discount,
-                  gst,
-                ),
-                child: const Text(
-                  "Demo: Failed",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _navigateToStatus(
-                  context,
-                  PremiumPurchaseStatus.renew,
-                  total,
-                  serviceCharge,
-                  discount,
-                  gst,
-                ),
-                child: const Text(
-                  "Demo: Renew",
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  void _navigateToStatus(
-    BuildContext context,
-    PremiumPurchaseStatus status,
-    double total,
-    double serviceCharge,
-    double discount,
-    double gst,
-  ) {
-    Navigator.pushNamed(
-      context,
-      AppRouter.premiumStatus,
-      arguments: {
-        'status': status,
-        'amount': total,
-        'planName': widget.planName,
-        'serviceCharge': serviceCharge,
-        'discount': discount,
-        'gst': gst,
-      },
+        ],
+      ),
     );
   }
 }

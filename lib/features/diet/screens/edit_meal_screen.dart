@@ -272,7 +272,36 @@ class _EditMealScreenState extends State<EditMealScreen> {
       height: 55,
       child: ElevatedButton(
         onPressed: () {
+          // Validation: ensure meal titles are non-empty and ingredients are sanitized
+          if (_localPlan['weeklyPlan'] != null) {
+            for (final day in _localPlan['weeklyPlan']) {
+              for (final meal in day['meals'] ?? []) {
+                final title = (meal['title'] as String?)?.trim();
+                if (title == null || title.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Meal titles cannot be empty.'),
+                      backgroundColor: Color(0xFFE11D48),
+                    ),
+                  );
+                  return;
+                }
+                if (meal['ingredients'] is List) {
+                  meal['ingredients'] = (meal['ingredients'] as List)
+                      .map((e) => e.toString().trim())
+                      .where((e) => e.isNotEmpty)
+                      .toList();
+                }
+              }
+            }
+          }
           _dietController.saveDietPlan(_localPlan);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Diet meal plan updated successfully.'),
+              backgroundColor: AppColors.primaryTeal,
+            ),
+          );
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(

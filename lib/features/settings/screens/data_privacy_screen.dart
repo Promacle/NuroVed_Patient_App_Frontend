@@ -195,7 +195,7 @@ class DataPrivacyScreen extends StatelessWidget {
           child: Text(
             'NuroVed places patient privacy and health data sovereignty at its core.\n\n'
             '1. Patient Data Ownership: You own your health records, blood sugar logs, and clinical timelines.\n'
-            '2. End-to-End Protection: Data at rest and in transit is encrypted using industry standard AES-256 and TLS 1.3.\n'
+            '2. Transit & Storage Protection: Data in transit is protected via HTTPS/TLS 1.3, and database access is governed by authenticated Row Level Security policies.\n'
             '3. Zero Credential Leakage: Authentication is verified directly with security-hardened tokens.\n'
             '4. Permanent Account Deletion: You have the right to permanently erase your account and all associated health records at any time.',
             style: TextStyle(fontSize: 13, height: 1.5),
@@ -302,7 +302,7 @@ class DataPrivacyScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Your Data Is Securely Stored & Encrypted",
+                  "Your Data Is Securely Stored & Protected",
                   style: TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],

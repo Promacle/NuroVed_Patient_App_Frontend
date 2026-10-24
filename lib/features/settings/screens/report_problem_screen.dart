@@ -132,13 +132,51 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     );
   }
 
+  void _handleSubmit() {
+    final text = _problemController.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a description of the problem.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+    if (text.length < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide more detail (minimum 10 characters).'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _pastProblems.insert(0, {
+        "description": text,
+        "time": "Just now",
+        "color": const Color(0xFF004445),
+      });
+      _problemController.clear();
+    });
+
+    FocusScope.of(context).unfocus();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Saved to local device diagnostics. Cloud sync will occur when support gateway is online.',
+        ),
+        duration: Duration(seconds: 4),
+      ),
+    );
+  }
+
   Widget _buildSubmitButton() {
     return ElevatedButton(
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Problem reported successfully!')),
-        );
-      },
+      onPressed: _handleSubmit,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF004445),
         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerSupportScreen extends StatefulWidget {
   const CustomerSupportScreen({super.key});
@@ -304,46 +305,147 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   }
 
   Widget _buildExpandableTile(IconData icon, String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F3F3),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 10),
-            spreadRadius: -5,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF2C4E4E), width: 1.5),
+    return GestureDetector(
+      onTap: () => _handleContactAction(context, title),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F3F3),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 12,
+              offset: const Offset(0, 10),
+              spreadRadius: -5,
             ),
-            child: Icon(icon, color: const Color(0xFF2C4E4E), size: 22),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C4E4E),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF2C4E4E), width: 1.5),
+              ),
+              child: Icon(icon, color: const Color(0xFF2C4E4E), size: 22),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2C4E4E),
+                ),
               ),
             ),
-          ),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            color: Color(0xFF2C4E4E),
-            size: 30,
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Color(0xFF2C4E4E),
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleContactAction(BuildContext context, String title) async {
+    switch (title) {
+      case "Customer Service":
+        final uri = Uri.parse("tel:+918000000000");
+        try {
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri);
+          } else if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Direct phone support is available at +91 80000 00000.",
+            );
+          }
+        } catch (_) {
+          if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Direct phone support is available at +91 80000 00000.",
+            );
+          }
+        }
+        break;
+      case "Website":
+        final uri = Uri.parse("https://nuroved.com");
+        try {
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Please visit https://nuroved.com in your web browser.",
+            );
+          }
+        } catch (_) {
+          if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Please visit https://nuroved.com in your web browser.",
+            );
+          }
+        }
+        break;
+      case "Whatsapp":
+        final uri = Uri.parse("https://wa.me/918000000000");
+        try {
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Reach out to official support via WhatsApp at +91 80000 00000.",
+            );
+          }
+        } catch (_) {
+          if (context.mounted) {
+            _showChannelDialog(
+              context,
+              title,
+              "Reach out to official support via WhatsApp at +91 80000 00000.",
+            );
+          }
+        }
+        break;
+      default:
+        _showChannelDialog(
+          context,
+          title,
+          "The $title support channel is not yet active in this preview. Please reach out via WhatsApp or Website.",
+        );
+        break;
+    }
+  }
+
+  void _showChannelDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(title),
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
           ),
         ],
       ),

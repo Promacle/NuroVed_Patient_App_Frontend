@@ -26,11 +26,6 @@ class _AccessScreenState extends State<AccessScreen> {
     },
   ];
 
-  final List<Map<String, String>> _accessRequests = [
-    {"name": "Apollo Hospitals", "type": "Edit Access", "data": "Full Profile"},
-    {"name": "Zydus Hospital", "type": "View Only", "data": "Medical Records"},
-  ];
-
   // Selection states for "Grant New Access"
   String _selectedHospital = "Select Hospital";
   String _selectedDuration = "Permanent Access";
@@ -568,477 +563,112 @@ class _AccessScreenState extends State<AccessScreen> {
             style: TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
           const SizedBox(height: 20),
-          if (_accessRequests.isEmpty)
-            _buildEmptyState()
-          else
-            ..._accessRequests.map((request) => _buildRequestTile(request)),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFD2E4DD)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFE8F4F0),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.verified_user_outlined,
+                    color: AppColors.primaryTeal,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Clinician Direct Sharing Coming Soon",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Direct institutional hospital and clinician sharing is disabled in the MVP.\n\nIn accordance with healthcare safety standards, clinical access requires server-side identity verification through accredited provider directories. A clinician's identity is never proven by an unverified name or typed email.\n\nDelegated caregiver access is available in the 'Manage Access' tab, protected by authenticated Row Level Security.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textGrey,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F6F4),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFD2E4DD)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.security,
+                        size: 16,
+                        color: AppColors.primaryTeal,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Enforced via Care Access Grants & RLS policies",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTeal,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF7CB9A8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () => setState(() => _selectedTab = 0),
+                    child: const Text(
+                      "Go to Manage Access",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-
-  Widget _buildRequestTile(Map<String, String> request) {
-    return GestureDetector(
-      onTap: () => _showReviewGrantPopup(request),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-        ),
-        child: Row(
-          children: [
-            const CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 20,
-              child: Icon(Icons.business, color: Color(0xFF2C4E4E), size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    request['name']!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Color(0xFF2C4E4E),
-                    ),
-                  ),
-                  Text(
-                    "${request['data']} - ${request['type']}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 10),
-                  ),
-                ],
-              ),
-            ),
-            _buildRequestButton(
-              label: "Grant",
-              color: const Color(0xFF7CB9A8),
-              onTap: () => _showReviewGrantPopup(request),
-            ),
-            const SizedBox(width: 8),
-            _buildRequestButton(
-              label: "Decline",
-              color: const Color(0xFFBDBDBD),
-              onTap: () {
-                setState(() => _accessRequests.remove(request));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Request from ${request['name']} declined"),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRequestButton({
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showReviewGrantPopup(Map<String, String> request) {
-    String tempDuration = "Permanent Access";
-    String tempType = request['type']!;
-    List<String> tempData = [request['data']!];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setPopupState) => Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: const BoxDecoration(
-            color: Color(0xFFE2EDEA),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(45)),
-          ),
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 25),
-              const Text(
-                "Hospital Access Request",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
-                ),
-              ),
-              const Text(
-                "Hospitals Requesting Access To Your Profile",
-                style: TextStyle(color: AppColors.textGrey, fontSize: 13),
-              ),
-              const SizedBox(height: 30),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.business,
-                            color: Color(0xFF2C4E4E),
-                            size: 32,
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                request['name']!,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Color(0xFF2C4E4E),
-                                ),
-                              ),
-                              Text(
-                                "${tempData.join(", ")} - $tempType",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Column(
-                        children: [
-                          _buildPopupRow(
-                            icon: Icons.access_time,
-                            title: "Access Duration",
-                            subtitle: tempDuration,
-                            onTap: () {
-                              _showSelectionPopup(
-                                title: "Access Duration",
-                                options: ["Permanent Access", "Custom Date"],
-                                onSelected: (val) async {
-                                  if (val == "Custom Date") {
-                                    final date = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime.now(),
-                                      lastDate: DateTime.now().add(
-                                        const Duration(days: 365),
-                                      ),
-                                    );
-                                    if (date != null)
-                                      setPopupState(
-                                        () => tempDuration =
-                                            "${date.day}/${date.month}/${date.year}",
-                                      );
-                                  } else {
-                                    setPopupState(() => tempDuration = val);
-                                  }
-                                },
-                                isSelected: (val) => val == "Custom Date"
-                                    ? tempDuration != "Permanent Access"
-                                    : tempDuration == val,
-                              );
-                            },
-                          ),
-                          const Divider(height: 1, indent: 60),
-                          _buildPopupRow(
-                            icon: Icons.create_new_folder_outlined,
-                            title: "Data To Share",
-                            subtitle: tempData.isEmpty
-                                ? "Full Profile"
-                                : tempData.join(", "),
-                            onTap: () {
-                              _showSelectionPopup(
-                                title: "Data To Share",
-                                options: [
-                                  "Full Profile",
-                                  "Only Health Timeline",
-                                  "Only Medical Records",
-                                  "Only Profile Page",
-                                ],
-                                isMultiSelect: true,
-                                onSelected: (val) {
-                                  setPopupState(() {
-                                    if (val == "Full Profile")
-                                      tempData.clear();
-                                    else if (tempData.contains(val))
-                                      tempData.remove(val);
-                                    else
-                                      tempData.add(val);
-                                  });
-                                },
-                                isSelected: (val) => val == "Full Profile"
-                                    ? tempData.isEmpty
-                                    : tempData.contains(val),
-                              );
-                            },
-                          ),
-                          const Divider(height: 1, indent: 60),
-                          _buildPopupRow(
-                            icon: Icons.lock_outline,
-                            title: "Access Type",
-                            subtitle: tempType,
-                            onTap: () {
-                              _showSelectionPopup(
-                                title: "Access Type",
-                                options: ["View Only", "Edit & View"],
-                                onSelected: (val) =>
-                                    setPopupState(() => tempType = val),
-                                isSelected: (val) => tempType == val,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _activeHospitals.insert(0, {
-                              "name": request['name']!,
-                              "type": tempType,
-                              "data": tempData.isEmpty
-                                  ? "Full Profile"
-                                  : tempData.join(", "),
-                              "expiry": tempDuration == "Permanent Access"
-                                  ? "Never"
-                                  : tempDuration,
-                            });
-                            _accessRequests.remove(request);
-                          });
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Access granted successfully!"),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7CB9A8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          "Review & Grant Access",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showSelectionPopup({
-    required String title,
-    required List<String> options,
-    required Function(String) onSelected,
-    required bool Function(String) isSelected,
-    bool isMultiSelect = false,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: const Color(0xFFE2EDEA),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF2C4E4E),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options
-                .map(
-                  (opt) => SelectionPill(
-                    label: opt,
-                    isSelected: isSelected(opt),
-                    onTap: () {
-                      onSelected(opt);
-                      setDialogState(() {});
-                      if (!isMultiSelect && opt != "Custom Date")
-                        Navigator.pop(context);
-                    },
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPopupRow({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(icon, color: const Color(0xFF7CB9A8), size: 24),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Color(0xFF2C4E4E),
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.black54, fontSize: 10),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward, size: 18, color: Color(0xFF2C4E4E)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: 100),
-        child: Column(
-          children: [
-            Icon(Icons.folder_open_outlined, size: 80, color: Colors.grey),
-            SizedBox(height: 15),
-            Text(
-              "No Access Requests",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
+
 
 class _ToggleItem extends StatelessWidget {
   final String label;

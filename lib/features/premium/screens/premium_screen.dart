@@ -89,7 +89,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     subtitle: "₹804/Year",
                     isMostPopular: true,
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
+                  _buildSubscriptionPreviewNotice(),
                   _buildContinueButton(),
                   const SizedBox(height: 150),
                 ],
@@ -509,6 +510,34 @@ class _PremiumScreenState extends State<PremiumScreen> {
             Icon(Icons.arrow_forward, color: Colors.white, size: 24),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionPreviewNotice() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F2EF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFC7E2D9)),
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.info_outline, size: 18, color: Color(0xFF2C4E4E)),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              "Subscriptions are currently in preview mode. In-app checkout is disabled until store release.",
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C4E4E),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

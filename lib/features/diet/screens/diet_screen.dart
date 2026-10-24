@@ -20,11 +20,45 @@ class DietScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
+                  _buildDisclaimerBanner(),
+                  const SizedBox(height: 16),
                   _buildActivityCard(),
                   const SizedBox(height: 30),
                   _buildQuickActionCard(context),
                   const SizedBox(height: 150),
                 ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDisclaimerBanner() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBF4E6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE8D7B8)),
+      ),
+      child: const Row(
+        children: [
+          Icon(
+            Icons.health_and_safety_outlined,
+            color: Color(0xFFB57D24),
+            size: 20,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              "Diet suggestions are for nutritional tracking only and do not constitute medical diagnosis or treatment.",
+              style: TextStyle(
+                fontSize: 11,
+                color: Color(0xFF7A571A),
+                height: 1.4,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -107,6 +141,30 @@ class DietScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline, size: 12, color: Colors.white),
+                SizedBox(width: 6),
+                Text(
+                  "Sample preview metrics - not clinical measurements",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Row(
             children: [
               const SizedBox(
