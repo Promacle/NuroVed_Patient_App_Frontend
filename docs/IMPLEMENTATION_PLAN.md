@@ -298,6 +298,40 @@
 
 ---
 
+## Stage 5: Medicines, Diet & Scanner, Sharing, Settings, Premium (Phase 6)
+
+### Goals
+1. **Medicine Routines & Notification Reminders**:
+   - Add, edit, delete, and toggle routine completion per subject UUID.
+   - Calculate adherence progress with safe zero-division handling (`total == 0 ? 0.0 : completed / total`).
+   - Tag routines as `verifiedPrescription` ("Verified Prescription") vs `selfEntered` ("Self-Entered"). Exact dosage preservation without altering or inventing doses.
+   - Asynchronous notification permissions check with `NotificationScheduler` and `FakeNotificationScheduler`. Handle denial and exact-alarm permission requirements.
+2. **Diet & Nutrition Disclaimers**:
+   - Add clinical disclaimer banner to Diet screen: "Diet suggestions are for nutritional tracking only and do not constitute medical diagnosis or treatment."
+   - Tag activity preview metrics as "Sample preview metrics - not clinical measurements".
+   - Confirm honest "Unavailable in MVP" states for Food Scanner and AI Diet Planner.
+3. **Doctor Sharing Safeguards**:
+   - External clinician/hospital direct sharing marked with honest "Clinician Direct Sharing Coming Soon — Requires Verified Clinician Portal & Server-Side Identity Check" state.
+   - Clarify that clinician identity is never proven by an unverified name or typed email.
+   - Caregiver delegation remains fully functional under "Manage Access" via Supabase RLS.
+4. **Settings, Privacy & Customer Support**:
+   - Privacy Policy and Terms of Service wired to detailed modals.
+   - Misleading "End-to-End Encryption" claims replaced with honest HTTPS/TLS 1.3 transit and Row Level Security statements.
+   - Customer Support wired to system launchers (`tel:`, `https:`, `https://wa.me/`) via `url_launcher`.
+   - Report a Problem validates input (min 10 characters), stores report to local diagnostics, and provides clear user feedback.
+5. **Premium & Purchases**:
+   - Eliminate fake "Pay", "Demo: Failed", and "Demo: Renew" buttons.
+   - Display honest "In-App Purchases Unavailable in MVP" card explaining unconfigured StoreKit / Google Play receipt verification.
+   - Create `docs/MVP_SCOPE.md` documenting active vs disabled features and clinical rationale.
+
+### Phase 6 Verification Results
+- `flutter test`: **VERIFIED** (146/146 tests passing; 20 new tests added in Phase 6; 100% pass rate).
+- `flutter analyze`: **VERIFIED** (0 errors, 0 warnings across the entire project).
+- Dead-Control Sweep: **VERIFIED** (`git grep -n "() {}" lib/` returns 0 dead callbacks).
+- Documentation: **VERIFIED** (`docs/MVP_SCOPE.md` created; `docs/TESTING_GUIDE.md` updated with Test Suites 17-19).
+
+---
+
 ## Stage 6: Test Suite, Verification & Final Polish
 
 ### Goals

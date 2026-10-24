@@ -255,3 +255,68 @@ This guide provides test procedures for validating the authentication, session s
 2. Verify that visits with timezone offsets (e.g., UTC morning vs IST afternoon) sort according to absolute UTC timestamp.
 3. Switch health subject to another family member.
    - **Expected Result**: Entire timeline updates immediately to display only the newly selected subject's visits and records.
+
+---
+
+## Test Suite 17: Medication Routines & Reminder Scheduling
+
+### TC-17.1: Routine Source Attribution & Exact Dosage Preservation
+1. Navigate to **Routines** (`/routine`).
+2. Verify default routines show the `Verified Prescription` badge.
+3. Tap **+ Add Medicine** (`/add-medicine`).
+4. Enter medicine name `Metformin 850mg`, exact dosage `850mg`, and scheduling instructions.
+5. Tap **Add Medicine**.
+   - **Expected Result**: Permission is checked. After scheduling confirms success, routine is saved with the `Self-Entered` badge. Exact dosage string `850mg` is preserved verbatim without altering or inventing doses.
+
+### TC-17.2: Progress Calculation & Zero-Routine Edge Case
+1. On `/routine`, check initial progress for 3 items with 1 completed -> displays `1/3 Completed` (33%).
+2. Tap checkbox on an incomplete item -> updates immediately to `2/3 Completed` (67%).
+3. Switch active subject to a family member with zero medications.
+   - **Expected Result**: Progress bar displays `0.0` and progress text displays `0/0 Completed` without division-by-zero or NaN error.
+
+### TC-17.3: Notification Permission Denial & System Handling
+1. In test environment with denied notification permissions, attempt scheduling a reminder.
+   - **Expected Result**: Permission dialog informs the user that notification permissions are denied. The routine is not scheduled falsely and false success messages are prevented.
+
+---
+
+## Test Suite 18: Nutritional Tracking & Clinical Disclaimers
+
+### TC-18.1: Diet Activity Card & Clinical Disclaimer Banner
+1. Navigate to **Diet Section** (`/diet`).
+2. Verify top disclaimer banner: "Diet suggestions are for nutritional tracking only and do not constitute medical diagnosis or treatment."
+3. Verify the activity preview card contains the prominent label: "Sample preview metrics - not clinical measurements".
+
+### TC-18.2: Food Scanner & Meal Planner Honest Unavailable States
+1. Tap **Food Scanner** (`/food-scanner`).
+   - **Expected Result**: Displays "Food Scanner Unavailable" with explanation that unverified nutritional estimation is disabled for diabetic safety. No mock barcodes or fabricated nutritional outputs.
+2. Navigate to **AI Diet Planner** (`/ai-diet-planner`).
+   - **Expected Result**: Displays "Meal Generation Unavailable" with notice that automated diet advice requires clinical validation.
+
+---
+
+## Test Suite 19: Access Control, Settings & Payment Integrity
+
+### TC-19.1: Clinician Sharing Coming Soon & Caregiver Isolation
+1. Navigate to **Access** (`/access`) and select the **Access Request** tab.
+   - **Expected Result**: Displays "Clinician Direct Sharing Coming Soon". Explains that clinical identity is never proven by an unverified name or typed email. Directs user to the "Manage Access" tab for caregiver delegation.
+2. On **Manage Access** tab, confirm caregiver grants remain functional and enforced via Row Level Security.
+
+### TC-19.2: Settings Links, Terms of Service & Privacy Policy
+1. Navigate to **Settings** (`/settings`).
+2. Tap **Privacy Policy**.
+   - **Expected Result**: Modal displays honest privacy policy explaining Row Level Security, private storage signed URLs, and zero data monetization.
+3. Tap **Terms of Service**.
+   - **Expected Result**: Modal displays continuity-of-care disclaimer, patient-entered routine tracking guidelines, and emergency facility directives.
+
+### TC-19.3: Customer Support & Local Diagnostics Reporting
+1. In Settings, tap **Customer Support** (`/customer-support`).
+   - **Expected Result**: Tapping Customer Service, Website, and WhatsApp opens system launchers (`tel:`, `https:`, `https://wa.me/`). Social channels display honest "Channel not yet active" dialog.
+2. Tap **Report a Problem** (`/report-problem`).
+   - **Expected Result**: Submitting with empty or <10 characters is blocked with validation error. Submitting a valid problem prepends to past problems list and confirms local device diagnostics logging pending cloud gateway availability.
+
+### TC-19.4: In-App Purchases & Free Preview Mode
+1. Navigate to **Explore Premium** (`/premium`).
+   - **Expected Result**: Displays notice: "Subscriptions are currently in preview mode. In-app checkout is disabled until store release."
+2. Tap **Continue to Premium** (`/purchase`).
+   - **Expected Result**: Displays "In-App Purchases Unavailable in MVP". Fake "Pay", "Demo: Failed", and "Demo: Renew" buttons are completely removed. Provides a single button to return safely to the app.
