@@ -30,6 +30,7 @@ import '../features/premium/screens/premium_status_screen.dart';
 import '../features/premium/screens/purchase_screen.dart';
 import '../features/profile/screens/profile_screen.dart';
 import '../features/records/screens/records_screen.dart';
+import '../features/routine/screens/add_medicine_screen.dart';
 import '../features/routine/screens/routine_screen.dart';
 import '../features/settings/screens/app_settings_screen.dart';
 import '../features/settings/screens/change_email_screen.dart';
@@ -63,6 +64,7 @@ class AppRouter {
   static const String purchase = '/purchase'; // Added this missing constant
   static const String settingsRoute = '/settings';
   static const String addVisit = '/add-visit';
+  static const String addMedicine = '/add-medicine';
   static const String aiDietPlanner = '/ai-diet-planner';
   static const String dietPreference = '/diet-preference';
   static const String healthGoal = '/health-goal';
@@ -212,6 +214,8 @@ class AppRouter {
         return _createAnimatedRoute(const DietPreferenceScreen());
       case addVisit:
         return MaterialPageRoute(builder: (_) => const AddVisitScreen());
+      case addMedicine:
+        return _createAnimatedRoute(const AddMedicineScreen());
       case visitDetails:
         if (settings.arguments is Visit) {
           return _createAnimatedRoute(VisitDetailsScreen(visit: settings.arguments as Visit));

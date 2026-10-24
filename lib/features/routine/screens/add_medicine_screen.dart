@@ -2,6 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../../core/models/medicine_routine.dart';
+import '../../../core/services/notification_scheduler.dart';
+import '../../../core/utils/uuid_generator.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
@@ -483,34 +486,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       width: double.infinity,
       height: 60,
       child: ElevatedButton(
-        onPressed: () {
-          if (_selectedProfileName.isEmpty ||
-              _medicineNameController.text.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Please select profile and enter medicine name"),
-              ),
-            );
-            return;
-          }
-
-          // Logic to extract 12h time from DateTime
-          final hours = _selectedTime.hour;
-          final minutes = _selectedTime.minute;
-          final amPm = hours >= 12 ? "PM" : "AM";
-          final displayHour = hours == 0
-              ? 12
-              : (hours > 12 ? hours - 12 : hours);
-          final timeStr =
-              "${displayHour.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')} $amPm";
-
-          _controller.addMedicine(
-            _medicineNameController.text,
-            "1 tablet * $timeStr * ${_instructionController.text}",
-          );
-
-          Navigator.pop(context);
-        },
+        onPressed: _onSaveReminderPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkTeal,
           shape: RoundedRectangleBorder(
@@ -526,6 +502,116 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _onSaveReminderPressed() async {
+    if (_selectedProfileName.isEmpty || _medicineNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please select profile and enter medicine name"),
+        ),
+      );
+      return;
+    }
+
+    // 1. Request notification permissions properly before scheduling
+    final permissionStatus = await _controller.scheduler.requestPermission();
+    if (permissionStatus != NotificationPermissionStatus.granted) {
+      if (mounted) {
+        _showPermissionDeniedDialog(context);
+      }
+      return;
+    }
+
+    // 2. Format 12-hour display time
+    final hours = _selectedTime.hour;
+    final minutes = _selectedTime.minute;
+    final amPm = hours >= 12 ? "PM" : "AM";
+    final displayHour = hours == 0 ? 12 : (hours > 12 ? hours - 12 : hours);
+    final timeStr =
+        "${displayHour.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')} $amPm";
+    final instruction = _instructionController.text.trim();
+    final medName = _medicineNameController.text.trim();
+    final reminderId = UuidGenerator.v4();
+
+    // 3. Schedule the reminder notification and verify confirmation
+    final scheduleResult = await _controller.scheduler.scheduleReminder(
+      id: reminderId,
+      title: "Medication Reminder: $medName",
+      body: "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}".trim(),
+      scheduledTime: _selectedTime,
+      exact: true,
+    );
+
+    if (scheduleResult.isFailure) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              scheduleResult.failureOrNull?.message ?? "Failed to schedule notification reminder",
+            ),
+            backgroundColor: const Color(0xFFE11D48),
+          ),
+        );
+      }
+      return;
+    }
+
+    // 4. Save the routine only after scheduling confirms success
+    _controller.addMedicine({
+      "id": reminderId,
+      "name": medName,
+      "instruction": "1 tablet * $timeStr ${instruction.isNotEmpty ? '* $instruction' : ''}".trim(),
+      "dosage": "1 tablet",
+      "time": timeStr,
+      "source": RoutineSource.selfEntered.name,
+      "source_display": "Self-Entered",
+      "isCompleted": false,
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Medication reminder scheduled and saved successfully!"),
+          backgroundColor: AppColors.primaryTeal,
+        ),
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.notifications_off_outlined, color: Color(0xFFE11D48)),
+            SizedBox(width: 10),
+            Text('Permission Denied', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Notification permission is required to sound medication alarms at your scheduled time.\n\nPlease enable notifications in device settings to receive timely dosage reminders.',
+          style: TextStyle(fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryTeal,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Understood', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }

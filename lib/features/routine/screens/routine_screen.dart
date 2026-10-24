@@ -6,6 +6,7 @@ import 'package:nuroved_patient/features/routine/controllers/routine_controller.
 import 'package:nuroved_patient/features/routine/screens/routine_detail_screen.dart';
 import 'package:nuroved_patient/features/routine/widgets/routine_tile.dart';
 
+import '../../../app/app_router.dart';
 import '../../settings/controllers/app_settings_controller.dart';
 import '../widgets/medicine_tile.dart';
 
@@ -68,11 +69,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
               ? Padding(
                   padding: const EdgeInsets.only(
                     bottom: 100,
-                  ), // Added padding here
+                  ),
                   child: FloatingActionButton(
-                    onPressed: () {
-                      /* ... */
-                    },
+                    onPressed: () =>
+                        Navigator.pushNamed(context, AppRouter.addMedicine),
                     backgroundColor: AppColors.sageGreen,
                     shape: const CircleBorder(),
                     child: const Icon(Icons.add, color: Colors.white, size: 35),
@@ -409,16 +409,57 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 ...List.generate(_controller.medicines.length, (index) {
                   final med = _controller.medicines[index];
                   return MedicineTile(
-                    name: med['name'],
-                    instruction: med['instruction'],
-                    isCompleted: med['isCompleted'],
+                    name: med['name']?.toString() ?? '',
+                    instruction: med['instruction']?.toString() ?? '',
+                    isCompleted: med['isCompleted'] == true,
+                    sourceDisplay: med['source_display']?.toString(),
                     onTap: () => _controller.toggleMedicine(index),
+                    onDelete: () => _confirmDeleteMedicine(
+                      context,
+                      index,
+                      med['name']?.toString() ?? 'Medicine',
+                    ),
                   );
                 }),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _confirmDeleteMedicine(BuildContext context, int index, String name) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Routine'),
+        content: Text(
+          'Are you sure you want to remove "$name" from your routine schedule?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE11D48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              _controller.deleteMedicine(index);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Removed "$name" from routine.')),
+              );
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }

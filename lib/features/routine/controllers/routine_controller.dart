@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/models/medicine_routine.dart';
+import '../../../core/services/fake_notification_scheduler.dart';
+import '../../../core/services/notification_scheduler.dart';
+import '../../../core/utils/uuid_generator.dart';
 import '../../profile/controllers/profile_controller.dart';
 
 class RoutineController extends ChangeNotifier {
   static final RoutineController _instance = RoutineController._internal();
   factory RoutineController() => _instance;
+
+  NotificationScheduler _scheduler = FakeNotificationScheduler();
+  NotificationScheduler get scheduler => _scheduler;
+
+  void setScheduler(NotificationScheduler scheduler) {
+    _scheduler = scheduler;
+  }
 
   RoutineController._internal() {
     _attachProfileListener();
@@ -16,12 +27,13 @@ class RoutineController extends ChangeNotifier {
     ProfileController.instance.addListener(_onProfileChanged);
   }
 
-  static void resetForTesting() {
+  static void resetForTesting({NotificationScheduler? scheduler}) {
     _instance._medicinesPerSubject.clear();
     _instance._mealsPerSubject.clear();
     _instance._currentSubjectId = null;
     _instance.progress = 0.0;
     _instance.progressText = "0/0 Completed";
+    _instance._scheduler = scheduler ?? FakeNotificationScheduler();
     _instance._attachProfileListener();
     _instance._initializeProfile(ProfileController.instance.activeSubjectId);
   }
@@ -56,21 +68,36 @@ class RoutineController extends ChangeNotifier {
   void _initializeProfile(String subjectId) {
     if (!_medicinesPerSubject.containsKey(subjectId)) {
       // Default diabetic routine only for primary user
-      if (subjectId == _profileController.profile.id || _profileController.isMainPatientActive) {
+      if (subjectId == _profileController.profile.id) {
         _medicinesPerSubject[subjectId] = [
           {
+            "id": "med-default-1",
+            "subjectId": subjectId,
             "name": "Atorvastatin 10mg",
+            "dosage": "10mg",
             "instruction": "1 tablet * 09:00 * Take Before bed",
+            "source": RoutineSource.verifiedPrescription.name,
+            "source_display": "Verified Prescription",
             "isCompleted": false,
           },
           {
+            "id": "med-default-2",
+            "subjectId": subjectId,
             "name": "Aspirin 75mg",
+            "dosage": "75mg",
             "instruction": "1 tablet * 09:00 * Take after lunch",
+            "source": RoutineSource.verifiedPrescription.name,
+            "source_display": "Verified Prescription",
             "isCompleted": false,
           },
           {
+            "id": "med-default-3",
+            "subjectId": subjectId,
             "name": "Metformin 500mg",
+            "dosage": "500mg",
             "instruction": "1 tablet * 08:00 * Take with breakfast",
+            "source": RoutineSource.verifiedPrescription.name,
+            "source_display": "Verified Prescription",
             "isCompleted": true,
           },
         ];
@@ -81,7 +108,7 @@ class RoutineController extends ChangeNotifier {
     }
 
     if (!_mealsPerSubject.containsKey(subjectId)) {
-      if (subjectId == _profileController.profile.id || _profileController.isMainPatientActive) {
+      if (subjectId == _profileController.profile.id) {
         _mealsPerSubject[subjectId] = [
           {
             "title": "Breakfast",
@@ -133,17 +160,66 @@ class RoutineController extends ChangeNotifier {
     if (!_medicinesPerSubject.containsKey(subjectId)) {
       _medicinesPerSubject[subjectId] = [];
     }
+
     if (nameOrMap is Map<String, dynamic>) {
-      _medicinesPerSubject[subjectId]!.add(Map<String, dynamic>.from(nameOrMap));
+      final map = Map<String, dynamic>.from(nameOrMap);
+      map['id'] ??= UuidGenerator.v4();
+      map['subjectId'] = subjectId;
+      map['source'] ??= RoutineSource.selfEntered.name;
+      map['source_display'] ??= (map['source'] == RoutineSource.verifiedPrescription.name
+          ? "Verified Prescription"
+          : "Self-Entered");
+      map['isCompleted'] ??= false;
+      _medicinesPerSubject[subjectId]!.add(map);
     } else {
       _medicinesPerSubject[subjectId]!.add({
+        "id": UuidGenerator.v4(),
+        "subjectId": subjectId,
         "name": nameOrMap.toString(),
         "instruction": instruction ?? "",
+        "source": RoutineSource.selfEntered.name,
+        "source_display": "Self-Entered",
         "isCompleted": false,
       });
     }
+
     _recalculateProgress();
     notifyListeners();
+  }
+
+  void updateMedicine(int index, Map<String, dynamic> updated) {
+    final subjectId = _currentSubjectId ?? _profileController.activeSubjectId;
+    final list = _medicinesPerSubject[subjectId];
+    if (list != null && index >= 0 && index < list.length) {
+      final existing = list[index];
+      list[index] = {
+        ...existing,
+        ...updated,
+        'subjectId': subjectId,
+      };
+      _recalculateProgress();
+      notifyListeners();
+    }
+  }
+
+  void deleteMedicine(int index) {
+    final subjectId = _currentSubjectId ?? _profileController.activeSubjectId;
+    final list = _medicinesPerSubject[subjectId];
+    if (list != null && index >= 0 && index < list.length) {
+      list.removeAt(index);
+      _recalculateProgress();
+      notifyListeners();
+    }
+  }
+
+  void deleteMedicineById(String id) {
+    final subjectId = _currentSubjectId ?? _profileController.activeSubjectId;
+    final list = _medicinesPerSubject[subjectId];
+    if (list != null) {
+      list.removeWhere((m) => m['id'] == id);
+      _recalculateProgress();
+      notifyListeners();
+    }
   }
 
   void intakeMeal(String title) {
