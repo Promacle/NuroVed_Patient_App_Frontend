@@ -5,7 +5,9 @@ import 'package:image_picker/image_picker.dart'; // Add this
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
+import 'package:nuroved_patient/core/utils/validators.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
+import 'package:nuroved_patient/features/records/controllers/records_controller.dart';
 import 'package:nuroved_patient/features/records/screens/record_success_screen.dart';
 
 import '../../home/screens/main_layout.dart';
@@ -27,7 +29,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   bool _isFileExpanded = false;
-  dynamic _pickedFileObject;
+  AppPlatformFile? _pickedPlatformFile;
   String _fileName = "Upload Your Record Document";
 
   DateTime _selectedDate = DateTime.now();
@@ -42,7 +44,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     _selectedProfileName = "";
   }
 
-  void _saveRecord() {
+  Future<void> _saveRecord() async {
     if (_selectedProfileName.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -50,46 +52,91 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       return;
     }
 
-    // Create the record data object
-    final Map<String, dynamic> recordData = {
-      "title": _titleController.text,
-      "description": _descController.text,
-      "type": _selectedRecordType,
-      "date": _selectedDate.toIso8601String(),
-      "fileName": _fileName,
-      "file": _pickedFileObject, // Contains File path or Web Bytes
-    };
+    if (_titleController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter a record title")));
+      return;
+    }
 
-    // Save to profile controller
-    ProfileController().addRecordToProfile(_selectedProfileName, recordData);
+    if (_pickedPlatformFile == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please attach a document or photo")));
+      return;
+    }
 
-    // 2. IMPORTANT: Set this as the active profile so the RecordsScreen knows who to display
-    ProfileController().activeProfileName = _selectedProfileName;
+    final recordsCtrl = RecordsController();
+    if (recordsCtrl.isUploading) {
+      return;
+    }
 
-    // 3. Navigate
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecordSuccessScreen(
-          profileName: _selectedProfileName,
-          date: DateTime.now(),
-        ),
-      ),
+    final result = await recordsCtrl.uploadAndSaveRecord(
+      title: _titleController.text.trim(),
+      recordType: _selectedRecordType.isEmpty ? 'Medical Record' : _selectedRecordType,
+      date: _selectedDate.toIso8601String(),
+      description: _descController.text.trim(),
+      file: _pickedPlatformFile!,
+    );
+
+    if (!mounted) return;
+
+    result.when(
+      success: (record) {
+        ProfileController().activeProfileName = _selectedProfileName;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecordSuccessScreen(
+              profileName: _selectedProfileName,
+              date: DateTime.now(),
+            ),
+          ),
+        );
+      },
+      failure: (f) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(f.message),
+            backgroundColor: Colors.red[700],
+          ),
+        );
+      },
     );
   }
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'jpg', 'png'],
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       withData: true,
     );
 
-    if (result != null) {
+    if (result != null && result.files.isNotEmpty) {
       final file = result.files.single;
+      final platformFile = await AppPlatformFile.fromPlatformFile(file);
+
+      // Validate format, 10MB limit, and magic bytes signature
+      final validationError = Validators.validateMedicalDocument(
+        fileName: platformFile.name,
+        byteLength: platformFile.size,
+        bytes: platformFile.bytes,
+      );
+      if (validationError != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(validationError),
+              backgroundColor: Colors.red[700],
+            ),
+          );
+        }
+        return;
+      }
+
       setState(() {
-        _pickedFileObject = file.bytes ?? file.path;
-        _fileName = file.name;
+        _pickedPlatformFile = platformFile;
+        _fileName = platformFile.name;
         _isFileExpanded = false;
       });
     }
@@ -100,10 +147,28 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
 
     if (photo != null) {
-      final bytes = await photo.readAsBytes();
+      final platformFile = await AppPlatformFile.fromXFile(photo);
+
+      final validationError = Validators.validateMedicalDocument(
+        fileName: platformFile.name,
+        byteLength: platformFile.size,
+        bytes: platformFile.bytes,
+      );
+      if (validationError != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(validationError),
+              backgroundColor: Colors.red[700],
+            ),
+          );
+        }
+        return;
+      }
+
       setState(() {
-        _fileName = "Photo_${DateTime.now().millisecondsSinceEpoch}.jpg";
-        _pickedFileObject = bytes;
+        _pickedPlatformFile = platformFile;
+        _fileName = platformFile.name;
         _isFileExpanded = false;
       });
     }
@@ -731,27 +796,64 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   }
 
   Widget _buildSaveButtonWidget() {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton(
-        onPressed: _saveRecord,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.darkTeal,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+    final recordsCtrl = RecordsController();
+
+    return ListenableBuilder(
+      listenable: recordsCtrl,
+      builder: (context, _) {
+        if (recordsCtrl.isUploading) {
+          final progressPercent = (recordsCtrl.uploadProgress * 100).toInt();
+          return Column(
+            children: [
+              LinearProgressIndicator(
+                value: recordsCtrl.uploadProgress > 0 ? recordsCtrl.uploadProgress : null,
+                backgroundColor: Colors.grey.shade200,
+                color: AppColors.primaryTeal,
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Uploading securely... $progressPercent%',
+                    style: const TextStyle(fontSize: 13, color: Colors.black87),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => recordsCtrl.cancelUpload(),
+                    icon: const Icon(Icons.cancel_outlined, size: 16, color: Colors.red),
+                    label: const Text('Cancel', style: TextStyle(color: Colors.red, fontSize: 13)),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+
+        return SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton(
+            onPressed: _saveRecord,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.darkTeal,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              elevation: 4,
+            ),
+            child: const Text(
+              "Save Records",
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          elevation: 4,
-        ),
-        child: const Text(
-          "Save Records",
-          style: TextStyle(
-            color: AppColors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -968,11 +1070,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         Text(
                           _fileName, // DYNAMIC FILE NAME
                           style: TextStyle(
-                            color: _pickedFileObject != null
+                            color: _pickedPlatformFile != null
                                 ? AppColors.primaryTeal
                                 : AppColors.textGrey,
                             fontSize: 11,
-                            fontWeight: _pickedFileObject != null
+                            fontWeight: _pickedPlatformFile != null
                                 ? FontWeight.bold
                                 : FontWeight.normal,
                           ),

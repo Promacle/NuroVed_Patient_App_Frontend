@@ -37,7 +37,11 @@ import '../features/settings/screens/change_password_screen.dart';
 import '../features/settings/screens/data_privacy_screen.dart';
 import '../features/settings/screens/report_problem_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
+import '../core/models/medical_record.dart';
+import '../core/models/visit.dart';
+import '../features/records/screens/record_details_screen.dart';
 import '../features/visits/screens/add_visit_screen.dart';
+import '../features/visits/screens/visit_details_screen.dart';
 import '../features/visits/screens/visits_screen.dart';
 
 class AppRouter {
@@ -76,6 +80,8 @@ class AppRouter {
   static const String changeEmail = '/change-email';
   static const String changePassword = '/change-password';
   static const String reportProblem = '/report-problem';
+  static const String visitDetails = '/visit-details';
+  static const String recordDetails = '/record-details';
 
   /// Injected active auth repository for route guard evaluation.
   static AuthRepository? authRepository;
@@ -206,6 +212,20 @@ class AppRouter {
         return _createAnimatedRoute(const DietPreferenceScreen());
       case addVisit:
         return MaterialPageRoute(builder: (_) => const AddVisitScreen());
+      case visitDetails:
+        if (settings.arguments is Visit) {
+          return _createAnimatedRoute(VisitDetailsScreen(visit: settings.arguments as Visit));
+        } else if (settings.arguments is String) {
+          return _createAnimatedRoute(VisitDetailsScreen(visitId: settings.arguments as String));
+        }
+        return _createAnimatedRoute(const VisitDetailsScreen());
+      case recordDetails:
+        if (settings.arguments is MedicalRecord) {
+          return _createAnimatedRoute(RecordDetailsScreen(record: settings.arguments as MedicalRecord));
+        } else if (settings.arguments is String) {
+          return _createAnimatedRoute(RecordDetailsScreen(recordId: settings.arguments as String));
+        }
+        return _createAnimatedRoute(const RecordDetailsScreen());
       case healthGoal:
         return _createAnimatedRoute(const HealthGoalScreen());
       case familyProfiles:

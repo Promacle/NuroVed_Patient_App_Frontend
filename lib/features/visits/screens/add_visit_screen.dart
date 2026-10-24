@@ -23,6 +23,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
 
   String _selectedProfileName = "";
   String _selectedRecordTitle = "";
+  String? _selectedRecordId;
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _visitTitleController = TextEditingController();
   final TextEditingController _visitDescController = TextEditingController();
@@ -46,10 +47,12 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
     final newVisit = {
       "profile": _selectedProfileName,
       "date": _formatDateForTimeline(_selectedDate),
+      "visit_date": _selectedDate.toIso8601String(),
       "title": _visitTitleController.text,
       "subtitle": _visitDescController.text,
       "icon": Icons.local_hospital_rounded,
       "relatedRecord": _selectedRecordTitle,
+      "relatedRecordIds": _selectedRecordId != null ? [_selectedRecordId!] : <String>[],
     };
 
     VisitsController().addVisit(newVisit);
@@ -127,8 +130,15 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                               ),
                             ),
                           );
-                          if (result != null && result is String) {
-                            setState(() => _selectedRecordTitle = result);
+                          if (result != null) {
+                            if (result is Map) {
+                              setState(() {
+                                _selectedRecordTitle = result['title']?.toString() ?? '';
+                                _selectedRecordId = result['id']?.toString();
+                              });
+                            } else if (result is String) {
+                              setState(() => _selectedRecordTitle = result);
+                            }
                           }
                         },
                       ),

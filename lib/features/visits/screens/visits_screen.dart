@@ -43,31 +43,65 @@ class _VisitsScreenState extends State<VisitsScreen> {
                     "Recent Visit's",
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _controller.filteredVisits.length,
-                    itemBuilder: (context, index) {
-                      // <--- START REPLACING HERE
-                      final visit = _controller.filteredVisits[index];
+                  ListenableBuilder(
+                    listenable: _controller,
+                    builder: (context, _) {
+                      if (_controller.filteredVisits.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(vertical: 40),
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              Icon(Icons.event_note_outlined, size: 50, color: Colors.grey[400]),
+                              const SizedBox(height: 12),
+                              const Text(
+                                "No visits recorded for this profile yet",
+                                style: TextStyle(color: Colors.grey, fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
 
-                      // LOGIC: Show date if it's the first item OR if this date is different from the previous one
-                      final bool showDate =
-                          index == 0 ||
-                          _controller.filteredVisits[index]['date'] !=
-                              _controller.filteredVisits[index - 1]['date'];
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _controller.filteredVisits.length,
+                        itemBuilder: (context, index) {
+                          final visit = _controller.filteredVisits[index];
 
-                      return VisitTimelineItem(
-                        date: visit['date'],
-                        showDate: showDate, // Pass the calculated flag
-                        title: visit['title'],
-                        subtitle: visit['subtitle'],
-                        icon: visit['icon'],
-                        isFirst: index == 0,
-                        isLast: index == _controller.filteredVisits.length - 1,
+                          // LOGIC: Show date if it's the first item OR if this date is different from the previous one
+                          final bool showDate =
+                              index == 0 ||
+                              _controller.filteredVisits[index]['date'] !=
+                                  _controller.filteredVisits[index - 1]['date'];
+
+                          return VisitTimelineItem(
+                            date: visit['date'],
+                            showDate: showDate,
+                            title: visit['title'],
+                            subtitle: visit['subtitle'],
+                            icon: visit['icon'],
+                            isFirst: index == 0,
+                            isLast: index == _controller.filteredVisits.length - 1,
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRouter.visitDetails,
+                                arguments: visit['visit'] ?? visit['id'],
+                              );
+                            },
+                            onViewRecord: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRouter.visitDetails,
+                                arguments: visit['visit'] ?? visit['id'],
+                              );
+                            },
+                          );
+                        },
                       );
-                    }, // <--- END REPLACING HERE
+                    },
                   ),
                   const SizedBox(height: 150),
                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/models/medical_record.dart';
+import 'package:nuroved_patient/core/repositories/records_repository.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
-import 'package:nuroved_patient/core/utils/app_logger.dart';
 
 import '../../profile/controllers/profile_controller.dart';
 import '../controllers/records_controller.dart';
@@ -8,6 +9,7 @@ import '../widgets/profile_selector.dart';
 import '../widgets/record_card.dart';
 import '../widgets/records_widgets.dart';
 import 'add_record_screen.dart';
+import 'record_details_screen.dart';
 
 class RecordsScreen extends StatefulWidget {
   const RecordsScreen({super.key});
@@ -51,13 +53,44 @@ class _RecordsScreenState extends State<RecordsScreen> {
                   _controller.filteredRecords.isEmpty
                       ? const SizedBox()
                       : RecentRecordCard(
-                          // Use the getter from the controller which is safer
                           record: _controller.recentRecord,
+                          onView: () {
+                            if (_controller.recentRecord != null) {
+                              _openRecordDetails(_controller.recentRecord);
+                            }
+                          },
                         ),
                   const SizedBox(height: 25),
-                  const Text(
-                    "Previous Records",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Previous Records",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      PopupMenuButton<RecordSortOrder>(
+                        icon: const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2C4E4E)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        onSelected: (order) {
+                          _controller.setSortOrder(order);
+                          setState(() {});
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(
+                            value: RecordSortOrder.newestFirst,
+                            child: Text('Newest First'),
+                          ),
+                          PopupMenuItem(
+                            value: RecordSortOrder.oldestFirst,
+                            child: Text('Oldest First'),
+                          ),
+                          PopupMenuItem(
+                            value: RecordSortOrder.titleAsc,
+                            child: Text('Title (A-Z)'),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   RecordsSearchBar(
@@ -142,8 +175,78 @@ class _RecordsScreenState extends State<RecordsScreen> {
     );
   }
 
+  void _confirmDeleteRecord(dynamic record) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Medical Record?'),
+        content: const Text(
+          'Are you sure you want to delete this record? This action will remove it from your records list.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[700],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              _controller.deleteRecord(record, _searchController.text);
+              setState(() {});
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openRecordDetails(dynamic record) {
+    final recordId = record is Map ? record['id']?.toString() : null;
+    final fullRecord = _controller.records.firstWhere(
+      (r) => r.id == recordId,
+      orElse: () => MedicalRecord(
+        id: recordId ?? '',
+        profileName: record is Map ? (record['profile'] ?? '') : '',
+        title: record is Map ? (record['title'] ?? 'Record') : 'Record',
+        recordType: record is Map ? (record['type'] ?? 'Medical Record') : 'Medical Record',
+        date: record is Map ? (record['date'] ?? '') : '',
+      ),
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecordDetailsScreen(record: fullRecord),
+      ),
+    ).then((_) {
+      setState(() {});
+    });
+  }
+
   Widget _buildRecordsGrid() {
     final records = _controller.filteredRecords;
+    if (records.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        alignment: Alignment.center,
+        child: Column(
+          children: [
+            Icon(Icons.folder_open_outlined, size: 45, color: Colors.grey[400]),
+            const SizedBox(height: 10),
+            const Text(
+              "No medical records found for this profile",
+              style: TextStyle(color: Colors.grey, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -154,21 +257,13 @@ class _RecordsScreenState extends State<RecordsScreen> {
         childAspectRatio: 0.62,
       ),
       itemCount: records.length,
-      // Inside _buildRecordsGrid item builder
       itemBuilder: (context, index) {
         final record = records[index];
         return RecordCard(
           title: record["title"] ?? "Untitled",
           subtitle: record["sub"] ?? record["description"] ?? "No description",
-          // Added required onTap
-          onTap: () {
-            // Placeholder: Navigate to record viewer in future
-            AppLogger.debug("Tapped on record");
-          },
-          onDelete: () {
-            _controller.deleteRecord(record, _searchController.text);
-            setState(() {}); // Ensure UI refreshes after delete
-          },
+          onTap: () => _openRecordDetails(record),
+          onDelete: () => _confirmDeleteRecord(record),
         );
       },
     );

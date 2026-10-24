@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/models/medical_record.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
-import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
+import 'package:nuroved_patient/features/records/controllers/records_controller.dart';
+import 'package:nuroved_patient/features/records/screens/record_details_screen.dart';
 
 class SelectRelatedRecordsScreen extends StatefulWidget {
   final String profileName;
@@ -15,7 +17,7 @@ class SelectRelatedRecordsScreen extends StatefulWidget {
 class _SelectRelatedRecordsScreenState
     extends State<SelectRelatedRecordsScreen> {
   int _selectedIndex = -1;
-  List<dynamic> _profileRecords = [];
+  List<MedicalRecord> _profileRecords = [];
 
   @override
   void initState() {
@@ -24,14 +26,15 @@ class _SelectRelatedRecordsScreenState
   }
 
   void _loadRecords() {
-    final members = ProfileController().familyMembers;
-    final member = members.firstWhere(
-      (m) => m['name'] == widget.profileName,
-      orElse: () => {},
-    );
-    if (member.isNotEmpty && member['records'] != null) {
-      _profileRecords = member['records'] as List<dynamic>;
-    }
+    final recordsCtrl = RecordsController();
+    final all = recordsCtrl.records;
+    final matched = all.where(
+      (r) => r.profileName.toLowerCase() == widget.profileName.toLowerCase(),
+    ).toList();
+
+    setState(() {
+      _profileRecords = matched.isNotEmpty ? matched : all;
+    });
   }
 
   @override
@@ -96,7 +99,7 @@ class _SelectRelatedRecordsScreenState
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  record['title'] ?? "Untitled",
+                  record.title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
@@ -108,7 +111,7 @@ class _SelectRelatedRecordsScreenState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  record['type'] ?? "Medical Record",
+                  record.recordType,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 8, color: Colors.black54),
                   maxLines: 2,
@@ -119,7 +122,14 @@ class _SelectRelatedRecordsScreenState
                   height: 24,
                   width: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RecordDetailsScreen(record: record),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.sageGreen,
                       padding: EdgeInsets.zero,
@@ -210,7 +220,10 @@ class _SelectRelatedRecordsScreenState
               ? null
               : () => Navigator.pop(
                   context,
-                  _profileRecords[_selectedIndex]['title'],
+                  {
+                    'id': _profileRecords[_selectedIndex].id,
+                    'title': _profileRecords[_selectedIndex].title,
+                  },
                 ),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.darkTeal,

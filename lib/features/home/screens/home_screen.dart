@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/widgets/backend_status_banner.dart';
 
+import '../../../app/app_router.dart';
 import '../widgets/graph_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/quick_access_grid.dart';
@@ -19,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           _buildTopHeader(),
           const BackendStatusBanner(),
-          _buildBodyContent(),
+          _buildBodyContent(context),
         ],
       ),
     );
@@ -54,7 +55,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -76,14 +77,16 @@ class HomeScreen extends StatelessWidget {
             child: ListView(
               scrollDirection: Axis.horizontal,
               clipBehavior: Clip.none,
-              children: const [
+              children: [
                 RecordCard(
                   title: 'Blood Test Report',
                   subtitle: 'Blood test report for dengue.',
+                  onView: () => Navigator.pushNamed(context, AppRouter.records),
                 ),
                 RecordCard(
                   title: 'Covid-19 Vaccine',
                   subtitle: 'Vaccine report from hope hospital.',
+                  onView: () => Navigator.pushNamed(context, AppRouter.records),
                 ),
               ],
             ),

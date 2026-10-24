@@ -4,7 +4,13 @@ import 'package:nuroved_patient/core/constants/app_assets.dart';
 class RecordCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  const RecordCard({super.key, required this.title, required this.subtitle});
+  final VoidCallback? onView;
+  const RecordCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.onView,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +62,7 @@ class RecordCard extends StatelessWidget {
           ),
           const Spacer(),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: onView,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E293B),
               minimumSize: const Size(100, 35),

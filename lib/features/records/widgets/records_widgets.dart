@@ -7,8 +7,9 @@ import '../../../core/constants/app_assets.dart';
 
 class RecentRecordCard extends StatelessWidget {
   final Map<String, dynamic>? record; // Change from String to dynamic
+  final VoidCallback? onView;
 
-  const RecentRecordCard({super.key, required this.record});
+  const RecentRecordCard({super.key, required this.record, this.onView});
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +77,7 @@ class RecentRecordCard extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: onView,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.kPrimary,
                   shape: const StadiumBorder(),
