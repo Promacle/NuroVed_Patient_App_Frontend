@@ -351,4 +351,315 @@ void main() {
       expect(find.text('—'), findsWidgets);
     });
   });
+
+  group('FoodScannerScreen Lifecycle & Loading Cleanup Tests (Task 11A)', () {
+    Widget buildTestApp(FakeNutritionService fakeService, {Widget? home}) {
+      return MaterialApp(
+        onGenerateRoute: (settings) {
+          if (settings.name == AppRouter.scannedProductResult) {
+            final product = settings.arguments as ScannedFoodProduct;
+            return MaterialPageRoute(
+              builder: (_) => ScannedProductResultScreen(product: product),
+            );
+          }
+          return MaterialPageRoute(
+            builder: (_) => FoodScannerScreen(nutritionService: fakeService),
+          );
+        },
+        home: home ?? FoodScannerScreen(nutritionService: fakeService),
+      );
+    }
+
+    testWidgets(
+      '1. Successful lookup dismisses loading dialog and opens ScannedProductResultScreen',
+      (tester) async {
+        final fakeService = FakeNutritionService(initialProducts: [testProduct])
+          ..delay = const Duration(milliseconds: 150);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('3017620422003');
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(find.text('Looking up product...'), findsOneWidget);
+        expect(state.isLoadingDialogVisible, isTrue);
+        expect(state.isProcessing, isTrue);
+
+        await tester.pump(const Duration(milliseconds: 150));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Looking up product...'), findsNothing);
+        expect(state.isLoadingDialogVisible, isFalse);
+
+        expect(find.byType(ScannedProductResultScreen), findsOneWidget);
+        expect(find.text('Nutella Hazelnut Spread'), findsOneWidget);
+
+        // Pop result screen and verify isProcessing is restored to false
+        Navigator.pop(tester.element(find.byType(ScannedProductResultScreen)));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '2. Product not found dismisses loading dialog and shows error state',
+      (tester) async {
+        final fakeService = FakeNutritionService()
+          ..delay = const Duration(milliseconds: 150);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('9999999999999');
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(find.text('Looking up product...'), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 150));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Looking up product...'), findsNothing);
+        expect(state.isLoadingDialogVisible, isFalse);
+
+        expect(find.text('Product Lookup'), findsOneWidget);
+        expect(find.textContaining('was not found'), findsOneWidget);
+        expect(find.text('Scan Again'), findsOneWidget);
+
+        await tester.tap(find.text('Scan Again'));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '3. Timeout or network failure dismisses loading dialog and displays error',
+      (tester) async {
+        final fakeService = FakeNutritionService()
+          ..simulateTimeout = true
+          ..delay = const Duration(milliseconds: 100);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('12345678');
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.text('Looking up product...'), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Looking up product...'), findsNothing);
+        expect(find.text('Product Lookup'), findsOneWidget);
+        expect(find.textContaining('timed out'), findsOneWidget);
+
+        await tester.tap(find.text('Scan Again'));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+
+        fakeService.reset();
+        fakeService.simulateNetworkError = true;
+        fakeService.delay = const Duration(milliseconds: 100);
+
+        state.handleBarcode('12345678');
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.text('Looking up product...'), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Looking up product...'), findsNothing);
+        expect(find.text('Product Lookup'), findsOneWidget);
+        expect(find.textContaining('internet connection'), findsOneWidget);
+
+        await tester.tap(find.text('Scan Again'));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '4. Unexpected service exception does not leave loading active or dialog stranded',
+      (tester) async {
+        final fakeService = FakeNutritionService()
+          ..simulateException = true
+          ..delay = const Duration(milliseconds: 100);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('12345678');
+        await tester.pump(const Duration(milliseconds: 50));
+        expect(find.text('Looking up product...'), findsOneWidget);
+
+        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Looking up product...'), findsNothing);
+        expect(state.isLoadingDialogVisible, isFalse);
+
+        expect(find.text('Product Lookup'), findsOneWidget);
+        expect(
+          find.textContaining('unexpected service failure'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Scan Again'));
+        await tester.pumpAndSettle();
+
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '5. Repeated barcode events do not trigger concurrent lookups',
+      (tester) async {
+        final fakeService = FakeNutritionService(initialProducts: [testProduct])
+          ..delay = const Duration(milliseconds: 200);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('3017620422003');
+        state.handleBarcode('3017620422003');
+        state.handleBarcode('8901030000000');
+        state.handleBarcode('12345678');
+
+        await tester.pump(const Duration(milliseconds: 250));
+        await tester.pumpAndSettle();
+
+        expect(fakeService.lookupCallCount, 1);
+        expect(find.byType(ScannedProductResultScreen), findsOneWidget);
+
+        Navigator.pop(tester.element(find.byType(ScannedProductResultScreen)));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '6. After error is dismissed, scanning can resume immediately',
+      (tester) async {
+        final fakeService = FakeNutritionService();
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('00000000');
+        await tester.pumpAndSettle();
+
+        expect(find.text('Product Lookup'), findsOneWidget);
+
+        await tester.tap(find.text('Scan Again'));
+        await tester.pumpAndSettle();
+
+        expect(state.isProcessing, isFalse);
+
+        fakeService.addProduct(testProduct);
+        state.handleBarcode('3017620422003');
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ScannedProductResultScreen), findsOneWidget);
+        expect(find.text('Nutella Hazelnut Spread'), findsOneWidget);
+
+        Navigator.pop(tester.element(find.byType(ScannedProductResultScreen)));
+        await tester.pumpAndSettle();
+        expect(state.isProcessing, isFalse);
+      },
+    );
+
+    testWidgets(
+      '7. Disposing during lookup safely cleans up dialog without unsafe context calls',
+      (tester) async {
+        final fakeService = FakeNutritionService()
+          ..delay = const Duration(milliseconds: 300);
+
+        await tester.pumpWidget(buildTestApp(fakeService));
+        await tester.pumpAndSettle();
+
+        final state = tester.state<FoodScannerScreenState>(
+          find.byType(FoodScannerScreen),
+        );
+
+        state.handleBarcode('12345678');
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Looking up product...'), findsOneWidget);
+
+        // Replace widget tree, forcing FoodScannerScreen to be disposed while lookup is in flight
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: Center(child: Text('Other Screen'))),
+          ),
+        );
+
+        // Advance time to allow pending async lookup to finish
+        await tester.pump(const Duration(milliseconds: 350));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Other Screen'), findsOneWidget);
+        expect(find.text('Looking up product...'), findsNothing);
+      },
+    );
+
+    testWidgets('8. Manual barcode lookup follows the same cleanup lifecycle', (
+      tester,
+    ) async {
+      final fakeService = FakeNutritionService()
+        ..delay = const Duration(milliseconds: 150);
+
+      await tester.pumpWidget(buildTestApp(fakeService));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Enter Barcode Manually'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '8888888888888');
+      await tester.tap(find.text('Look Up Product'));
+
+      // One frame to start sheet dismissal and display loading dialog
+      await tester.pump();
+      expect(find.text('Looking up product...'), findsOneWidget);
+
+      // Complete sheet exit animation and service lookup
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Enter Barcode Manually'), findsNothing);
+      expect(find.text('Looking up product...'), findsNothing);
+      expect(find.text('Product Lookup'), findsOneWidget);
+
+      await tester.tap(find.text('Scan Again'));
+      await tester.pumpAndSettle();
+
+      final state = tester.state<FoodScannerScreenState>(
+        find.byType(FoodScannerScreen),
+      );
+      expect(state.isProcessing, isFalse);
+    });
+  });
 }
