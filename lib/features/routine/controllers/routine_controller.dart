@@ -267,6 +267,16 @@ class RoutineController extends ChangeNotifier {
     progressText = "$completed/$total Completed";
   }
 
+  /// Purges in-memory medicine and meal routines upon user sign out or account deletion.
+  void clear() {
+    _medicinesPerSubject.clear();
+    _mealsPerSubject.clear();
+    _currentSubjectId = null;
+    progress = 0.0;
+    progressText = "0/0 Completed";
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _profileController.removeListener(_onProfileChanged);

@@ -35,6 +35,9 @@ class AuthForm extends StatelessWidget {
           controller: authController.passwordController,
           onChanged: (_) => authController.validatePasswords(),
           suffixIcon: IconButton(
+            tooltip: authController.isPasswordVisible
+                ? 'Hide password'
+                : 'Show password',
             icon: Icon(
               authController.isPasswordVisible
                   ? Icons.visibility_outlined
@@ -84,6 +87,9 @@ class AuthForm extends StatelessWidget {
                 ? const Color(0xFFFDA4AF)
                 : null,
             suffixIcon: IconButton(
+              tooltip: authController.isConfirmPasswordVisible
+                  ? 'Hide password'
+                  : 'Show password',
               icon: Icon(
                 authController.isConfirmPasswordVisible
                     ? Icons.visibility_outlined

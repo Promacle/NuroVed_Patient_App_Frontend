@@ -63,8 +63,25 @@ class FakeRecordsRepository implements RecordsRepository {
       );
     }
 
+    // Validate path segments against path traversal
+    if (ownerId.contains('/') ||
+        ownerId.contains(r'\') ||
+        ownerId.contains('..') ||
+        subjectId.contains('/') ||
+        subjectId.contains(r'\') ||
+        subjectId.contains('..') ||
+        recordId.contains('/') ||
+        recordId.contains(r'\') ||
+        recordId.contains('..')) {
+      return const Result.failure(
+        ValidationFailure(
+          message: 'Invalid path segments: path traversal detected',
+        ),
+      );
+    }
+
     // Storage path follows Phase 3 schema convention: {owner_id}/{subject_id}/{record_id}/{filename}
-    final storagePath = '$ownerId/$subjectId/$recordId/${file.name}';
+    final storagePath = '$ownerId/$subjectId/$recordId/${file.sanitizedName}';
     _storageObjects[storagePath] = file.bytes ?? [];
 
     return Result.success(storagePath);

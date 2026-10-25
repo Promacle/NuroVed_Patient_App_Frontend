@@ -4,7 +4,9 @@ import 'package:nuroved_patient/features/diet/screens/diet_output_screen.dart';
 import 'package:nuroved_patient/features/diet/screens/diet_preference_screen.dart';
 import 'package:nuroved_patient/features/diet/screens/edit_meal_screen.dart';
 import 'package:nuroved_patient/features/diet/screens/food_scanner_history_screen.dart';
+import 'package:nuroved_patient/features/diet/screens/food_scanner_screen.dart';
 import 'package:nuroved_patient/features/diet/screens/meal_routine_history_screen.dart';
+import 'package:nuroved_patient/features/diet/screens/scanned_product_result_screen.dart';
 import 'package:nuroved_patient/features/home/screens/main_layout.dart';
 import 'package:nuroved_patient/features/settings/screens/customer_support_screen.dart';
 
@@ -38,9 +40,15 @@ import '../features/settings/screens/change_password_screen.dart';
 import '../features/settings/screens/data_privacy_screen.dart';
 import '../features/settings/screens/report_problem_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
+import '../core/models/diet/diet_preferences.dart';
+import '../core/models/diet/meal_recipe.dart';
 import '../core/models/medical_record.dart';
+import '../core/models/scanned_food_product.dart';
 import '../core/models/visit.dart';
+import '../features/records/screens/add_record_screen.dart';
 import '../features/records/screens/record_details_screen.dart';
+import '../features/records/screens/record_success_screen.dart';
+import '../features/routine/screens/routine_success_screen.dart';
 import '../features/visits/screens/add_visit_screen.dart';
 import '../features/visits/screens/visit_details_screen.dart';
 import '../features/visits/screens/visits_screen.dart';
@@ -65,6 +73,7 @@ class AppRouter {
   static const String settingsRoute = '/settings';
   static const String addVisit = '/add-visit';
   static const String addMedicine = '/add-medicine';
+  static const String addRecord = '/add-record';
   static const String aiDietPlanner = '/ai-diet-planner';
   static const String dietPreference = '/diet-preference';
   static const String healthGoal = '/health-goal';
@@ -72,8 +81,13 @@ class AppRouter {
   static const String timeAndContext = '/time-and-context';
   static const String dietOutput = '/diet-output';
   static const String mealRoutineHistory = '/meal-routine-history';
+  static const String foodScanner = '/food-scanner';
   static const String foodScannerHistory = '/food-scanner-history';
+  static const String scannedProductResult = '/scanned-product-result';
   static const String calorieSuccess = '/calorie-success';
+  static const String dietSuccess = '/diet-success';
+  static const String recordSuccess = '/record-success';
+  static const String routineSuccess = '/routine-success';
   static const String editMeal = '/edit-meal';
   static const String premiumStatus = '/premium-status';
   static const String appSettings = '/app-settings';
@@ -174,11 +188,14 @@ class AppRouter {
 
       // Change the home case to this:
       case home:
+        final initialIndex = settings.arguments is int
+            ? settings.arguments as int
+            : 0;
         return PageRouteBuilder(
           settings: settings, // <--- THIS IS THE CRITICAL FIX
           maintainState: false, // Important for "Back" button re-animation
           pageBuilder: (context, animation, secondaryAnimation) =>
-              const MainLayout(),
+              MainLayout(initialIndex: initialIndex),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -208,14 +225,24 @@ class AppRouter {
         return createAnimatedRoute(const PremiumScreen());
 
       case aiDietPlanner:
-        return createAnimatedRoute(const AiDietPlannerScreen());
+        return createAnimatedRoute(
+          AiDietPlannerScreen(
+            initialPreferences: settings.arguments as DietPreferences?,
+          ),
+        );
       // Inside generateRoute switch:
       case dietPreference:
-        return createAnimatedRoute(const DietPreferenceScreen());
+        return createAnimatedRoute(
+          DietPreferenceScreen(
+            initialPreferences: settings.arguments as DietPreferences?,
+          ),
+        );
       case addVisit:
         return MaterialPageRoute(builder: (_) => const AddVisitScreen());
       case addMedicine:
         return createAnimatedRoute(const AddMedicineScreen());
+      case addRecord:
+        return createAnimatedRoute(const AddRecordScreen());
       case visitDetails:
         if (settings.arguments is Visit) {
           return createAnimatedRoute(
@@ -239,15 +266,44 @@ class AppRouter {
         }
         return createAnimatedRoute(const RecordDetailsScreen());
       case healthGoal:
-        return createAnimatedRoute(const HealthGoalScreen());
+        return createAnimatedRoute(
+          HealthGoalScreen(
+            initialPreferences: settings.arguments as DietPreferences?,
+          ),
+        );
       case familyProfiles:
         return createAnimatedRoute(const FamilyProfilesScreen());
       case timeAndContext:
-        return createAnimatedRoute(const TimeAndContextScreen());
+        return createAnimatedRoute(
+          TimeAndContextScreen(
+            initialPreferences: settings.arguments as DietPreferences?,
+          ),
+        );
       case dietOutput:
-        return createAnimatedRoute(const DietOutputScreen());
+        WeeklyDietPlan? plan;
+        DietPreferences? preferences;
+        if (settings.arguments is Map<String, dynamic>) {
+          final map = settings.arguments as Map<String, dynamic>;
+          plan = map['plan'] as WeeklyDietPlan?;
+          preferences = map['preferences'] as DietPreferences?;
+        } else if (settings.arguments is WeeklyDietPlan) {
+          plan = settings.arguments as WeeklyDietPlan;
+        }
+        return createAnimatedRoute(
+          DietOutputScreen(initialPlan: plan, preferences: preferences),
+        );
+      case foodScanner:
+        return createAnimatedRoute(const FoodScannerScreen());
       case foodScannerHistory:
         return createAnimatedRoute(const FoodScannerHistoryScreen());
+      case scannedProductResult:
+        final product = settings.arguments as ScannedFoodProduct?;
+        if (product != null) {
+          return createAnimatedRoute(
+            ScannedProductResultScreen(product: product),
+          );
+        }
+        return createAnimatedRoute(const FoodScannerScreen());
       case editMeal:
         return createAnimatedRoute(const EditMealScreen());
       case settingsRoute:
@@ -263,15 +319,26 @@ class AppRouter {
       case changePassword:
         return createAnimatedRoute(const ChangePasswordScreen());
       case calorieSuccess:
-        final timestamp = settings.arguments as DateTime;
+        final timestamp = (settings.arguments is DateTime)
+            ? settings.arguments as DateTime
+            : DateTime.now();
         return createAnimatedRoute(CalorieSuccessScreen(timestamp: timestamp));
       case reportProblem:
         return createAnimatedRoute(const ReportProblemScreen());
-      case '/diet-success':
-        final timestamp = settings.arguments as DateTime;
-        return MaterialPageRoute(
-          builder: (_) => DietSuccessScreen(timestamp: timestamp),
+      case dietSuccess:
+        final timestamp = (settings.arguments is DateTime)
+            ? settings.arguments as DateTime
+            : DateTime.now();
+        return createAnimatedRoute(DietSuccessScreen(timestamp: timestamp));
+      case recordSuccess:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final profileName = args?['profileName'] as String? ?? '';
+        final date = args?['date'] as DateTime? ?? DateTime.now();
+        return createAnimatedRoute(
+          RecordSuccessScreen(profileName: profileName, date: date),
         );
+      case routineSuccess:
+        return createAnimatedRoute(const RoutineSuccessScreen());
       // In app_router.dart
 
       case purchase:

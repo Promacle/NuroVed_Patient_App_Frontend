@@ -68,6 +68,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
               ? Padding(
                   padding: const EdgeInsets.only(bottom: 100),
                   child: FloatingActionButton(
+                    heroTag: 'routine_fab',
                     tooltip: "Add routine medicine",
                     onPressed: () =>
                         Navigator.pushNamed(context, AppRouter.addMedicine),

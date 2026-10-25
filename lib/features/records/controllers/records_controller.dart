@@ -83,6 +83,16 @@ class RecordsController extends ChangeNotifier {
     return null;
   }
 
+  /// Purges in-memory records cache upon user sign out or account deletion.
+  void clear() {
+    _allRecords.clear();
+    _records.clear();
+    _currentSearch = "";
+    _currentSubjectId = null;
+    selectedFilter = "All";
+    notifyListeners();
+  }
+
   void _filterRecordsSynchronously() {
     final activeId = _profileController.activeSubjectId;
     _currentSubjectId = activeId;
@@ -206,70 +216,86 @@ class RecordsController extends ChangeNotifier {
     final subjectId = _profileController.activeSubjectId;
     final recordId = UuidGenerator.v4();
 
-    // 3. Upload file to private storage bucket
-    final uploadResult = await _repository.uploadFile(
-      ownerId: ownerId,
-      subjectId: subjectId,
-      recordId: recordId,
-      file: file,
-      onProgress: (p) {
-        _uploadProgress = p;
+    String? storagePath;
+    try {
+      // 3. Upload file to private storage bucket
+      final uploadResult = await _repository.uploadFile(
+        ownerId: ownerId,
+        subjectId: subjectId,
+        recordId: recordId,
+        file: file,
+        onProgress: (p) {
+          _uploadProgress = p;
+          notifyListeners();
+        },
+        isCancelled: () => _cancelToken?.isCancelled ?? false,
+      );
+
+      if (uploadResult.isFailure) {
+        _isUploading = false;
+        _uploadError = uploadResult.failureOrNull?.message ?? 'Upload failed';
         notifyListeners();
-      },
-      isCancelled: () => _cancelToken?.isCancelled ?? false,
-    );
+        return Result.failure(uploadResult.failureOrNull!);
+      }
 
-    if (uploadResult.isFailure) {
+      storagePath = uploadResult.dataOrNull!;
+
+      // 4. Construct canonical record metadata (NO local file paths stored)
+      final record = MedicalRecord(
+        id: recordId,
+        userId: ownerId,
+        subjectId: subjectId,
+        profileName: _profileController.activeProfileName,
+        title: title.trim().isEmpty ? 'Untitled Record' : title.trim(),
+        recordType: recordType.trim().isEmpty ? 'Other' : recordType.trim(),
+        date: date.isNotEmpty
+            ? date
+            : DateTime.now().toIso8601String().split('T')[0],
+        doctorName: doctorName?.trim(),
+        hospitalName: hospitalName?.trim(),
+        description: description?.trim(),
+        storagePath: storagePath,
+        fileName: file.name,
+        mimeType: file.mimeType,
+        fileSize: file.size,
+        createdAt: DateTime.now(),
+      );
+
+      // 5. Persist record metadata
+      final saveResult = await _repository.addRecord(record);
+
+      if (saveResult.isFailure) {
+        // Clean up orphaned storage object on partial failure
+        await _repository.deleteStorageFile(storagePath);
+        _isUploading = false;
+        _uploadError =
+            saveResult.failureOrNull?.message ??
+            'Failed to save record metadata';
+        notifyListeners();
+        return Result.failure(saveResult.failureOrNull!);
+      }
+
+      final savedRecord = saveResult.dataOrNull!;
       _isUploading = false;
-      _uploadError = uploadResult.failureOrNull?.message ?? 'Upload failed';
+      _uploadProgress = 1.0;
+      _allRecords.insert(0, savedRecord);
+      _records.insert(0, savedRecord);
       notifyListeners();
-      return Result.failure(uploadResult.failureOrNull!);
-    }
 
-    final storagePath = uploadResult.dataOrNull!;
-
-    // 4. Construct canonical record metadata (NO local file paths stored)
-    final record = MedicalRecord(
-      id: recordId,
-      userId: ownerId,
-      subjectId: subjectId,
-      profileName: _profileController.activeProfileName,
-      title: title.trim().isEmpty ? 'Untitled Record' : title.trim(),
-      recordType: recordType.trim().isEmpty ? 'Other' : recordType.trim(),
-      date: date.isNotEmpty
-          ? date
-          : DateTime.now().toIso8601String().split('T')[0],
-      doctorName: doctorName?.trim(),
-      hospitalName: hospitalName?.trim(),
-      description: description?.trim(),
-      storagePath: storagePath,
-      fileName: file.name,
-      mimeType: file.mimeType,
-      fileSize: file.size,
-      createdAt: DateTime.now(),
-    );
-
-    // 5. Persist record metadata
-    final saveResult = await _repository.addRecord(record);
-
-    if (saveResult.isFailure) {
-      // Clean up orphaned storage object on partial failure
-      await _repository.deleteStorageFile(storagePath);
+      return Result.success(savedRecord);
+    } catch (e) {
+      if (storagePath != null) {
+        try {
+          await _repository.deleteStorageFile(storagePath);
+        } catch (_) {}
+      }
       _isUploading = false;
-      _uploadError =
-          saveResult.failureOrNull?.message ?? 'Failed to save record metadata';
+      _uploadError = e.toString();
       notifyListeners();
-      return Result.failure(saveResult.failureOrNull!);
+      return Result.failure(
+        ServerFailure(message: 'Upload or persistence failed: $e'),
+      );
     }
-
-    final savedRecord = saveResult.dataOrNull!;
-    _isUploading = false;
-    _uploadProgress = 1.0;
-    _allRecords.insert(0, savedRecord);
-    _records.insert(0, savedRecord);
-    notifyListeners();
-
-    return Result.success(savedRecord);
   }
 
   /// Backward-compatible addRecord method

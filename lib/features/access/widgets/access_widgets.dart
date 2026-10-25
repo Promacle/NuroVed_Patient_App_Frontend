@@ -27,7 +27,9 @@ class AccessExpansionTile extends StatelessWidget {
       decoration: BoxDecoration(
         border: isLast
             ? null
-            : Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.1))),
+            : Border(
+                bottom: BorderSide(color: Colors.black.withValues(alpha: 0.1)),
+              ),
       ),
       child: Column(
         children: [

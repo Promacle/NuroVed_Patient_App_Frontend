@@ -21,7 +21,11 @@ class _VisitsScreenState extends State<VisitsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.loadVisits();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _controller.loadVisits();
+      }
+    });
   }
 
   @override
@@ -125,6 +129,7 @@ class _VisitsScreenState extends State<VisitsScreen> {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 100),
         child: FloatingActionButton(
+          heroTag: 'visits_fab',
           tooltip: "Add doctor visit",
           onPressed: () => Navigator.pushNamed(context, AppRouter.addVisit),
           backgroundColor: AppColors.primaryTeal,

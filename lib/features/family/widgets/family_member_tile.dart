@@ -43,50 +43,53 @@ class FamilyMemberTile extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildAvatar(),
-                const SizedBox(height: 10),
-                Text(
-                  member['name'] ?? "Unknown",
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: Color(0xFF2C4E4E),
-                  ),
-                ),
-                Text(
-                  member['relation'] ?? "Relative",
-                  style: const TextStyle(
-                    color: Color(0xFF5A6A6A),
-                    fontSize: 11,
-                  ),
-                ),
-                if (isActive)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildAvatar(),
+                  const SizedBox(height: 10),
+                  Text(
+                    member['name'] ?? "Unknown",
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: Color(0xFF2C4E4E),
                     ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryTeal,
-                      borderRadius: BorderRadius.circular(8),
+                  ),
+                  Text(
+                    member['relation'] ?? "Relative",
+                    style: const TextStyle(
+                      color: Color(0xFF5A6A6A),
+                      fontSize: 11,
                     ),
-                    child: const Text(
-                      "ACTIVE",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  if (isActive)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryTeal,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        "ACTIVE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

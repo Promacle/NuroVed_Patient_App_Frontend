@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../utils/platform_file.dart';
 import '../utils/uuid_generator.dart';
 
 /// Strongly-typed immutable domain model for family member.
@@ -12,6 +13,7 @@ class FamilyMember {
   final String? phone;
   final String? bloodGroup;
   final String? photoUrl;
+  final AppPlatformFile? imageFile;
 
   const FamilyMember({
     required this.id,
@@ -22,6 +24,7 @@ class FamilyMember {
     this.phone,
     this.bloodGroup,
     this.photoUrl,
+    this.imageFile,
   });
 
   FamilyMember copyWith({
@@ -33,6 +36,7 @@ class FamilyMember {
     String? phone,
     String? bloodGroup,
     String? photoUrl,
+    AppPlatformFile? imageFile,
   }) {
     return FamilyMember(
       id: id ?? this.id,
@@ -43,6 +47,7 @@ class FamilyMember {
       phone: phone ?? this.phone,
       bloodGroup: bloodGroup ?? this.bloodGroup,
       photoUrl: photoUrl ?? this.photoUrl,
+      imageFile: imageFile ?? this.imageFile,
     );
   }
 
@@ -56,6 +61,7 @@ class FamilyMember {
       'phone': phone,
       'blood_group': bloodGroup,
       'photo_url': photoUrl,
+      if (imageFile != null) 'imageFile': imageFile,
     };
   }
 
@@ -69,6 +75,9 @@ class FamilyMember {
       phone: map['phone']?.toString(),
       bloodGroup: (map['blood_group'] ?? map['blood'])?.toString(),
       photoUrl: map['photo_url']?.toString(),
+      imageFile: map['imageFile'] is AppPlatformFile
+          ? map['imageFile'] as AppPlatformFile
+          : null,
     );
   }
 

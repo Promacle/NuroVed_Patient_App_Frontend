@@ -25,7 +25,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   bool _isProfileExpanded = false;
   bool _isDetailsExpanded = false;
   bool _isTimeExpanded = true; // Keep time expanded by default as in photo
-  // Added this variable
+  bool _isSubmitting = false;
 
   String _selectedProfileName = "";
   final TextEditingController _medicineNameController = TextEditingController();
@@ -77,18 +77,28 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.5),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-                size: 20,
+          Semantics(
+            button: true,
+            label: 'Back',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Navigator.pop(context),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -486,7 +496,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       width: double.infinity,
       height: 60,
       child: ElevatedButton(
-        onPressed: _onSaveReminderPressed,
+        onPressed: _isSubmitting ? null : _onSaveReminderPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkTeal,
           shape: RoundedRectangleBorder(
@@ -494,19 +504,30 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           ),
           elevation: 5,
         ),
-        child: const Text(
-          "Save Reminder",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: _isSubmitting
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : const Text(
+                "Save Reminder",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }
 
   Future<void> _onSaveReminderPressed() async {
+    if (_isSubmitting) return;
+
     if (_selectedProfileName.isEmpty ||
         _medicineNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -517,10 +538,13 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       return;
     }
 
+    setState(() => _isSubmitting = true);
+
     // 1. Request notification permissions properly before scheduling
     final permissionStatus = await _controller.scheduler.requestPermission();
     if (permissionStatus != NotificationPermissionStatus.granted) {
       if (mounted) {
+        setState(() => _isSubmitting = false);
         _showPermissionDeniedDialog(context);
       }
       return;
@@ -550,6 +574,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
     if (scheduleResult.isFailure) {
       if (mounted) {
+        setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

@@ -12,8 +12,14 @@ class DietPlannerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.paddingOf(context).top;
     return Container(
-      padding: const EdgeInsets.only(top: 50, bottom: 30, left: 20, right: 20),
+      padding: EdgeInsets.only(
+        top: topPadding > 20 ? topPadding + 12 : 50,
+        bottom: 24,
+        left: 20,
+        right: 20,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFE8F2EF),
         borderRadius: BorderRadius.only(
@@ -26,18 +32,28 @@ class DietPlannerHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFC7E2D9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 20,
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: GestureDetector(
+                  onTap: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC7E2D9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFF2C4E4E),
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -47,7 +63,7 @@ class DietPlannerHeader extends StatelessWidget {
                   title,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
@@ -110,12 +126,15 @@ class DietPlannerCard extends StatelessWidget {
                   Icon(icon, color: const Color(0xFF7CB9A8), size: 30),
                   const SizedBox(width: 15),
                 ],
-                Text(
-                  title!,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2C4E4E),
+                Expanded(
+                  child: Text(
+                    title!,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C4E4E),
+                    ),
                   ),
                 ),
               ],

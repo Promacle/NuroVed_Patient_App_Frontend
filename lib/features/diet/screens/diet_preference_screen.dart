@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nuroved_patient/core/models/diet/diet_preferences.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../../../app/app_router.dart';
 import '../widgets/diet_planner_widgets.dart';
 
+/// Step 2 of Diet Planner flow: Dietary Pattern, Non-veg days, and Allergies/Exclusions.
 class DietPreferenceScreen extends StatefulWidget {
-  const DietPreferenceScreen({super.key});
+  final DietPreferences? initialPreferences;
+
+  const DietPreferenceScreen({super.key, this.initialPreferences});
 
   @override
   State<DietPreferenceScreen> createState() => _DietPreferenceScreenState();
@@ -17,6 +21,88 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
   final TextEditingController _allergiesController = TextEditingController();
   final List<String> _days = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
   final Set<String> _selectedDays = {"TU", "FR"};
+  String? _validationError;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPreferences != null) {
+      final p = widget.initialPreferences!;
+      switch (p.dietaryPattern) {
+        case DietaryPattern.vegetarian:
+          _selectedType = "Vegetarian";
+          break;
+        case DietaryPattern.nonVegetarian:
+          _selectedType = "Non-veg";
+          break;
+        case DietaryPattern.both:
+          _selectedType = "Both (Veg & Non-Veg)";
+          break;
+      }
+      if (p.nonVegDays.isNotEmpty) {
+        _selectedDays
+          ..clear()
+          ..addAll(p.nonVegDays);
+      }
+      if (p.allergiesAndExclusions.isNotEmpty) {
+        _allergiesController.text = p.allergiesAndExclusions.join(', ');
+      }
+      if (p.medicalConditionNotes != null &&
+          p.medicalConditionNotes!.isNotEmpty) {
+        if (_allergiesController.text.isNotEmpty) {
+          _allergiesController.text += ', ${p.medicalConditionNotes!}';
+        } else {
+          _allergiesController.text = p.medicalConditionNotes!;
+        }
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _allergiesController.dispose();
+    super.dispose();
+  }
+
+  void _onContinue() {
+    setState(() => _validationError = null);
+
+    if (_selectedType == "Both (Veg & Non-Veg)" && _selectedDays.isEmpty) {
+      setState(
+        () => _validationError =
+            "Please select at least one day for non-vegetarian meals.",
+      );
+      return;
+    }
+
+    DietaryPattern pattern;
+    if (_selectedType == "Vegetarian") {
+      pattern = DietaryPattern.vegetarian;
+    } else if (_selectedType == "Non-veg") {
+      pattern = DietaryPattern.nonVegetarian;
+    } else {
+      pattern = DietaryPattern.both;
+    }
+
+    final rawInput = _allergiesController.text.trim();
+    final tokens = rawInput
+        .split(RegExp(r'[,;\n]'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    final preferences = (widget.initialPreferences ?? const DietPreferences())
+        .copyWith(
+          dietaryPattern: pattern,
+          nonVegDays: _selectedType == "Both (Veg & Non-Veg)"
+              ? _selectedDays
+              : {},
+          allergiesAndExclusions: tokens,
+          medicalConditionNotes: rawInput.isNotEmpty ? rawInput : null,
+        );
+
+    Navigator.pushNamed(context, AppRouter.healthGoal, arguments: preferences);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,17 +152,27 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                         ),
                       ],
                     ),
-                    if (_selectedType != "Vegetarian") _buildDayPicker(),
+                    if (_selectedType == "Both (Veg & Non-Veg)")
+                      _buildDayPicker(),
                     const SizedBox(height: 35),
                     const Text(
-                      "Allergies / Medical Condition (Optional)",
+                      "Allergies / Disallowed Foods (Optional)",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF5A6A6A),
                       ),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Specify ingredients to strictly exclude (e.g., Peanuts, Dairy, Gluten, Soy, Shellfish, Eggs).",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textGrey,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     CustomPaint(
                       painter: DashedBorderPainter(),
                       child: Container(
@@ -90,7 +186,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                           maxLines: 3,
                           decoration: const InputDecoration(
                             hintText:
-                                "e.g., Peanuts, Gluten, Dairy intolerance, Diabetes...",
+                                "e.g., Peanuts, Gluten, Dairy, Soy, Shellfish...",
                             hintStyle: TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -100,13 +196,45 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 50),
+                    if (_validationError != null) ...[
+                      const SizedBox(height: 14),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEE2E2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Color(0xFFDC2626),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _validationError!,
+                                style: const TextStyle(
+                                  color: Color(0xFFDC2626),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 40),
                     DietPlannerActionButton(
-                      label: "Continue",
-                      onPressed: () =>
-                          Navigator.pushNamed(context, AppRouter.healthGoal),
+                      label: "Continue to Health Goals",
+                      onPressed: _onContinue,
                     ),
-                    const SizedBox(height: 150),
+                    const SizedBox(height: 80),
                   ],
                 ),
               ),
@@ -139,7 +267,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Pick a day you prefer non-veg",
+                "Pick the days you prefer non-veg meals",
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -167,9 +295,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                         child: Container(
                           width: 38,
                           height: 38,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 2,
-                          ), // Added small horizontal margin
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? const Color(0xFF7CB9A8)
@@ -180,7 +306,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                           child: Text(
                             day,
                             style: TextStyle(
-                              fontSize: 9,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: isSelected
                                   ? Colors.white
@@ -205,9 +331,9 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedType = label),
       child: Container(
-        width: 95,
-        height: 110,
-        padding: const EdgeInsets.all(10),
+        width: 100,
+        constraints: const BoxConstraints(minHeight: 115),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFFF0F6F4),
           borderRadius: BorderRadius.circular(15),

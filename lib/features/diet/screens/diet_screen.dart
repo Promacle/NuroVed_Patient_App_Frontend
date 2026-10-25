@@ -1,36 +1,48 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nuroved_patient/app/app_router.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
-import 'package:nuroved_patient/features/home/screens/main_layout.dart';
 
 class DietScreen extends StatelessWidget {
   const DietScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.kMainBg,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _buildDisclaimerBanner(),
-                  const SizedBox(height: 16),
-                  _buildActivityCard(),
-                  const SizedBox(height: 30),
-                  _buildQuickActionCard(context),
-                  const SizedBox(height: 150),
-                ],
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.kMainBg,
+        body: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                child: Column(
+                  children: [
+                    _buildDisclaimerBanner(),
+                    const SizedBox(height: 16),
+                    _buildActivityCard(),
+                    const SizedBox(height: 24),
+                    _buildQuickActionCard(context),
+                    const SizedBox(height: 120),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -68,8 +80,14 @@ class DietScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final topPadding = MediaQuery.paddingOf(context).top;
     return Container(
-      padding: const EdgeInsets.only(top: 50, bottom: 30, left: 20, right: 20),
+      padding: EdgeInsets.only(
+        top: max(topPadding, 20.0) + 12,
+        bottom: 24,
+        left: 20,
+        right: 20,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFE8F2EF),
         borderRadius: BorderRadius.only(
@@ -82,34 +100,46 @@ class DietScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFC7E2D9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 20,
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: GestureDetector(
+                  onTap: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFC7E2D9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFF2C4E4E),
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 15),
-              const Text(
-                "Diet Section",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
+              const Expanded(
+                child: Text(
+                  "Diet Section",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
                 ),
               ),
             ],
           ),
           const Padding(
-            padding: EdgeInsets.only(left: 45),
+            padding: EdgeInsets.only(left: 59),
             child: Text(
               "Calculate Your Every Single Bite",
               style: TextStyle(
@@ -154,12 +184,14 @@ class DietScreen extends StatelessWidget {
               children: [
                 Icon(Icons.info_outline, size: 12, color: Colors.white),
                 SizedBox(width: 6),
-                Text(
-                  "Sample preview metrics - not clinical measurements",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                Flexible(
+                  child: Text(
+                    "Sample preview metrics - not clinical measurements",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -167,40 +199,44 @@ class DietScreen extends StatelessWidget {
           ),
           Row(
             children: [
-              const SizedBox(
-                width: 100,
-                height: 100,
-                child: CustomPaint(painter: ConcentricRingsPainter()),
+              const IgnorePointer(
+                child: SizedBox(
+                  width: 90,
+                  height: 90,
+                  child: CustomPaint(painter: ConcentricRingsPainter()),
+                ),
               ),
-              const SizedBox(width: 25),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "350/1000 kCAL",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C4E4E),
+              const SizedBox(width: 20),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "350/1000 kCAL",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C4E4E),
+                      ),
                     ),
-                  ),
-                  Text(
-                    "1/3 MEALS",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF6ED940),
+                    Text(
+                      "1/3 MEALS",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF6ED940),
+                      ),
                     ),
-                  ),
-                  Text(
-                    "4/8 HRS",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF56BFDB),
+                    Text(
+                      "4/8 HRS",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF56BFDB),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -256,11 +292,13 @@ class DietScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 5),
-        SizedBox(
-          height: 60,
-          child: CustomPaint(
-            size: Size.infinite,
-            painter: MiniBarChartPainter(values: values, gradient: gradient),
+        IgnorePointer(
+          child: SizedBox(
+            height: 60,
+            child: CustomPaint(
+              size: Size.infinite,
+              painter: MiniBarChartPainter(values: values, gradient: gradient),
+            ),
           ),
         ),
       ],
@@ -270,71 +308,69 @@ class DietScreen extends StatelessWidget {
   Widget _buildQuickActionCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-            spreadRadius: -12,
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+            spreadRadius: -8,
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Quick Action",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2C4E4E),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              "Quick Action",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2C4E4E),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               QuickActionButton(
                 label: "Diet Planner",
-                icon: const FaIcon(
-                  FontAwesomeIcons.appleWhole,
+                icon: const Icon(
+                  Icons.restaurant_menu_rounded,
                   color: AppColors.sageGreen,
-                  size: 35,
+                  size: 34,
                 ),
-                onTap: () => Navigator.pushNamed(context, '/ai-diet-planner'),
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRouter.aiDietPlanner),
               ),
+              const SizedBox(width: 8),
               QuickActionButton(
                 label: "Food Scanner",
                 icon: const Icon(
-                  Icons.qr_code_scanner,
+                  Icons.qr_code_scanner_rounded,
                   color: AppColors.sageGreen,
-                  size: 35,
+                  size: 34,
                 ),
-                onTap: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MainLayout(initialIndex: 2),
-                    ),
-                    (route) => false,
-                  );
-                },
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRouter.foodScanner),
               ),
+              const SizedBox(width: 8),
               QuickActionButton(
                 label: "Meal Routine History",
                 icon: const Icon(
                   Icons.timer_outlined,
                   color: AppColors.sageGreen,
-                  size: 35,
+                  size: 34,
                 ),
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/meal-routine-history',
-                ), // Add this
+                onTap: () =>
+                    Navigator.pushNamed(context, AppRouter.mealRoutineHistory),
               ),
             ],
           ),
@@ -344,7 +380,7 @@ class DietScreen extends StatelessWidget {
   }
 }
 
-class QuickActionButton extends StatefulWidget {
+class QuickActionButton extends StatelessWidget {
   final String label;
   final Widget icon;
   final VoidCallback onTap;
@@ -357,67 +393,51 @@ class QuickActionButton extends StatefulWidget {
   });
 
   @override
-  State<QuickActionButton> createState() => _QuickActionButtonState();
-}
-
-class _QuickActionButtonState extends State<QuickActionButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.92,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
-        onTapDown: (_) => _controller.forward(),
-        onTapUp: (_) {
-          _controller.reverse();
-          widget.onTap();
-        },
-        onTapCancel: () => _controller.reverse(),
-        child: ScaleTransition(
-          scale: _scaleAnimation,
-          child: Column(
-            children: [
-              Container(
-                height: 80,
-                width: 80,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0F6F4),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: widget.icon,
+      child: Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            hoverColor: const Color(0xFFC7E2D9).withValues(alpha: 0.25),
+            splashColor: const Color(0xFFC7E2D9).withValues(alpha: 0.35),
+            highlightColor: const Color(0xFFC7E2D9).withValues(alpha: 0.15),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 76,
+                    width: 76,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0F6F4),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: icon,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C4E4E),
+                      height: 1.2,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                widget.label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

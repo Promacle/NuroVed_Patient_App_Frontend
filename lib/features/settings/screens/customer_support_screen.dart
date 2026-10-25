@@ -44,15 +44,25 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   ];
 
   final List<Map<String, dynamic>> contactOptions = [
-    {"icon": Icons.headset_mic_outlined, "title": "Customer Service"},
-    {"icon": Icons.language, "title": "Website"},
+    {
+      "icon": const Icon(
+        Icons.headset_mic_outlined,
+        color: Color(0xFF2C4E4E),
+        size: 22,
+      ),
+      "title": "Customer Service",
+    },
+    {
+      "icon": const Icon(Icons.language, color: Color(0xFF2C4E4E), size: 22),
+      "title": "Website",
+    },
     {
       "icon": const FaIcon(
         FontAwesomeIcons.whatsapp,
         color: Color(0xFF2C4E4E),
         size: 22,
       ),
-      "title": "Whatsapp"
+      "title": "Whatsapp",
     },
     {
       "icon": const FaIcon(
@@ -60,7 +70,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         color: Color(0xFF2C4E4E),
         size: 22,
       ),
-      "title": "Facebook"
+      "title": "Facebook",
     },
     {
       "icon": const FaIcon(
@@ -68,7 +78,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         color: Color(0xFF2C4E4E),
         size: 22,
       ),
-      "title": "Instagram"
+      "title": "Instagram",
     },
   ];
 
@@ -80,26 +90,29 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.kMainBg,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          const SizedBox(height: 25),
-          _buildToggle(),
-          const SizedBox(height: 25),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  isContactUs ? _buildContactUsList() : _buildFAQList(),
-                  const SizedBox(height: 150),
-                ],
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
+        backgroundColor: AppColors.kMainBg,
+        body: Column(
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 25),
+            _buildToggle(),
+            const SizedBox(height: 25),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    isContactUs ? _buildContactUsList() : _buildFAQList(),
+                    const SizedBox(height: 150),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -117,11 +130,23 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const CircleAvatar(
-                  backgroundColor: Color(0xFF769E93),
-                  child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: GestureDetector(
+                  onTap: () {
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const CircleAvatar(
+                    backgroundColor: Color(0xFF769E93),
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 20),
@@ -239,6 +264,16 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       return option['title'].toString().toLowerCase().contains(searchQuery);
     }).toList();
 
+    if (filteredOptions.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Text(
+          "No contact options match your search.",
+          style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+        ),
+      );
+    }
+
     return Column(
       children: filteredOptions.map((option) {
         return _buildExpandableTile(option['icon'], option['title']);
@@ -251,6 +286,16 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       return faq['question'].toString().toLowerCase().contains(searchQuery) ||
           faq['answer'].toString().toLowerCase().contains(searchQuery);
     }).toList();
+
+    if (filteredFaqs.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Text(
+          "No FAQs match your search.",
+          style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+        ),
+      );
+    }
 
     return Column(
       children: filteredFaqs.asMap().entries.map((entry) {
@@ -325,7 +370,20 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
-  Widget _buildExpandableTile(Widget icon, String title) {
+  Widget _buildExpandableTile(dynamic icon, String title) {
+    Widget iconWidget;
+    if (icon is Widget) {
+      iconWidget = icon;
+    } else if (icon is IconData) {
+      iconWidget = Icon(icon, color: const Color(0xFF2C4E4E), size: 22);
+    } else {
+      iconWidget = const Icon(
+        Icons.help_outline,
+        color: Color(0xFF2C4E4E),
+        size: 22,
+      );
+    }
+
     return GestureDetector(
       onTap: () => _handleContactAction(context, title),
       child: Container(
@@ -346,12 +404,14 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFF2C4E4E), width: 1.5),
               ),
-              child: icon,
+              alignment: Alignment.center,
+              child: iconWidget,
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -378,26 +438,11 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   Future<void> _handleContactAction(BuildContext context, String title) async {
     switch (title) {
       case "Customer Service":
-        final uri = Uri.parse("tel:+918000000000");
-        try {
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri);
-          } else if (context.mounted) {
-            _showChannelDialog(
-              context,
-              title,
-              "Direct phone support is available at +91 80000 00000.",
-            );
-          }
-        } catch (_) {
-          if (context.mounted) {
-            _showChannelDialog(
-              context,
-              title,
-              "Direct phone support is available at +91 80000 00000.",
-            );
-          }
-        }
+        _showChannelDialog(
+          context,
+          title,
+          "Direct phone support is currently unconfigured in this release. Please visit our website or report a problem via Settings.",
+        );
         break;
       case "Website":
         final uri = Uri.parse("https://nuroved.com");
@@ -408,7 +453,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             _showChannelDialog(
               context,
               title,
-              "Please visit https://nuroved.com in your web browser.",
+              "Official website: https://nuroved.com\nPlease open this link in your web browser.",
             );
           }
         } catch (_) {
@@ -416,38 +461,23 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             _showChannelDialog(
               context,
               title,
-              "Please visit https://nuroved.com in your web browser.",
+              "Official website: https://nuroved.com\nPlease open this link in your web browser.",
             );
           }
         }
         break;
       case "Whatsapp":
-        final uri = Uri.parse("https://wa.me/918000000000");
-        try {
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          } else if (context.mounted) {
-            _showChannelDialog(
-              context,
-              title,
-              "Reach out to official support via WhatsApp at +91 80000 00000.",
-            );
-          }
-        } catch (_) {
-          if (context.mounted) {
-            _showChannelDialog(
-              context,
-              title,
-              "Reach out to official support via WhatsApp at +91 80000 00000.",
-            );
-          }
-        }
+        _showChannelDialog(
+          context,
+          title,
+          "WhatsApp support is currently unconfigured in this release. Please visit our website or report a problem via Settings.",
+        );
         break;
       default:
         _showChannelDialog(
           context,
           title,
-          "The $title support channel is not yet active in this preview. Please reach out via WhatsApp or Website.",
+          "The $title support channel is not yet active in this release. Please visit our website or report a problem via Settings.",
         );
         break;
     }

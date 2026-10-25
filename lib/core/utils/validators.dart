@@ -180,6 +180,12 @@ class AppValidators {
     if (fileName.trim().isEmpty) {
       return 'File name is required';
     }
+    if (fileName.contains('/') ||
+        fileName.contains(r'\') ||
+        fileName.contains('..') ||
+        fileName.contains('\x00')) {
+      return 'File name contains invalid path traversal characters';
+    }
     final dotIndex = fileName.lastIndexOf('.');
     if (dotIndex == -1 || dotIndex == fileName.length - 1) {
       return 'File has no extension';

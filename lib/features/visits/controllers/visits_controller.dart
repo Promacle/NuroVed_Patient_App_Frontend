@@ -178,6 +178,14 @@ class VisitsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Purges in-memory visits cache upon user sign out or account deletion.
+  void clear() {
+    _allVisits.clear();
+    _visits.clear();
+    _currentSubjectId = null;
+    notifyListeners();
+  }
+
   void _onProfileChanged() {
     final activeId = _profileController.activeSubjectId;
     if (_currentSubjectId != activeId) {

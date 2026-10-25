@@ -10,7 +10,7 @@ import 'package:nuroved_patient/features/profile/controllers/profile_controller.
 import 'package:nuroved_patient/features/records/controllers/records_controller.dart';
 import 'package:nuroved_patient/features/records/screens/record_success_screen.dart';
 
-import '../../home/screens/main_layout.dart';
+import '../../home/controllers/home_controller.dart';
 
 class AddRecordScreen extends StatefulWidget {
   const AddRecordScreen({super.key});
@@ -86,7 +86,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     result.when(
       success: (record) {
         ProfileController().activeProfileName = _selectedProfileName;
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => RecordSuccessScreen(
@@ -184,13 +184,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
             if (didPop) return;
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MainLayout(initialIndex: 1),
-              ),
-              (route) => false,
-            );
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              HomeController().setTab(1);
+            }
           },
           child: Scaffold(
             backgroundColor: AppColors.mintBackground,
@@ -247,14 +245,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
             children: [
               GestureDetector(
                 onTap: () {
-                  // Force return to MainLayout on the Records Tab (Index 1)
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const MainLayout(initialIndex: 1),
-                    ),
-                    (route) => false,
-                  );
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    HomeController().setTab(1);
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(8),
