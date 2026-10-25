@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/errors/failures.dart';
+import '../../../core/models/scanned_food_product.dart';
 import '../../../core/services/nutrition_service.dart';
 import '../../../core/services/open_food_facts_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/result.dart';
 import '../../home/controllers/home_controller.dart';
 
 /// Screen for barcode food scanning using camera and verified Open Food Facts lookup.
@@ -15,19 +18,29 @@ class FoodScannerScreen extends StatefulWidget {
   const FoodScannerScreen({super.key, this.nutritionService});
 
   @override
-  State<FoodScannerScreen> createState() => _FoodScannerScreenState();
+  State<FoodScannerScreen> createState() => FoodScannerScreenState();
 }
 
-class _FoodScannerScreenState extends State<FoodScannerScreen>
+class FoodScannerScreenState extends State<FoodScannerScreen>
     with WidgetsBindingObserver {
   late final NutritionService _nutritionService;
   late final MobileScannerController _scannerController;
 
+  DialogRoute<void>? _loadingDialogRoute;
   bool _isProcessing = false;
   bool _isTorchOn = false;
   CameraFacing _cameraFacing = CameraFacing.back;
   bool _isCameraDeniedOrUnavailable = false;
   String _cameraErrorMessage = '';
+
+  @visibleForTesting
+  bool get isProcessing => _isProcessing;
+
+  @visibleForTesting
+  bool get isLoadingDialogVisible => _loadingDialogRoute?.isActive ?? false;
+
+  @visibleForTesting
+  Future<void> handleBarcode(String barcode) => _handleBarcode(barcode);
 
   @override
   void initState() {
@@ -45,6 +58,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _dismissLoadingDialog();
     _scannerController.dispose();
     super.dispose();
   }
@@ -63,101 +77,165 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
     }
   }
 
+  void _showLoadingDialog(String barcode) {
+    if (!mounted) return;
+    _dismissLoadingDialog();
+
+    final themes = InheritedTheme.capture(
+      from: context,
+      to: Navigator.of(context).context,
+    );
+
+    final route = DialogRoute<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      themes: themes,
+      builder: (dialogCtx) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryTeal,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Looking up product...",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Querying Open Food Facts for barcode $barcode",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textGrey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    _loadingDialogRoute = route;
+    Navigator.of(context).push(route);
+  }
+
+  void _dismissLoadingDialog() {
+    final route = _loadingDialogRoute;
+    _loadingDialogRoute = null;
+
+    if (route != null && route.isActive) {
+      try {
+        if (route.isCurrent) {
+          route.navigator?.pop();
+        } else {
+          route.navigator?.removeRoute(route);
+        }
+      } catch (_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (route.isActive) {
+            route.navigator?.removeRoute(route);
+          }
+        });
+      }
+    }
+  }
+
   Future<void> _handleBarcode(String rawBarcode) async {
     final barcode = rawBarcode.trim();
-    if (barcode.isEmpty || _isProcessing) return;
+    if (barcode.isEmpty || _isProcessing || !mounted) return;
 
-    setState(() {
-      _isProcessing = true;
-    });
+    _isProcessing = true;
+    if (mounted) {
+      setState(() {});
+    }
 
     // Provide haptic feedback on successful detection
     HapticFeedback.mediumImpact();
 
-    // Show loading dialog
-    if (mounted) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogCtx) => PopScope(
-          canPop: false,
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            content: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryTeal,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Looking up product...",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C4E4E),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Querying Open Food Facts for barcode $barcode",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textGrey,
-                    ),
-                  ),
-                ],
+    Result<ScannedFoodProduct>? result;
+    String? unexpectedError;
+
+    _showLoadingDialog(barcode);
+
+    try {
+      result = await _nutritionService
+          .lookupBarcode(barcode)
+          .timeout(
+            const Duration(seconds: 11),
+            onTimeout: () => const Result.failure(
+              NetworkFailure(
+                message:
+                    'Nutrition database lookup timed out. Please check your network connection and retry.',
               ),
             ),
-          ),
-        ),
-      );
+          );
+    } catch (e) {
+      unexpectedError = 'An error occurred during barcode lookup: $e';
+    } finally {
+      _dismissLoadingDialog();
     }
 
-    final result = await _nutritionService.lookupBarcode(barcode);
-
-    // Dismiss loading dialog safely
-    if (mounted && Navigator.canPop(context)) {
-      Navigator.pop(context);
+    if (!mounted) {
+      _isProcessing = false;
+      return;
     }
 
-    if (!mounted) return;
-
-    if (result.isSuccess) {
-      final product = result.dataOrNull!;
-      await Navigator.pushNamed(
-        context,
-        AppRouter.scannedProductResult,
-        arguments: product,
-      );
-
-      // Re-enable scanning upon returning from result screen
+    try {
+      if (unexpectedError != null) {
+        final action = await _showErrorDialog(barcode, unexpectedError);
+        if (action == 'manual' && mounted) {
+          _showManualEntrySheet();
+        }
+      } else if (result != null && result.isSuccess) {
+        final product = result.dataOrNull!;
+        await Navigator.pushNamed(
+          context,
+          AppRouter.scannedProductResult,
+          arguments: product,
+        );
+      } else {
+        final failure = result?.failureOrNull;
+        final errorMessage =
+            failure?.message ?? 'Failed to retrieve nutrition information.';
+        final action = await _showErrorDialog(barcode, errorMessage);
+        if (action == 'manual' && mounted) {
+          _showManualEntrySheet();
+        }
+      }
+    } finally {
       if (mounted) {
         setState(() {
           _isProcessing = false;
         });
+      } else {
+        _isProcessing = false;
       }
-    } else {
-      final failure = result.failureOrNull;
-      final errorMessage =
-          failure?.message ?? 'Failed to retrieve nutrition information.';
-
-      _showErrorDialog(barcode, errorMessage);
     }
   }
 
-  void _showErrorDialog(String barcode, String message) {
-    if (!mounted) return;
+  Future<String?> _showErrorDialog(String barcode, String message) {
+    if (!mounted) return Future.value(null);
 
-    showDialog(
+    return showDialog<String>(
       context: context,
+      barrierDismissible: true,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
@@ -215,8 +293,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(dialogCtx);
-              setState(() => _isProcessing = false);
+              Navigator.pop(dialogCtx, 'retry');
             },
             child: const Text("Scan Again"),
           ),
@@ -229,9 +306,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
               ),
             ),
             onPressed: () {
-              Navigator.pop(dialogCtx);
-              setState(() => _isProcessing = false);
-              _showManualEntrySheet();
+              Navigator.pop(dialogCtx, 'manual');
             },
             child: const Text("Enter Manually"),
           ),
@@ -241,6 +316,8 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
   }
 
   void _showManualEntrySheet() {
+    if (_isProcessing || !mounted) return;
+
     final textController = TextEditingController();
     String? localError;
 
@@ -329,6 +406,7 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
                       ),
                     ),
                     onPressed: () {
+                      if (_isProcessing) return;
                       final input = textController.text.trim();
                       if (input.isEmpty) {
                         setSheetState(() {
@@ -367,20 +445,24 @@ class _FoodScannerScreenState extends State<FoodScannerScreen>
   Future<void> _toggleTorch() async {
     try {
       await _scannerController.toggleTorch();
-      setState(() {
-        _isTorchOn = !_isTorchOn;
-      });
+      if (mounted) {
+        setState(() {
+          _isTorchOn = !_isTorchOn;
+        });
+      }
     } catch (_) {}
   }
 
   Future<void> _switchCamera() async {
     try {
       await _scannerController.switchCamera();
-      setState(() {
-        _cameraFacing = (_cameraFacing == CameraFacing.back)
-            ? CameraFacing.front
-            : CameraFacing.back;
-      });
+      if (mounted) {
+        setState(() {
+          _cameraFacing = (_cameraFacing == CameraFacing.back)
+              ? CameraFacing.front
+              : CameraFacing.back;
+        });
+      }
     } catch (_) {}
   }
 

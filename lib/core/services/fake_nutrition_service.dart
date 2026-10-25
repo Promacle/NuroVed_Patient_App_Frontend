@@ -11,6 +11,8 @@ class FakeNutritionService implements NutritionService {
   bool simulateNetworkError = false;
   bool simulateRateLimit = false;
   bool simulateServerError = false;
+  bool simulateException = false;
+  int lookupCallCount = 0;
   Duration delay = Duration.zero;
 
   FakeNutritionService({List<ScannedFoodProduct>? initialProducts}) {
@@ -29,10 +31,26 @@ class FakeNutritionService implements NutritionService {
     _products.clear();
   }
 
+  void reset() {
+    simulateTimeout = false;
+    simulateNetworkError = false;
+    simulateRateLimit = false;
+    simulateServerError = false;
+    simulateException = false;
+    lookupCallCount = 0;
+    delay = Duration.zero;
+  }
+
   @override
   Future<Result<ScannedFoodProduct>> lookupBarcode(String barcode) async {
+    lookupCallCount++;
+
     if (delay > Duration.zero) {
       await Future.delayed(delay);
+    }
+
+    if (simulateException) {
+      throw Exception('Simulated unexpected service failure');
     }
 
     final sanitizedBarcode = barcode.trim();
