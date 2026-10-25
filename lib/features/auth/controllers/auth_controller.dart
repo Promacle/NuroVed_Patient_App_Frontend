@@ -3,6 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../app/app_router.dart';
+import '../../diet/controllers/diet_controller.dart';
+import '../../home/controllers/home_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
+import '../../records/controllers/records_controller.dart';
+import '../../routine/controllers/routine_controller.dart';
+import '../../visits/controllers/visits_controller.dart';
 import '../../../core/errors/failures.dart';
 import '../../../core/models/user_profile.dart';
 import '../../../core/repositories/auth_repository.dart';
@@ -194,9 +200,7 @@ class AuthController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    AppLogger.info(
-      'Attempting genuine sign in for email: ${emailController.text.trim()}',
-    );
+    AppLogger.info('Attempting genuine sign in');
 
     final result = await _authRepository.signIn(
       email: emailController.text.trim(),
@@ -210,11 +214,10 @@ class AuthController extends ChangeNotifier {
         _currentUser = user;
         clearForm();
         if (context != null && context.mounted) {
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.of(
             context,
-            AppRouter.home,
-            (route) => false,
-          );
+            rootNavigator: true,
+          ).pushNamedAndRemoveUntil(AppRouter.home, (route) => false);
         }
         return true;
       },
@@ -273,9 +276,7 @@ class AuthController extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    AppLogger.info(
-      'Attempting genuine sign up for email: ${emailController.text.trim()}',
-    );
+    AppLogger.info('Attempting genuine sign up');
 
     final result = await _authRepository.signUp(
       email: emailController.text.trim(),
@@ -298,11 +299,10 @@ class AuthController extends ChangeNotifier {
         _currentUser = user;
         clearForm();
         if (context != null && context.mounted) {
-          Navigator.pushNamedAndRemoveUntil(
+          Navigator.of(
             context,
-            AppRouter.home,
-            (route) => false,
-          );
+            rootNavigator: true,
+          ).pushNamedAndRemoveUntil(AppRouter.home, (route) => false);
         }
         return true;
       },
@@ -452,12 +452,17 @@ class AuthController extends ChangeNotifier {
     if (result.isSuccess) {
       clearForm();
       _currentUser = null;
+      await ProfileController.instance.logout();
+      RecordsController.instance.clear();
+      VisitsController.instance.clear();
+      RoutineController().clear();
+      DietController().clear();
       if (context != null && context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(
+        HomeController().setTab(0);
+        Navigator.of(
           context,
-          AppRouter.login,
-          (route) => false,
-        );
+          rootNavigator: true,
+        ).pushNamedAndRemoveUntil(AppRouter.login, (route) => false);
       }
     } else {
       _errorMessage = result.failureOrNull?.message;
@@ -476,15 +481,21 @@ class AuthController extends ChangeNotifier {
 
     _currentUser = null;
     clearForm();
+    await ProfileController.instance.logout();
+    RecordsController.instance.clear();
+    VisitsController.instance.clear();
+    RoutineController().clear();
+    DietController().clear();
+
     _isLoading = false;
     notifyListeners();
 
     if (context != null && context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(
+      HomeController().setTab(0);
+      Navigator.of(
         context,
-        AppRouter.login,
-        (route) => false,
-      );
+        rootNavigator: true,
+      ).pushNamedAndRemoveUntil(AppRouter.login, (route) => false);
     }
   }
 

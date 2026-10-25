@@ -25,6 +25,18 @@ class AppPlatformFile {
     return '';
   }
 
+  /// Returns safe filename stripped of path separators and relative path traversal indicators.
+  String get sanitizedName {
+    var baseName = name;
+    final lastSlash = baseName.lastIndexOf(RegExp(r'[\/\\]'));
+    if (lastSlash != -1 && lastSlash < baseName.length - 1) {
+      baseName = baseName.substring(lastSlash + 1);
+    }
+    var clean = baseName.replaceAll(RegExp(r'[\/\\]'), '_');
+    clean = clean.replaceAll(RegExp(r'\.{2,}'), '');
+    return clean.isEmpty ? 'document' : clean;
+  }
+
   /// Inferred MIME type based on file extension and/or header bytes.
   String get mimeType {
     final ext = extension;

@@ -29,12 +29,23 @@ class ProfileHeader extends StatelessWidget {
                   color: Color(0xFF2C4E4E),
                 ),
               ),
-              // Find the Row containing "Profile" and the Icon
-              // Replace the Icon with:
-              GestureDetector(
-                onTap: () =>
-                    Navigator.pushNamed(context, AppRouter.settingsRoute),
-                child: const Icon(Icons.settings_outlined, size: 28),
+              Semantics(
+                button: true,
+                label: 'Settings',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRouter.settingsRoute),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.settings_outlined, size: 28),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

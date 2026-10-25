@@ -154,22 +154,28 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
     final id = member['id']?.toString() ?? '';
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: const Text("Remove Profile?"),
         content: Text(
           "Are you sure you want to remove $name from your family?",
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogCtx),
             child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () {
+              Navigator.pop(dialogCtx);
               if (id.isNotEmpty) {
                 _controller.removeFamilyMemberById(id);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Removed "$name" from family profiles.'),
+                    backgroundColor: AppColors.primaryTeal,
+                  ),
+                );
               }
-              Navigator.pop(context);
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
@@ -194,28 +200,44 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: AppColors.sageGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 20,
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.pop(context),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: AppColors.sageGreen,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 15),
-              const Text(
-                "Family Profile",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
+              const Expanded(
+                child: Text(
+                  "Family Profile",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

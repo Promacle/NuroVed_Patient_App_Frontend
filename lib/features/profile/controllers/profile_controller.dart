@@ -162,7 +162,7 @@ class ProfileController extends ChangeNotifier {
         'phone': member.phone,
         'blood': member.bloodGroup,
         'photo_url': member.photoUrl,
-        'imageFile': null,
+        'imageFile': member.imageFile,
         'records': <dynamic>[],
       });
     }
@@ -267,6 +267,9 @@ class ProfileController extends ChangeNotifier {
 
     // 1. Optimistic UI update
     _profile = newProfile;
+    if (_activeSubjectId.isEmpty || _activeSubjectId == previousProfile.id) {
+      _activeSubjectId = newProfile.id;
+    }
     if (imageFile != null) {
       _selectedImage = imageFile;
     }
@@ -274,28 +277,45 @@ class ProfileController extends ChangeNotifier {
     notifyListeners();
 
     // 2. Persist to repository
-    final result = await _repository.updateProfile(newProfile);
+    Result<UserProfile> updateOutcome;
+    try {
+      final result = await _repository.updateProfile(newProfile);
 
-    return result.when(
-      success: (saved) {
-        _profile = saved;
-        _saveToCache(saved);
-        notifyListeners();
-        return Result.success(saved);
-      },
-      failure: (failure) {
-        // Rollback optimistic changes on failure
-        _profile = previousProfile;
-        _selectedImage = previousImage;
-        _errorMessage = failure.message;
-        notifyListeners();
-        AppLogger.error(
-          'Profile update failed. Rolled back to previous state.',
-          failure.message,
-        );
-        return Result.failure(failure);
-      },
-    );
+      updateOutcome = result.when(
+        success: (saved) {
+          _profile = saved;
+          _saveToCache(saved);
+          notifyListeners();
+          return Result.success(saved);
+        },
+        failure: (failure) {
+          // Rollback optimistic changes on failure
+          _profile = previousProfile;
+          _selectedImage = previousImage;
+          _errorMessage = failure.message;
+          notifyListeners();
+          AppLogger.error(
+            'Profile update failed. Rolled back to previous state.',
+            failure.message,
+          );
+          return Result.failure(failure);
+        },
+      );
+    } catch (e) {
+      // Rollback optimistic changes on unhandled exception
+      _profile = previousProfile;
+      _selectedImage = previousImage;
+      _errorMessage = e.toString();
+      notifyListeners();
+      AppLogger.error(
+        'Profile update threw exception. Rolled back to previous state.',
+        e.toString(),
+      );
+      updateOutcome = Result.failure(
+        ServerFailure(message: 'Failed to update profile: $e'),
+      );
+    }
+    return updateOutcome;
   }
 
   /// Adds an allergy with optimistic update and rollback on failure.
@@ -385,6 +405,11 @@ class ProfileController extends ChangeNotifier {
   }
 
   Future<Result<FamilyMember>> updateFamilyMember(FamilyMember member) async {
+    if (member.name.trim().isEmpty) {
+      return const Result.failure(
+        ValidationFailure(message: 'Family member name cannot be empty'),
+      );
+    }
     final result = await _repository.updateFamilyMember(member);
     return result.when(
       success: (updated) {
@@ -549,8 +574,10 @@ class ProfileController extends ChangeNotifier {
           ? result['imageFile'] as AppPlatformFile
           : null;
 
-      await updateProfile(updatedProfile, imageFile: img);
-      onUpdate();
+      final updateResult = await updateProfile(updatedProfile, imageFile: img);
+      if (updateResult.isSuccess) {
+        onUpdate();
+      }
     }
   }
 
@@ -558,13 +585,14 @@ class ProfileController extends ChangeNotifier {
     AppLogger.info('Record added to profile: $name');
   }
 
-  void logout() {
+  Future<void> logout() async {
     AppLogger.info('User logged out from profile');
     _selectedImage = null;
     _profile = UserProfile.empty();
     _familyMemberList.clear();
     _caregiverGrant = null;
     _activeSubjectId = _profile.id;
+    await clearCache();
     notifyListeners();
   }
 
@@ -657,6 +685,27 @@ class ProfileController extends ChangeNotifier {
       await prefs.setString('last_active_subject_id', id);
     } catch (e) {
       AppLogger.warning('Failed to persist active subject: $e');
+    }
+  }
+
+  /// Clears persistent profile cache from local storage upon user logout or account deletion.
+  Future<void> clearCache() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cached_profile_id');
+      await prefs.remove('cached_profile_name');
+      await prefs.remove('cached_profile_email');
+      await prefs.remove('cached_profile_phone');
+      await prefs.remove('cached_profile_dob');
+      await prefs.remove('cached_profile_blood');
+      await prefs.remove('cached_profile_height');
+      await prefs.remove('cached_profile_weight');
+      await prefs.remove('cached_profile_gender');
+      await prefs.remove('cached_profile_allergies');
+      await prefs.remove('cached_profile_chronic');
+      await prefs.remove('last_active_subject_id');
+    } catch (e) {
+      AppLogger.warning('Failed to clear profile cache: $e');
     }
   }
 }

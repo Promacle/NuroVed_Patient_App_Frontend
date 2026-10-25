@@ -18,20 +18,96 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final plan = _dietController.savedDietPlan;
-
-    return Scaffold(
-      backgroundColor: AppColors.kMainBg,
-      body: Column(
-        children: [
-          const DietPlannerHeader(
-            title: "Meal Routine History",
-            subtitle: "Check Out Your Meal Routine And Edit",
-          ),
-          Expanded(
-            child: plan == null
-                ? const Center(child: Text("No diet plan saved yet."))
-                : SingleChildScrollView(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.kMainBg,
+        body: Column(
+          children: [
+            const DietPlannerHeader(
+              title: "Meal Routine History",
+              subtitle: "Check Out Your Meal Routine And Edit",
+            ),
+            Expanded(
+              child: ListenableBuilder(
+                listenable: _dietController,
+                builder: (context, _) {
+                  final plan = _dietController.savedDietPlan;
+                  if (plan == null) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 76,
+                              height: 76,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFE8F2EF),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.calendar_month_outlined,
+                                size: 38,
+                                color: Color(0xFF2C4E4E),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              "No Meal Routine Saved Yet",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2C4E4E),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Your saved weekly meal routine will appear here once configured.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF5A6A6A),
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: () {
+                                if (Navigator.canPop(context)) {
+                                  Navigator.pop(context);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2C4E4E),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                "Back to Diet Overview",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
@@ -41,9 +117,12 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                         const SizedBox(height: 150),
                       ],
                     ),
-                  ),
-          ),
-        ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -271,7 +350,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
             onPressed: null, // Done button disabled/non-working as requested
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2C4E4E),
-              disabledBackgroundColor: const Color(0xFF2C4E4E).withValues(alpha: 0.5),
+              disabledBackgroundColor: const Color(
+                0xFF2C4E4E,
+              ).withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
@@ -287,10 +368,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
         ),
         const SizedBox(height: 15),
         GestureDetector(
-          onTap: () {
-            _dietController.deleteDietPlan();
-            Navigator.pop(context);
-          },
+          onTap: () => _confirmDelete(context),
           child: Container(
             width: double.infinity,
             height: 55,
@@ -310,6 +388,47 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Diet Plan?'),
+        content: const Text(
+          'Are you sure you want to delete your saved meal routine? This will clear all weekly meal schedule data.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE11D48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              _dietController.deleteDietPlan();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Diet plan deleted successfully'),
+                  backgroundColor: AppColors.primaryTeal,
+                ),
+              );
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }

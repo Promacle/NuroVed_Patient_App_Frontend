@@ -240,19 +240,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildDropdown(
-                          _selectedGender,
-                          ["male", "female", "other"],
-                          (val) => setState(() => _selectedGender = val!),
-                        ),
+                        child: _buildDropdown(_selectedGender, [
+                          "male",
+                          "female",
+                          "other",
+                        ], (val) => setState(() => _selectedGender = val!)),
                       ),
                       const SizedBox(width: 15),
                       Expanded(
-                        child: _buildDropdown(
-                          _selectedBloodGroup,
-                          ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"],
-                          (val) => setState(() => _selectedBloodGroup = val!),
-                        ),
+                        child: _buildDropdown(_selectedBloodGroup, [
+                          "A+",
+                          "B+",
+                          "O+",
+                          "AB+",
+                          "A-",
+                          "B-",
+                          "O-",
+                          "AB-",
+                        ], (val) => setState(() => _selectedBloodGroup = val!)),
                       ),
                     ],
                   ),
@@ -353,6 +358,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Row(
         children: [
           IconButton(
+            tooltip: 'Back',
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(
               Icons.arrow_back_ios_new,
               color: Color(0xFF2C4E4E),
@@ -363,12 +370,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             },
           ),
           const SizedBox(width: 10),
-          const Text(
-            "Edit Profile",
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2C4E4E),
+          const Expanded(
+            child: Text(
+              "Edit Profile",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2C4E4E),
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

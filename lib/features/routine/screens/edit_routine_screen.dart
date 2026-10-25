@@ -46,15 +46,28 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
   }
 
   void _saveMeal() {
+    final mealName = _mealNameController.text.trim();
+    if (mealName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Meal name cannot be empty"),
+          backgroundColor: Color(0xFFE11D48),
+        ),
+      );
+      return;
+    }
+
     final newIngredients = _ingredientControllers
         .map((c) => c.text.trim())
         .where((text) => text.isNotEmpty)
         .toList();
 
-    RoutineController().updateMeal(
-      widget.title,
-      _mealNameController.text.trim(),
-      newIngredients,
+    RoutineController().updateMeal(widget.title, mealName, newIngredients);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Meal routine updated successfully!"),
+        backgroundColor: AppColors.primaryTeal,
+      ),
     );
     Navigator.pop(context);
   }

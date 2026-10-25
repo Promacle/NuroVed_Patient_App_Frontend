@@ -186,7 +186,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
 
           // Editable Title with Dashed Border
           CustomPaint(
-            painter: DashedBorderPainter(color: Colors.white.withValues(alpha: 0.6)),
+            painter: DashedBorderPainter(
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: TextFormField(
@@ -215,7 +217,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
 
           // Editable Ingredients List with Dashed Border
           CustomPaint(
-            painter: DashedBorderPainter(color: Colors.white.withValues(alpha: 0.6)),
+            painter: DashedBorderPainter(
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
             child: Container(
               padding: const EdgeInsets.all(10),
               width: double.infinity,

@@ -96,6 +96,7 @@ class HomeHeader extends StatelessWidget {
               height: 55,
               shape: BoxShape.circle,
               child: IconButton(
+                tooltip: 'Notifications',
                 icon: const Icon(
                   Icons.notifications,
                   color: Color(0xFF7CB9A8),
@@ -111,6 +112,7 @@ class HomeHeader extends StatelessWidget {
               height: 55,
               shape: BoxShape.circle,
               child: IconButton(
+                tooltip: 'Upgrade to Premium',
                 onPressed: () =>
                     Navigator.pushNamed(context, AppRouter.premium),
                 icon: const FaIcon(

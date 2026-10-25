@@ -83,7 +83,9 @@ class HospitalDetailsScreen extends StatelessWidget {
               if (grant != null) {
                 await ProfileController.instance.revokeCaregiver(grant.id);
               }
+              if (!ctx.mounted) return;
               Navigator.pop(ctx);
+              if (!context.mounted) return;
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text("Access revoked for $hospitalName")),

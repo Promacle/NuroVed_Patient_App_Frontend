@@ -519,17 +519,17 @@ class _AccessScreenState extends State<AccessScreen> {
               if (grant != null) {
                 await ProfileController.instance.revokeCaregiver(grant.id);
               }
+              if (!mounted) return;
               setState(() {
                 _activeHospitals.remove(hospital);
               });
+              if (!ctx.mounted) return;
               Navigator.pop(ctx);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Access revoked for ${hospital['name']}"),
-                  ),
-                );
-              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Access revoked for ${hospital['name']}"),
+                ),
+              );
             },
             child: const Text("Revoke", style: TextStyle(color: Colors.red)),
           ),

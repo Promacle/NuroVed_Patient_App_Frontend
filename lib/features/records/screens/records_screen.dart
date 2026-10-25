@@ -25,103 +25,115 @@ class _RecordsScreenState extends State<RecordsScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.runFilter("");
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _controller.runFilter("");
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.kMainBg,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Recent Records",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 12),
-                  // If there are no records yet, show a placeholder or hide the card
-                  // If there are no records yet, show nothing (or a placeholder)
-                  _controller.filteredRecords.isEmpty
-                      ? const SizedBox()
-                      : RecentRecordCard(
-                          record: _controller.recentRecord,
-                          onView: () {
-                            if (_controller.recentRecord != null) {
-                              _openRecordDetails(_controller.recentRecord);
-                            }
-                          },
-                        ),
-                  const SizedBox(height: 25),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListenableBuilder(
+      listenable: _controller,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.kMainBg,
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 20),
                       const Text(
-                        "Previous Records",
+                        "Recent Records",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      PopupMenuButton<RecordSortOrder>(
-                        icon: const Icon(
-                          Icons.sort_rounded,
-                          size: 20,
-                          color: Color(0xFF2C4E4E),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        onSelected: (order) {
-                          _controller.setSortOrder(order);
-                          setState(() {});
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(
-                            value: RecordSortOrder.newestFirst,
-                            child: Text('Newest First'),
+                      const SizedBox(height: 12),
+                      // If there are no records yet, show a placeholder or hide the card
+                      // If there are no records yet, show nothing (or a placeholder)
+                      _controller.filteredRecords.isEmpty
+                          ? const SizedBox()
+                          : RecentRecordCard(
+                              record: _controller.recentRecord,
+                              onView: () {
+                                if (_controller.recentRecord != null) {
+                                  _openRecordDetails(_controller.recentRecord);
+                                }
+                              },
+                            ),
+                      const SizedBox(height: 25),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Previous Records",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                          PopupMenuItem(
-                            value: RecordSortOrder.oldestFirst,
-                            child: Text('Oldest First'),
-                          ),
-                          PopupMenuItem(
-                            value: RecordSortOrder.titleAsc,
-                            child: Text('Title (A-Z)'),
+                          PopupMenuButton<RecordSortOrder>(
+                            icon: const Icon(
+                              Icons.sort_rounded,
+                              size: 20,
+                              color: Color(0xFF2C4E4E),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            onSelected: (order) {
+                              _controller.setSortOrder(order);
+                              setState(() {});
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: RecordSortOrder.newestFirst,
+                                child: Text('Newest First'),
+                              ),
+                              PopupMenuItem(
+                                value: RecordSortOrder.oldestFirst,
+                                child: Text('Oldest First'),
+                              ),
+                              PopupMenuItem(
+                                value: RecordSortOrder.titleAsc,
+                                child: Text('Title (A-Z)'),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      RecordsSearchBar(
+                        controller: _searchController,
+                        onChanged: (v) {
+                          _controller.runFilter(v);
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildFilterChips(),
+                      const SizedBox(height: 20),
+                      _buildRecordsGrid(),
+                      const SizedBox(height: 150),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  RecordsSearchBar(
-                    controller: _searchController,
-                    onChanged: (v) {
-                      _controller.runFilter(v);
-                      setState(() {});
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  _buildFilterChips(),
-                  const SizedBox(height: 20),
-                  _buildRecordsGrid(),
-                  const SizedBox(height: 150),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: _buildFAB(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          ),
+          floatingActionButton: _buildFAB(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        );
+      },
     );
   }
 
@@ -206,10 +218,35 @@ class _RecordsScreenState extends State<RecordsScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(dialogCtx);
-              _controller.deleteRecord(record, _searchController.text);
-              setState(() {});
+              final id = record is Map ? record['id']?.toString() : null;
+              if (id != null && id.isNotEmpty) {
+                final result = await _controller.softDeleteRecord(id);
+                if (mounted) {
+                  result.when(
+                    success: (_) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Record deleted successfully'),
+                          backgroundColor: AppColors.primaryTeal,
+                        ),
+                      );
+                      setState(() {});
+                    },
+                    failure: (f) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Failed to delete record: ${f.message}',
+                          ),
+                          backgroundColor: Colors.red[700],
+                        ),
+                      );
+                    },
+                  );
+                }
+              }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
@@ -328,6 +365,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 100, right: 10),
       child: FloatingActionButton(
+        heroTag: 'records_fab',
         tooltip: "Add medical record",
         onPressed: () => Navigator.push(
           context,

@@ -1,4 +1,6 @@
+import '../../../core/errors/failures.dart';
 import '../../../core/models/family_member.dart';
+import '../../../core/utils/platform_file.dart';
 import '../../../core/utils/result.dart';
 import '../../../core/utils/uuid_generator.dart';
 import '../../profile/controllers/profile_controller.dart';
@@ -9,7 +11,7 @@ class FamilyController {
   factory FamilyController() => _instance;
   FamilyController._internal();
 
-  final ProfileController _profileController = ProfileController();
+  ProfileController get _profileController => ProfileController.instance;
 
   List<Map<String, dynamic>> get familyMembers =>
       _profileController.familyMembers;
@@ -28,6 +30,9 @@ class FamilyController {
       phone: data['phone']?.toString(),
       bloodGroup: data['blood']?.toString() ?? data['blood_group']?.toString(),
       photoUrl: data['photo_url']?.toString(),
+      imageFile: data['imageFile'] is AppPlatformFile
+          ? data['imageFile'] as AppPlatformFile
+          : null,
     );
     return _profileController.addFamilyMember(member);
   }
@@ -46,10 +51,15 @@ class FamilyController {
       id = idOrIndex.toString();
     }
 
-    final existing = _profileController.familyMembersList.firstWhere(
+    final existingIndex = _profileController.familyMembersList.indexWhere(
       (m) => m.id == id,
-      orElse: () => FamilyMember(id: id, name: '', relation: ''),
     );
+    if (existingIndex == -1) {
+      return const Result.failure(
+        ValidationFailure(message: 'Family member not found'),
+      );
+    }
+    final existing = _profileController.familyMembersList[existingIndex];
 
     final updated = existing.copyWith(
       name: updatedData['name']?.toString() ?? existing.name,
@@ -62,6 +72,9 @@ class FamilyController {
           updatedData['blood']?.toString() ??
           updatedData['blood_group']?.toString() ??
           existing.bloodGroup,
+      imageFile: updatedData['imageFile'] is AppPlatformFile
+          ? updatedData['imageFile'] as AppPlatformFile
+          : existing.imageFile,
     );
 
     return _profileController.updateFamilyMember(updated);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nuroved_patient/features/diet/screens/food_scanner_screen.dart';
 import 'package:nuroved_patient/features/home/screens/home_screen.dart';
 import 'package:nuroved_patient/features/profile/screens/profile_screen.dart';
@@ -69,7 +70,14 @@ class _MainLayoutState extends State<MainLayout> {
             } else if (_homeController.currentIndex != 0) {
               _homeController.setTab(0);
             } else {
-              if (context.mounted) Navigator.of(context).pop();
+              if (context.mounted) {
+                final rootNav = Navigator.of(context);
+                if (rootNav.canPop()) {
+                  rootNav.pop();
+                } else {
+                  SystemNavigator.pop();
+                }
+              }
             }
           },
           child: Scaffold(

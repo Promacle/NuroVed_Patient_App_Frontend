@@ -15,6 +15,7 @@ class AddFamilyMemberScreen extends StatefulWidget {
 
 class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
   final FamilyController _controller = FamilyController();
+  bool _isSubmitting = false;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _relationController = TextEditingController();
@@ -70,28 +71,44 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: AppColors.sageGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.white,
-                    size: 20,
+              Semantics(
+                button: true,
+                label: 'Back',
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.pop(context),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: AppColors.sageGreen,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 15),
-              const Text(
-                "Add Family Profile",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
+              const Expanded(
+                child: Text(
+                  "Add Family Profile",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -301,43 +318,84 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
-        onPressed: () {
-          if (_nameController.text.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Please enter a name")),
-            );
-            return;
-          }
-          _controller.addFamilyMember({
-            'name': _nameController.text,
-            'relation': _relationController.text,
-            'dob': _dobController.text,
-            'gender': _selectedGender,
-            'blood': _selectedBloodGroup,
-            'height': _heightController.text,
-            'weight': _weightController.text,
-            'allergies': _allergyControllers.map((c) => c.text).toList(),
-            'chronicConditions': _chronicControllers
-                .map((c) => c.text)
-                .toList(),
-            'image': null,
-          });
-          Navigator.pop(context);
-        },
+        onPressed: _isSubmitting
+            ? null
+            : () async {
+                if (_nameController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please enter a name")),
+                  );
+                  return;
+                }
+
+                setState(() => _isSubmitting = true);
+
+                final result = await _controller.addFamilyMember({
+                  'name': _nameController.text.trim(),
+                  'relation': _relationController.text.trim(),
+                  'dob': _dobController.text.trim(),
+                  'gender': _selectedGender,
+                  'blood': _selectedBloodGroup,
+                  'height': _heightController.text.trim(),
+                  'weight': _weightController.text.trim(),
+                  'allergies': _allergyControllers
+                      .map((c) => c.text.trim())
+                      .where((t) => t.isNotEmpty)
+                      .toList(),
+                  'chronicConditions': _chronicControllers
+                      .map((c) => c.text.trim())
+                      .where((t) => t.isNotEmpty)
+                      .toList(),
+                  'imageFile': _selectedImage,
+                  'image': null,
+                });
+
+                if (!mounted) return;
+
+                if (result.isSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Family member added successfully!"),
+                      backgroundColor: AppColors.primaryTeal,
+                    ),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  setState(() => _isSubmitting = false);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        result.failureOrNull?.message ??
+                            "Failed to add family member",
+                      ),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.sageGreen,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
         ),
-        child: const Text(
-          "Add New Profile",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.white,
-          ),
-        ),
+        child: _isSubmitting
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: AppColors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Text(
+                "Add New Profile",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.white,
+                ),
+              ),
       ),
     );
   }

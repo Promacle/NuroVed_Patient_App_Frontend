@@ -10,7 +10,7 @@ import 'package:nuroved_patient/features/settings/screens/settings_screen.dart';
 void main() {
   group('Disabled Features & Honest State Tests', () {
     testWidgets(
-      'FoodScannerScreen displays honest unavailable state without mock data',
+      'FoodScannerScreen operates with genuine barcode scanning and no mock data',
       (tester) async {
         tester.view.physicalSize = const Size(1080, 2400);
         tester.view.devicePixelRatio = 1.0;
@@ -19,44 +19,46 @@ void main() {
         await tester.pumpWidget(const MaterialApp(home: FoodScannerScreen()));
         await tester.pumpAndSettle();
 
-        expect(find.text('Food Scanner Unavailable'), findsOneWidget);
-        expect(
-          find.textContaining('Safety First — No Mock Nutritional Claims'),
-          findsOneWidget,
-        );
+        expect(find.text('Food Scanner'), findsOneWidget);
+        expect(find.text('Scan Retail Food Barcode'), findsOneWidget);
         expect(find.text('Scan Food Item'), findsNothing);
       },
     );
 
-    testWidgets('AiDietPlannerScreen displays honest unavailable state', (
-      tester,
-    ) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
+    testWidgets(
+      'AiDietPlannerScreen operates with verified nutritional parameters and safety guidance',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
 
-      await tester.pumpWidget(const MaterialApp(home: AiDietPlannerScreen()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(const MaterialApp(home: AiDietPlannerScreen()));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Meal Generation Unavailable'), findsOneWidget);
-      expect(
-        find.textContaining('Safety First — Clinical Validation Required'),
-        findsOneWidget,
-      );
-    });
+        expect(find.text('Basic Information'), findsOneWidget);
+        expect(find.text('Continue to Diet Preference'), findsOneWidget);
+        expect(
+          find.textContaining('Verified Nutritional Planning'),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('DietOutputScreen displays honest unavailable state', (
-      tester,
-    ) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
+    testWidgets(
+      'DietOutputScreen renders weekly verified nutrition plan and clinical disclaimer',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
 
-      await tester.pumpWidget(const MaterialApp(home: DietOutputScreen()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(const MaterialApp(home: DietOutputScreen()));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Meal Plan Unavailable'), findsOneWidget);
-    });
+        expect(find.text('Weekly Meal Plan'), findsOneWidget);
+        expect(find.text('Clinical Reference Notice'), findsOneWidget);
+        expect(find.text('Save to My Routine'), findsOneWidget);
+      },
+    );
 
     testWidgets(
       'PurchaseScreen displays honest unavailable state without fake pay buttons',

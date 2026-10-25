@@ -101,43 +101,76 @@ class RoutineDetailScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const CircleAvatar(
-                backgroundColor: AppColors.white,
-                child: Icon(
-                  Icons.arrow_back,
-                  color: AppColors.sageGreen,
-                  size: 20,
+            Semantics(
+              button: true,
+              label: 'Back',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.pop(context),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: 48,
+                    minHeight: 48,
+                  ),
+                  child: const Center(
+                    child: CircleAvatar(
+                      backgroundColor: AppColors.white,
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: AppColors.sageGreen,
+                        size: 20,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-            Text(
-              "$title | ${_settingsController.formatTime(time)}", // Format the time here
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C4E4E),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  "$title | ${_settingsController.formatTime(time)}", // Format the time here
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditRoutineScreen(
-                      title: title,
-                      time: time,
-                      mealName: mealName,
-                      ingredients: ingredients,
+            Semantics(
+              button: true,
+              label: 'Edit Routine',
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditRoutineScreen(
+                        title: title,
+                        time: time,
+                        mealName: mealName,
+                        ingredients: ingredients,
+                      ),
+                    ),
+                  );
+                },
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: 48,
+                    minHeight: 48,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.edit_note_rounded,
+                      color: AppColors.sageGreen,
+                      size: 32,
                     ),
                   ),
-                );
-              },
-              child: const Icon(
-                Icons.edit_note_rounded,
-                color: AppColors.sageGreen,
-                size: 32,
+                ),
               ),
             ),
           ],
@@ -304,7 +337,7 @@ class RoutineDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogCtx) {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
@@ -339,7 +372,7 @@ class RoutineDetailScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(dialogCtx),
                         child: Text(
                           "Not yet",
                           style: TextStyle(
@@ -363,9 +396,9 @@ class RoutineDetailScreen extends StatelessWidget {
                           // 1. Update the state
                           controller.intakeMeal(title);
                           // 2. Close the dialog
-                          Navigator.pop(context);
+                          Navigator.pop(dialogCtx);
                           // 3. Navigate to the success screen
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>

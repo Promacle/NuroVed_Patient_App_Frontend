@@ -21,6 +21,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
   bool _isDetailsExpanded = false;
   bool _isDateExpanded = false;
 
+  bool _isSaving = false;
   String _selectedProfileName = "";
   String _selectedRecordTitle = "";
   String? _selectedRecordId;
@@ -30,7 +31,9 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
 
   String get _formattedDate =>
       "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}";
-  void _saveVisit() {
+  Future<void> _saveVisit() async {
+    if (_isSaving) return;
+
     if (_selectedProfileName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a profile first")),
@@ -43,6 +46,8 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       );
       return;
     }
+
+    setState(() => _isSaving = true);
 
     final newVisit = {
       "profile": _selectedProfileName,
@@ -57,9 +62,29 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
           : <String>[],
     };
 
-    VisitsController().addVisit(newVisit);
-    ProfileController().activeProfileName = _selectedProfileName;
-    Navigator.pop(context);
+    final result = await VisitsController().addVisit(newVisit);
+    if (!mounted) return;
+
+    if (result.isSuccess) {
+      ProfileController().activeProfileName = _selectedProfileName;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Doctor visit added successfully!"),
+          backgroundColor: AppColors.primaryTeal,
+        ),
+      );
+      Navigator.pop(context);
+    } else {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.failureOrNull?.message ?? "Failed to save doctor visit",
+          ),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   String _formatDateForTimeline(DateTime date) {
@@ -169,31 +194,45 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.arrow_back, color: AppColors.sageGreen),
+          Semantics(
+            button: true,
+            label: 'Back',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => Navigator.pop(context),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                child: const Center(
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.arrow_back, color: AppColors.sageGreen),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 15),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Add New Visit",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
-                  fontFamily: 'serif',
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Add New Visit",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                    fontFamily: 'serif',
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                "Add Visit Details Below",
-                style: TextStyle(color: Colors.black54, fontSize: 14),
-              ),
-            ],
+                Text(
+                  "Add Visit Details Below",
+                  style: TextStyle(color: Colors.black54, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -587,8 +626,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       width: double.infinity,
       height: 60,
       child: ElevatedButton(
-        onPressed: _saveVisit, // Make sure this is linked to the method above
-
+        onPressed: _isSaving ? null : _saveVisit,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkTeal,
           elevation: 0,
@@ -596,14 +634,23 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        child: const Text(
-          "Save Visit",
-          style: TextStyle(
-            color: AppColors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: _isSaving
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: AppColors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : const Text(
+                "Save Visit",
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }

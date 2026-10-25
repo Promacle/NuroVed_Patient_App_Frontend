@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/app/app_router.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 
@@ -188,7 +189,7 @@ class EmergencyCardView extends StatelessWidget {
                 elevation: 0,
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/family-profiles');
+                Navigator.pushNamed(context, AppRouter.familyProfiles);
               },
               child: const Text(
                 "View all family profiles",
@@ -224,7 +225,7 @@ class EmergencyCardView extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/family-profiles');
+        Navigator.pushNamed(context, AppRouter.familyProfiles);
       },
       borderRadius: BorderRadius.circular(18),
       child: Row(

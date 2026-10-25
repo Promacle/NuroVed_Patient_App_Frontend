@@ -138,8 +138,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
           LogoutButton(
             onLogout: () async {
-              _controller.logout();
-              await context.read<AuthController>().logout(context);
+              final authCtrl = context.read<AuthController>();
+              await _controller.logout();
+              if (mounted) {
+                await authCtrl.logout(context);
+              }
             },
           ),
         ],

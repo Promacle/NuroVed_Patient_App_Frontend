@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 class GraphCard extends StatefulWidget {
   const GraphCard({super.key});
 
@@ -56,9 +58,9 @@ class _GraphCardState extends State<GraphCard>
                 "Health Timeline",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              Text(
+              const Text(
                 "Visits",
-                style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
             ],
           ),

@@ -1,135 +1,163 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nuroved_patient/app/app_router.dart';
 
 class DietSuccessScreen extends StatelessWidget {
   final DateTime timestamp;
 
   const DietSuccessScreen({super.key, required this.timestamp});
 
+  void _navigateToDiet(BuildContext context) {
+    final nav = Navigator.of(context);
+    bool reachedDiet = false;
+    nav.popUntil((route) {
+      if (route.settings.name == AppRouter.diet ||
+          route.settings.name == '/diet') {
+        reachedDiet = true;
+        return true;
+      }
+      return route.isFirst;
+    });
+    if (!reachedDiet) {
+      if (nav.canPop()) {
+        nav.pop();
+      } else {
+        nav.pushReplacementNamed(AppRouter.diet);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('dd/MM/yyyy').format(timestamp);
     String formattedTime = DateFormat('hh : mm : ss a').format(timestamp);
 
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFA8D5C2), Color(0xFFE8F2EF), Color(0xFFF0F6F4)],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _navigateToDiet(context);
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFA8D5C2), Color(0xFFE8F2EF), Color(0xFFF0F6F4)],
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              // Back Button
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: GestureDetector(
-                    onTap: () {
-                      // This pops all screens (success, output, wizard) and returns to the main Diet Screen
-                      Navigator.popUntil(context, (route) {
-                        // Pop until we find '/diet' OR we hit the very first screen (Home)
-                        return route.settings.name == '/diet' || route.isFirst;
-                      });
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 60),
+                // Back Button
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Semantics(
+                      button: true,
+                      label: 'Back to diet overview',
+                      child: GestureDetector(
+                        onTap: () => _navigateToDiet(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFC4E2D5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Color(0xFF2C4E4E),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 60),
+                // Success Checkmark
+                Container(
+                  height: 100,
+                  width: 100,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF3B8E6D),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 50),
+                ),
+                const SizedBox(height: 40),
+                const Text(
+                  "New Meal Routine Saved\nSuccessfully",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
+                ),
+                const SizedBox(height: 60),
+                // Date and Time Info
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: Column(
+                    children: [
+                      _buildDataRow("Date", formattedDate),
+                      const SizedBox(height: 20),
+                      _buildDataRow("Time", formattedTime),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 100),
+                // Action Button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 60),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRouter.mealRoutineHistory,
+                        (route) =>
+                            route.settings.name == AppRouter.diet ||
+                            route.settings.name == '/diet' ||
+                            route.isFirst,
+                      );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFC4E2D5),
-                        shape: BoxShape.circle,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 12,
                       ),
-                      child: const Icon(
-                        Icons.arrow_back,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      "See in Meal Routine History",
+                      style: TextStyle(
                         color: Color(0xFF2C4E4E),
-                        size: 20,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 60),
-              // Success Checkmark
-              Container(
-                height: 100,
-                width: 100,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3B8E6D),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.check, color: Colors.white, size: 50),
-              ),
-              const SizedBox(height: 40),
-              const Text(
-                "New Meal Routine Saved\nSuccessfully",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
-                ),
-              ),
-              const SizedBox(height: 60),
-              // Date and Time Info
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Column(
-                  children: [
-                    _buildDataRow("Date", formattedDate),
-                    const SizedBox(height: 20),
-                    _buildDataRow("Time", formattedTime),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 100),
-              // Action Button
-              Padding(
-                padding: const EdgeInsets.only(bottom: 60),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/meal-routine-history',
-                      (route) =>
-                          route.settings.name == '/diet' || route.isFirst,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 25,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: const Text(
-                    "See in Meal Routine History",
-                    style: TextStyle(
-                      color: Color(0xFF2C4E4E),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 150),
-            ],
+                const SizedBox(height: 150),
+              ],
+            ),
           ),
         ),
       ),
