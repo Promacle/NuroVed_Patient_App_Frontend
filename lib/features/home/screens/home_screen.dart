@@ -6,6 +6,8 @@ import 'package:nuroved_patient/core/widgets/empty_state_view.dart';
 import 'package:nuroved_patient/core/widgets/section_header.dart';
 import 'package:nuroved_patient/features/records/controllers/records_controller.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 import '../widgets/graph_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/quick_access_grid.dart';
@@ -36,14 +38,14 @@ class HomeScreen extends StatelessWidget {
         color: AppColors.kTopBg,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(44)),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          HomeHeader(),
-          SizedBox(height: 24),
+          const HomeHeader(),
+          const SizedBox(height: 24),
           Text(
-            "Let's take the next step\nfor your health!",
-            style: TextStyle(
+            context.l10n.homeHealthHeadline,
+            style: const TextStyle(
               fontSize: 27,
               fontWeight: FontWeight.w500,
               color: Color(0xFF5B7D72),
@@ -51,14 +53,15 @@ class HomeScreen extends StatelessWidget {
               letterSpacing: -0.4,
             ),
           ),
-          SizedBox(height: 24),
-          GraphCard(),
+          const SizedBox(height: 24),
+          const GraphCard(),
         ],
       ),
     );
   }
 
   Widget _buildBodyContent(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
@@ -67,9 +70,9 @@ class HomeScreen extends StatelessWidget {
           const QuickAccessGrid(),
           const SizedBox(height: 28),
           SectionHeader(
-            title: "Recent Health Records",
-            subtitle: "Diagnostic reports and prescriptions",
-            actionText: "View All",
+            title: l10n.homeRecentRecords,
+            subtitle: l10n.recordsSubtitle,
+            actionText: l10n.commonViewAll,
             onAction: () => Navigator.pushNamed(context, AppRouter.records),
             padding: EdgeInsets.zero,
           ),
@@ -92,10 +95,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: EmptyStateView(
                     icon: Icons.description_outlined,
-                    title: "No medical records yet",
-                    description:
-                        "Upload lab tests, doctor notes, or prescriptions to track your health progress.",
-                    actionLabel: "+ Upload Record",
+                    title: l10n.recordsNoRecordsFound,
+                    description: l10n.recordsEmptyUploadPrompt,
+                    actionLabel: "+ ${l10n.homeQuickUploadRecord}",
                     onAction: () =>
                         Navigator.pushNamed(context, AppRouter.records),
                     padding: const EdgeInsets.symmetric(

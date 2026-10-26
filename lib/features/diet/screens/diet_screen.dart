@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 class DietScreen extends StatelessWidget {
@@ -31,9 +32,9 @@ class DietScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildDisclaimerBanner(),
+                    _buildDisclaimerBanner(context),
                     const SizedBox(height: 16),
-                    _buildActivityCard(),
+                    _buildActivityCard(context),
                     const SizedBox(height: 24),
                     _buildQuickActionCard(context),
                     const SizedBox(height: 120),
@@ -47,7 +48,7 @@ class DietScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDisclaimerBanner() {
+  Widget _buildDisclaimerBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -55,18 +56,18 @@ class DietScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE8D7B8)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.health_and_safety_outlined,
             color: Color(0xFFB57D24),
             size: 20,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              "Diet suggestions are for nutritional tracking only and do not constitute medical diagnosis or treatment.",
-              style: TextStyle(
+              context.l10n.dietDisclaimerBanner,
+              style: const TextStyle(
                 fontSize: 11,
                 color: Color(0xFF7A571A),
                 height: 1.4,
@@ -102,7 +103,7 @@ class DietScreen extends StatelessWidget {
             children: [
               Semantics(
                 button: true,
-                label: 'Back',
+                label: context.l10n.commonBack,
                 child: GestureDetector(
                   onTap: () {
                     if (Navigator.canPop(context)) {
@@ -126,10 +127,10 @@ class DietScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 15),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  "Diet Section",
-                  style: TextStyle(
+                  context.l10n.dietSectionTitle,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -138,11 +139,11 @@ class DietScreen extends StatelessWidget {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 59),
+          Padding(
+            padding: const EdgeInsets.only(left: 59),
             child: Text(
-              "Calculate Your Every Single Bite",
-              style: TextStyle(
+              context.l10n.dietSectionSubtitle,
+              style: const TextStyle(
                 fontSize: 14,
                 color: Color(0xFF5A6A6A),
                 fontWeight: FontWeight.w500,
@@ -154,7 +155,7 @@ class DietScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityCard() {
+  Widget _buildActivityCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -179,15 +180,15 @@ class DietScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.info_outline, size: 12, color: Colors.white),
-                SizedBox(width: 6),
+                const Icon(Icons.info_outline, size: 12, color: Colors.white),
+                const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    "Sample preview metrics - not clinical measurements",
-                    style: TextStyle(
+                    context.l10n.dietPreviewMetricsNotice,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -242,7 +243,7 @@ class DietScreen extends StatelessWidget {
           ),
           const SizedBox(height: 25),
           _buildChartSection(
-            "kcal intake",
+            context.l10n.dietKcalIntake,
             [2, 3, 5, 8, 12, 10, 8, 9, 6, 7, 10, 13, 11, 10, 9, 7, 5, 4, 3],
             const LinearGradient(
               colors: [Color(0xFF059597), Color(0xFF004445)],
@@ -252,7 +253,7 @@ class DietScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           _buildChartSection(
-            "Meals",
+            context.l10n.routineTabMeals,
             [1, 2, 4, 6, 10, 8, 7, 9, 11, 12, 11, 9, 7, 6, 4, 3, 2, 1, 0.5],
             const LinearGradient(
               colors: [Color(0xFF6ED940), Color(0xFFA5FF7E)],
@@ -262,7 +263,7 @@ class DietScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           _buildChartSection(
-            "Sleep",
+            context.l10n.dietSleep,
             [0, 0, 0, 0, 0, 8, 9, 10, 10, 10, 10, 10, 10, 10, 0, 0, 0, 0, 0],
             const LinearGradient(
               colors: [Color(0xFF56BFDB), Color(0xFF77E2FF)],
@@ -324,11 +325,11 @@ class DietScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
-              "Quick Action",
-              style: TextStyle(
+              context.l10n.dietQuickAction,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2C4E4E),
@@ -341,7 +342,7 @@ class DietScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               QuickActionButton(
-                label: "Diet Planner",
+                label: context.l10n.dietPlannerNav,
                 icon: const Icon(
                   Icons.restaurant_menu_rounded,
                   color: AppColors.sageGreen,
@@ -352,7 +353,7 @@ class DietScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               QuickActionButton(
-                label: "Food Scanner",
+                label: context.l10n.foodScannerNav,
                 icon: const Icon(
                   Icons.qr_code_scanner_rounded,
                   color: AppColors.sageGreen,
@@ -363,7 +364,7 @@ class DietScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               QuickActionButton(
-                label: "Meal Routine History",
+                label: context.l10n.dietMealRoutineHistoryNav,
                 icon: const Icon(
                   Icons.timer_outlined,
                   color: AppColors.sageGreen,

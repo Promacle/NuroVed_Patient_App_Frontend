@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/medical_record.dart';
 import 'package:nuroved_patient/core/models/visit.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
@@ -69,14 +70,12 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Visit?'),
-        content: const Text(
-          'Are you sure you want to delete this consultation visit? This will remove it from your timeline.',
-        ),
+        title: Text(context.l10n.visitsDeleteDialogTitle),
+        content: Text(context.l10n.visitsDeleteDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(context.l10n.commonCancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -94,8 +93,8 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                 result.when(
                   success: (_) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Visit deleted successfully'),
+                      SnackBar(
+                        content: Text(context.l10n.visitsDeletedSuccess),
                       ),
                     );
                     Navigator.pop(context);
@@ -103,14 +102,14 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                   failure: (f) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to delete visit: ${f.message}'),
+                        content: Text(context.l10n.visitsSaveFailed(f.message)),
                       ),
                     );
                   },
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.commonDelete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -133,32 +132,32 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Edit Visit Details'),
+        title: Text(context.l10n.visitsEditDetailsTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'Title / Purpose'),
+                decoration: InputDecoration(labelText: context.l10n.visitsEditTitleLabel),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: doctorController,
-                decoration: const InputDecoration(labelText: 'Doctor Name'),
+                decoration: InputDecoration(labelText: context.l10n.visitsEditDoctorLabel),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: hospitalController,
-                decoration: const InputDecoration(
-                  labelText: 'Hospital / Clinic',
+                decoration: InputDecoration(
+                  labelText: context.l10n.visitsEditHospitalLabel,
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: notesController,
                 maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Clinical Notes'),
+                decoration: InputDecoration(labelText: context.l10n.visitsEditNotesLabel),
               ),
             ],
           ),
@@ -166,7 +165,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(context.l10n.commonCancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -190,11 +189,11 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
               if (mounted && result.isSuccess) {
                 setState(() => _visit = updated);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Visit updated successfully')),
+                  SnackBar(content: Text(context.l10n.visitsUpdatedSuccess)),
                 );
               }
             },
-            child: const Text('Save', style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.commonSave, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -248,9 +247,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          const Text(
-            'Visit Details',
-            style: TextStyle(
+          Text(
+            context.l10n.visitsDetailsTitle,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -269,27 +268,27 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.edit_outlined,
                       size: 20,
                       color: Color(0xFF2C4E4E),
                     ),
-                    SizedBox(width: 10),
-                    Text('Edit Details'),
+                    const SizedBox(width: 10),
+                    Text(context.l10n.visitsEditDetailsAction),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text('Delete Visit', style: TextStyle(color: Colors.red)),
+                    const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    const SizedBox(width: 10),
+                    Text(context.l10n.visitsDeleteVisitAction, style: const TextStyle(color: Colors.red)),
                   ],
                 ),
               ),
@@ -420,9 +419,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Consultation Notes & Diagnosis',
-            style: TextStyle(
+          Text(
+            context.l10n.visitsConsultationNotesTitle,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -432,7 +431,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           Text(
             notes.isNotEmpty
                 ? notes
-                : 'No detailed notes recorded for this visit.',
+                : context.l10n.visitsNoDetailedNotes,
             style: TextStyle(
               fontSize: 14,
               color: notes.isNotEmpty ? Colors.black87 : Colors.grey,
@@ -478,7 +477,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Next Follow-Up',
+                  context.l10n.visitsNextFollowUp,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -489,7 +488,7 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                 Text(
                   hasFollowUp
                       ? displayFollowUp!
-                      : 'No follow-up appointment scheduled',
+                      : context.l10n.visitsNoFollowUpScheduled,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: hasFollowUp
@@ -527,16 +526,16 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Related Medical Records',
-                style: TextStyle(
+              Text(
+                context.l10n.visitsRelatedRecordsTitle,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
                 ),
               ),
               Text(
-                '${_relatedRecords.length} attached',
+                context.l10n.visitsAttachedCount(_relatedRecords.length),
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
@@ -561,9 +560,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                     size: 40,
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'No medical records attached to this visit',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  Text(
+                    context.l10n.visitsNoRecordsAttached,
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                 ],
               ),
@@ -622,9 +621,9 @@ class _VisitDetailsScreenState extends State<VisitDetailsScreen> {
                         ),
                       );
                     },
-                    child: const Text(
-                      'View',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    child: Text(
+                      context.l10n.commonView,
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 );

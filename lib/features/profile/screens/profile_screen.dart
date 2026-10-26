@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 
@@ -100,8 +101,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           Text(
             _controller.calculateAge() == 'N/A'
-                ? 'Age not provided'
-                : "${_controller.calculateAge()} old",
+                ? context.l10n.profileAgeNotProvided
+                : context.l10n.profileAgeYearsOld(_controller.calculateAge()),
             style: const TextStyle(
               color: Colors.black,
               fontSize: 14,
@@ -109,7 +110,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Text(
-            "User ID: ${data['id'] ?? 'Not assigned'}",
+            context.l10n.profileUserId(
+              data['id']?.toString() ?? context.l10n.emergencyCardNotAssigned,
+            ),
             style: const TextStyle(color: AppColors.textGrey, fontSize: 12),
           ),
           const SizedBox(height: 15),
@@ -160,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: MetricCard(
                 icon: Icons.water_drop_outlined,
                 value: data['blood'],
-                label: "Blood",
+                label: context.l10n.profileMetricBlood,
                 color: AppColors.errorRed,
               ),
             ),
@@ -171,7 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // USES formatHeight
                 value:
                     "${_settingsController.formatHeight(data['height'])} ${_settingsController.heightUnit}",
-                label: "Height",
+                label: context.l10n.profileMetricHeight,
                 color: Colors.blueAccent,
               ),
             ),
@@ -182,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // USES formatWeight
                 value:
                     "${_settingsController.formatWeight(data['weight'])} ${_settingsController.weightUnit}",
-                label: "Weight",
+                label: context.l10n.profileMetricWeight,
                 color: AppColors.primaryTeal,
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../widgets/notification_tile.dart';
@@ -17,6 +18,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.kMainBg,
       body: SafeArea(
@@ -33,50 +35,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 10),
-                    _buildSectionHeader("Today"),
+                    _buildSectionHeader(l10n.notificationsSectionToday),
                     NotificationTile(
-                      title: "Time For Mom's Medicine",
-                      subtitle: "It's time to take Mom's BP medicine....",
-                      time: "Just now",
+                      title: l10n.notificationsSampleMedicineTitle,
+                      subtitle: l10n.notificationsSampleMedicineSub,
+                      time: l10n.notificationsTimeJustNow,
                       iconPath: AppAssets.medicineIcon,
                       isUnread: !_allRead,
                     ),
                     NotificationTile(
-                      title: "Blood test Reminder",
-                      subtitle: "Remember your upcoming blood test tomorrow...",
-                      time: "1 hr ago",
+                      title: l10n.notificationsSampleBloodTestTitle,
+                      subtitle: l10n.notificationsSampleBloodTestSub,
+                      time: l10n.notificationsTimeOneHourAgo,
                       iconPath: AppAssets.bloodTestIcon,
                       isUnread: !_allRead,
                     ),
                     NotificationTile(
-                      title: "5-day Streak! Great Job!",
-                      subtitle:
-                          "You have logged in for 5 days consecutively...",
-                      time: "2 hr ago",
+                      title: l10n.notificationsSampleStreakTitle,
+                      subtitle: l10n.notificationsSampleStreakSub,
+                      time: l10n.notificationsTimeTwoHoursAgo,
                       iconPath: AppAssets.streakIcon,
                       isUnread: false,
                     ),
                     const SizedBox(height: 25),
-                    _buildSectionHeader("This week"),
-                    const NotificationTile(
-                      title: "Your Data is Encrypted",
-                      subtitle:
-                          "Your health records are securely encrypted & protected",
-                      time: "Tuesday",
+                    _buildSectionHeader(l10n.notificationsSectionThisWeek),
+                    NotificationTile(
+                      title: l10n.notificationsSampleEncryptedTitle,
+                      subtitle: l10n.notificationsSampleEncryptedSub,
+                      time: l10n.notificationsTimeTuesday,
                       iconPath: AppAssets.encryptedIcon,
                     ),
-                    const NotificationTile(
-                      title: "First record has been added",
-                      subtitle:
-                          "Your first health records has been added successfully.....",
-                      time: "Monday",
+                    NotificationTile(
+                      title: l10n.notificationsSampleRecordTitle,
+                      subtitle: l10n.notificationsSampleRecordSub,
+                      time: l10n.notificationsTimeMonday,
                       iconPath: AppAssets.docIcon,
                     ),
-                    const NotificationTile(
-                      title: "Thank you for joining us",
-                      subtitle:
-                          "Welcome to new revolutionary step towards your health....",
-                      time: "2 hr ago",
+                    NotificationTile(
+                      title: l10n.notificationsSampleWelcomeTitle,
+                      subtitle: l10n.notificationsSampleWelcomeSub,
+                      time: l10n.notificationsTimeTwoHoursAgo,
                       iconPath: AppAssets.heartIcon,
                     ),
                     const SizedBox(height: 30),
@@ -91,12 +89,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
+              tooltip: l10n.commonBack,
               onPressed: () => Navigator.pop(context),
               icon: const Icon(
                 Icons.arrow_circle_left_rounded,
@@ -104,9 +104,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: AppColors.kPrimary,
               ),
             ),
-            const Text(
-              "Notification",
-              style: TextStyle(
+            Text(
+              l10n.notificationsTitle,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: AppColors.kDarkText,
@@ -123,13 +123,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 _allRead = true;
               });
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("All notifications marked as read"),
+                SnackBar(
+                  content: Text(l10n.notificationsAllMarkedRead),
                 ),
               );
             },
             child: Text(
-              "Mark all as read",
+              l10n.notificationsMarkAllRead,
               style: TextStyle(
                 color: _allRead ? Colors.grey : AppColors.kPrimary,
                 fontSize: 16,

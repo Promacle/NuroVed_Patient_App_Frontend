@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/routine/controllers/routine_controller.dart';
 
@@ -49,9 +50,9 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
     final mealName = _mealNameController.text.trim();
     if (mealName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Meal name cannot be empty"),
-          backgroundColor: Color(0xFFE11D48),
+        SnackBar(
+          content: Text(context.l10n.routineMealNameEmpty),
+          backgroundColor: const Color(0xFFE11D48),
         ),
       );
       return;
@@ -64,8 +65,8 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
 
     RoutineController().updateMeal(widget.title, mealName, newIngredients);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Meal routine updated successfully!"),
+      SnackBar(
+        content: Text(context.l10n.routineMealUpdatedSuccess),
         backgroundColor: AppColors.primaryTeal,
       ),
     );
@@ -134,8 +135,7 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
                 ),
-                overflow:
-                    TextOverflow.ellipsis, // Added ellipsis to prevent overflow
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 20),
@@ -224,10 +224,9 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            // Removed the edit icon from here
-            "Ingredients",
-            style: TextStyle(
+          Text(
+            context.l10n.routineIngredients,
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Color(0xFF5A6A6A),
@@ -252,11 +251,11 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
                         color: Colors.grey,
                         fontFamily: 'serif',
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         isDense: true,
-                        hintText: "Add ingredient...",
-                        hintStyle: TextStyle(
+                        hintText: context.l10n.routineAddIngredientHint,
+                        hintStyle: const TextStyle(
                           fontSize: 16,
                           color: Colors.black26,
                         ),
@@ -288,11 +287,11 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
                 ),
                 child: CustomPaint(
                   painter: _DashedBorderPainter(radius: 20, color: Colors.grey),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                     child: Text(
-                      "+ Add More",
-                      style: TextStyle(
+                      context.l10n.dietAddMore,
+                      style: const TextStyle(
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -321,9 +320,9 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
           ),
           elevation: 8,
         ),
-        child: const Text(
-          "Save Meal",
-          style: TextStyle(
+        child: Text(
+          context.l10n.routineSaveMeal,
+          style: const TextStyle(
             color: AppColors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,

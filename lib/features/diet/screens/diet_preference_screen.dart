@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/diet/diet_preferences.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
@@ -69,8 +70,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
 
     if (_selectedType == "Both (Veg & Non-Veg)" && _selectedDays.isEmpty) {
       setState(
-        () => _validationError =
-            "Please select at least one day for non-vegetarian meals.",
+        () => _validationError = context.l10n.validationSelectNonVegDay,
       );
       return;
     }
@@ -110,15 +110,15 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Ai Diet Planner",
-            subtitle: "Calculate Your Every Single Bite",
+          DietPlannerHeader(
+            title: context.l10n.dietPlannerTitle,
+            subtitle: context.l10n.dietSectionSubtitle,
           ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: DietPlannerCard(
-                title: "Diet Preference",
+                title: context.l10n.dietStep2Title,
                 icon: Icons.restaurant,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,24 +127,27 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildPreferenceOption(
-                          "Vegetarian",
-                          const Icon(
+                          typeValue: "Vegetarian",
+                          label: context.l10n.dietPatternVegetarian,
+                          icon: const Icon(
                             Icons.eco_outlined,
                             color: Color(0xFF2C4E4E),
                             size: 30,
                           ),
                         ),
                         _buildPreferenceOption(
-                          "Non-veg",
-                          const FaIcon(
+                          typeValue: "Non-veg",
+                          label: context.l10n.dietPatternNonVegetarian,
+                          icon: const FaIcon(
                             FontAwesomeIcons.drumstickBite,
                             color: Color(0xFF2C4E4E),
                             size: 30,
                           ),
                         ),
                         _buildPreferenceOption(
-                          "Both (Veg & Non-Veg)",
-                          const Icon(
+                          typeValue: "Both (Veg & Non-Veg)",
+                          label: context.l10n.dietPatternBoth,
+                          icon: const Icon(
                             Icons.rice_bowl_outlined,
                             color: Color(0xFF2C4E4E),
                             size: 30,
@@ -155,18 +158,18 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                     if (_selectedType == "Both (Veg & Non-Veg)")
                       _buildDayPicker(),
                     const SizedBox(height: 35),
-                    const Text(
-                      "Allergies / Disallowed Foods (Optional)",
-                      style: TextStyle(
+                    Text(
+                      context.l10n.dietAllergiesOptional,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF5A6A6A),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      "Specify ingredients to strictly exclude (e.g., Peanuts, Dairy, Gluten, Soy, Shellfish, Eggs).",
-                      style: TextStyle(
+                    Text(
+                      context.l10n.dietSpecifyIngredientsPrompt,
+                      style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textGrey,
                         height: 1.3,
@@ -184,10 +187,9 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                         child: TextField(
                           controller: _allergiesController,
                           maxLines: 3,
-                          decoration: const InputDecoration(
-                            hintText:
-                                "e.g., Peanuts, Gluten, Dairy, Soy, Shellfish...",
-                            hintStyle: TextStyle(
+                          decoration: InputDecoration(
+                            hintText: context.l10n.dietAllergiesHint,
+                            hintStyle: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
                             ),
@@ -231,7 +233,7 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
                     ],
                     const SizedBox(height: 40),
                     DietPlannerActionButton(
-                      label: "Continue to Health Goals",
+                      label: context.l10n.dietBtnContinueHealthGoals,
                       onPressed: _onContinue,
                     ),
                     const SizedBox(height: 80),
@@ -266,9 +268,9 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Pick the days you prefer non-veg meals",
-                style: TextStyle(
+              Text(
+                context.l10n.dietNonVegDaysPrompt,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF2C4E4E),
@@ -326,10 +328,14 @@ class _DietPreferenceScreenState extends State<DietPreferenceScreen> {
     );
   }
 
-  Widget _buildPreferenceOption(String label, Widget icon) {
-    final isSelected = _selectedType == label;
+  Widget _buildPreferenceOption({
+    required String typeValue,
+    required String label,
+    required Widget icon,
+  }) {
+    final isSelected = _selectedType == typeValue;
     return GestureDetector(
-      onTap: () => setState(() => _selectedType = label),
+      onTap: () => setState(() => _selectedType = typeValue),
       child: Container(
         width: 100,
         constraints: const BoxConstraints(minHeight: 115),

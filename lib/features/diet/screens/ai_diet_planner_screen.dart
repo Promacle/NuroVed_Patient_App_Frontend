@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/diet/diet_preferences.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
@@ -107,14 +108,14 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
 
     final age = int.tryParse(_ageController.text.trim());
     if (age == null || age < 1 || age > 120) {
-      setState(() => _validationError = 'Please enter a valid age (1–120).');
+      setState(() => _validationError = context.l10n.validationAgeRange);
       return;
     }
 
     final weight = double.tryParse(_weightController.text.trim());
     if (weight == null || weight < 20 || weight > 300) {
       setState(
-        () => _validationError = 'Please enter a valid weight in kg (20–300).',
+        () => _validationError = context.l10n.dietValidationWeight,
       );
       return;
     }
@@ -122,7 +123,7 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
     final height = double.tryParse(_heightController.text.trim());
     if (height == null || height < 50 || height > 250) {
       setState(
-        () => _validationError = 'Please enter a valid height in cm (50–250).',
+        () => _validationError = context.l10n.dietValidationHeight,
       );
       return;
     }
@@ -149,19 +150,19 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Ai Diet Planner",
-            subtitle: "Personalized Nutritional Planning",
+          DietPlannerHeader(
+            title: context.l10n.dietPlannerTitle,
+            subtitle: context.l10n.dietPlannerSubtitle,
           ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _buildInformationalBanner(),
+                  _buildInformationalBanner(context),
                   const SizedBox(height: 16),
                   DietPlannerCard(
-                    title: "Basic Information",
+                    title: context.l10n.dietStep1Title,
                     icon: Icons.person_outline_rounded,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,7 +189,9 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    "Profile: $_selectedProfileName",
+                                    context.l10n.dietProfilePrefix(
+                                      _selectedProfileName!,
+                                    ),
                                     style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
@@ -202,7 +205,7 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
                           const SizedBox(height: 16),
                         ],
                         DietPlannerTextField(
-                          label: "Age (Years)",
+                          label: context.l10n.dietAgeYearsLabel,
                           controller: _ageController,
                           hint: "28",
                           keyboardType: TextInputType.number,
@@ -228,17 +231,17 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        _buildGenderSelector(),
+                        _buildGenderSelector(context),
                         const SizedBox(height: 16),
                         DietPlannerTextField(
-                          label: "Weight (Kg)",
+                          label: context.l10n.dietWeightKgLabel,
                           controller: _weightController,
                           hint: "70",
                           keyboardType: TextInputType.number,
                         ),
                         const SizedBox(height: 16),
                         DietPlannerTextField(
-                          label: "Height (Cm)",
+                          label: context.l10n.dietHeightCmLabel,
                           controller: _heightController,
                           hint: "175",
                           keyboardType: TextInputType.number,
@@ -278,7 +281,7 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
                         ],
                         const SizedBox(height: 30),
                         DietPlannerActionButton(
-                          label: "Continue to Diet Preference",
+                          label: context.l10n.dietBtnContinueDietPref,
                           onPressed: _onContinue,
                         ),
                       ],
@@ -294,7 +297,7 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
     );
   }
 
-  Widget _buildInformationalBanner() {
+  Widget _buildInformationalBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -302,15 +305,15 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFBBF7D0)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.verified_outlined, color: AppColors.primaryTeal, size: 20),
-          SizedBox(width: 10),
+          const Icon(Icons.verified_outlined, color: AppColors.primaryTeal, size: 20),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              "Verified Nutritional Planning: Calculations are based on clinical dietary guidelines (ICMR-NIN & Mifflin-St Jeor). General reference only.",
-              style: TextStyle(
+              context.l10n.dietVerifiedNutritionalPlanningNotice,
+              style: const TextStyle(
                 fontSize: 12,
                 color: Color(0xFF166534),
                 height: 1.4,
@@ -323,13 +326,13 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
     );
   }
 
-  Widget _buildGenderSelector() {
+  Widget _buildGenderSelector(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Gender",
-          style: TextStyle(
+        Text(
+          context.l10n.dietFieldGender,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Color(0xFF5A6A6A),
@@ -347,10 +350,19 @@ class _AiDietPlannerScreenState extends State<AiDietPlannerScreen> {
             child: DropdownButton<String>(
               value: _selectedGender,
               isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: "Male", child: Text("Male")),
-                DropdownMenuItem(value: "Female", child: Text("Female")),
-                DropdownMenuItem(value: "Other", child: Text("Other")),
+              items: [
+                DropdownMenuItem(
+                  value: "Male",
+                  child: Text(context.l10n.dietFieldGenderMale),
+                ),
+                DropdownMenuItem(
+                  value: "Female",
+                  child: Text(context.l10n.dietFieldGenderFemale),
+                ),
+                DropdownMenuItem(
+                  value: "Other",
+                  child: Text(context.l10n.dietFieldGenderOther),
+                ),
               ],
               onChanged: (val) {
                 if (val != null) {

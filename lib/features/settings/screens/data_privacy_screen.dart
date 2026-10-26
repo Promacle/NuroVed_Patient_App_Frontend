@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/controllers/auth_controller.dart';
 
@@ -10,6 +11,7 @@ class DataPrivacyScreen extends StatelessWidget {
   const DataPrivacyScreen({super.key});
 
   void _showDeleteConfirmation(BuildContext context) {
+    final l10n = context.l10n;
     final passwordController = TextEditingController();
     bool isDeleting = false;
     String? dialogError;
@@ -22,9 +24,9 @@ class DataPrivacyScreen extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            title: const Text(
-              'Delete Account & Data',
-              style: TextStyle(
+            title: Text(
+              l10n.dataPrivacyDeleteTitle,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFE11D48),
               ),
@@ -33,14 +35,14 @@ class DataPrivacyScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Are you sure you want to permanently delete your account? All medical records, visits, and timeline data will be permanently erased. This action cannot be reversed.',
-                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                Text(
+                  l10n.dataPrivacyDeleteMessage,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Confirm your password:',
-                  style: TextStyle(
+                Text(
+                  l10n.dataPrivacyConfirmPassword,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -51,7 +53,7 @@ class DataPrivacyScreen extends StatelessWidget {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    hintText: 'Enter password',
+                    hintText: l10n.dataPrivacyEnterPassword,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 12,
@@ -76,9 +78,9 @@ class DataPrivacyScreen extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: isDeleting ? null : () => Navigator.pop(dialogCtx),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.grey),
+                child: Text(
+                  l10n.commonCancel,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
               ElevatedButton(
@@ -94,7 +96,7 @@ class DataPrivacyScreen extends StatelessWidget {
                         final pwd = passwordController.text;
                         if (pwd.isEmpty) {
                           setDialogState(() {
-                            dialogError = 'Password confirmation is required.';
+                            dialogError = l10n.dataPrivacyPasswordRequired;
                           });
                           return;
                         }
@@ -115,7 +117,7 @@ class DataPrivacyScreen extends StatelessWidget {
                             isDeleting = false;
                             dialogError =
                                 result.failureOrNull?.message ??
-                                'Account deletion failed.';
+                                l10n.dataPrivacyDeleteFailed;
                           });
                         } else {
                           if (dialogCtx.mounted) {
@@ -132,9 +134,9 @@ class DataPrivacyScreen extends StatelessWidget {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'Permanently Delete',
-                        style: TextStyle(color: Colors.white),
+                    : Text(
+                        l10n.dataPrivacyPermanentlyDelete,
+                        style: const TextStyle(color: Colors.white),
                       ),
               ),
             ],
@@ -145,20 +147,21 @@ class DataPrivacyScreen extends StatelessWidget {
   }
 
   void _triggerResetPassword(BuildContext context) async {
+    final l10n = context.l10n;
     final authController = context.read<AuthController>();
     final email = authController.currentUser?.email;
 
     if (email == null || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No active email found for current user.'),
+        SnackBar(
+          content: Text(l10n.dataPrivacyNoActiveEmail),
         ),
       );
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sending password reset instructions...')),
+      SnackBar(content: Text(l10n.dataPrivacySendingReset)),
     );
 
     final result = await authController.sendPasswordReset(email);
@@ -168,7 +171,7 @@ class DataPrivacyScreen extends StatelessWidget {
         success: (_) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Reset instructions sent to $email.'),
+              content: Text(l10n.dataPrivacyResetSent(email)),
               backgroundColor: AppColors.primaryTeal,
             ),
           );
@@ -186,11 +189,12 @@ class DataPrivacyScreen extends StatelessWidget {
   }
 
   void _showPrivacyPolicy(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Privacy & Security Policy'),
+        title: Text(l10n.dataPrivacyPolicyDialogTitle),
         content: const SingleChildScrollView(
           child: Text(
             'NuroVed places patient privacy and health data sovereignty at its core.\n\n'
@@ -204,7 +208,7 @@ class DataPrivacyScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(l10n.commonClose),
           ),
         ],
       ),
@@ -243,21 +247,21 @@ class DataPrivacyScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   _buildOptionCard(
-                    title: 'Change email address',
+                    title: context.l10n.dataPrivacyChangeEmail,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.changeEmail),
                   ),
                   _buildOptionCard(
-                    title: 'Change password',
+                    title: context.l10n.dataPrivacyChangePassword,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.changePassword),
                   ),
                   _buildOptionCard(
-                    title: 'Reset password via email',
+                    title: context.l10n.dataPrivacyResetPassword,
                     onTap: () => _triggerResetPassword(context),
                   ),
                   _buildOptionCard(
-                    title: 'Privacy Policy',
+                    title: context.l10n.dataPrivacyPolicy,
                     onTap: () => _showPrivacyPolicy(context),
                   ),
                   const SizedBox(height: 60),
@@ -283,29 +287,33 @@ class DataPrivacyScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
-              backgroundColor: Color(0xFF769E93),
-              child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: const CircleAvatar(
+                backgroundColor: Color(0xFF769E93),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              ),
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Data & Privacy",
-                  style: TextStyle(
+                  context.l10n.dataPrivacyTitle,
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Your Data Is Securely Stored & Protected",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  context.l10n.dataPrivacySubtitle,
+                  style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],
             ),
@@ -369,10 +377,10 @@ class DataPrivacyScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFFECDD3)),
         ),
-        child: const Center(
+        child: Center(
           child: Text(
-            'Delete My Account',
-            style: TextStyle(
+            context.l10n.dataPrivacyDeleteMyAccount,
+            style: const TextStyle(
               color: Color(0xFFE11D48),
               fontWeight: FontWeight.bold,
               fontSize: 16,

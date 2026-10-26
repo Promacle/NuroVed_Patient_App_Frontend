@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -15,6 +17,7 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
@@ -45,7 +48,7 @@ class CustomBottomNav extends StatelessWidget {
                   icon: currentIndex == 0
                       ? Icons.home_rounded
                       : Icons.home_outlined,
-                  label: "Home",
+                  label: l10n.navHome,
                   isActive: currentIndex == 0,
                   onTap: () => onTap(0),
                 ),
@@ -55,16 +58,16 @@ class CustomBottomNav extends StatelessWidget {
                   icon: currentIndex == 1
                       ? Icons.description_rounded
                       : Icons.description_outlined,
-                  label: "Records",
+                  label: l10n.navRecords,
                   isActive: currentIndex == 1,
                   onTap: () => onTap(1),
                 ),
               ),
               Semantics(
                 button: true,
-                label: "Food Scanner",
+                label: l10n.foodScannerTitle,
                 child: Tooltip(
-                  message: "Food Scanner",
+                  message: l10n.foodScannerTitle,
                   child: InkWell(
                     onTap: () => onTap(2),
                     customBorder: const CircleBorder(),
@@ -103,7 +106,7 @@ class CustomBottomNav extends StatelessWidget {
                   icon: currentIndex == 3
                       ? Icons.calendar_month_rounded
                       : Icons.calendar_month_outlined,
-                  label: "Visits",
+                  label: l10n.navVisits,
                   isActive: currentIndex == 3,
                   onTap: () => onTap(3),
                 ),
@@ -113,7 +116,7 @@ class CustomBottomNav extends StatelessWidget {
                   icon: currentIndex == 4
                       ? Icons.person_rounded
                       : Icons.person_outline_rounded,
-                  label: "Profile",
+                  label: l10n.navProfile,
                   isActive: currentIndex == 4,
                   onTap: () => onTap(4),
                 ),

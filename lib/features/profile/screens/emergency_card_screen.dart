@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 
@@ -12,19 +13,19 @@ class EmergencyCardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildEmergencyRedCard(),
+        _buildEmergencyRedCard(context),
         const SizedBox(height: 25),
         _buildFamilyProfilesSection(context),
       ],
     );
   }
 
-  Widget _buildEmergencyRedCard() {
+  Widget _buildEmergencyRedCard(BuildContext context) {
     final blood = data['blood']?.toString();
     final displayBlood =
         (blood != null && blood.isNotEmpty && blood != 'Not provided')
         ? blood
-        : 'Not provided';
+        : context.l10n.emergencyCardNotProvided;
 
     final allergies = data['allergies'] is List
         ? (data['allergies'] as List)
@@ -34,7 +35,7 @@ class EmergencyCardView extends StatelessWidget {
         .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
         .join(', ');
     final finalAllergies = displayAllergies.isEmpty
-        ? 'Not provided'
+        ? context.l10n.emergencyCardNotProvided
         : displayAllergies;
 
     final conditions = data['chronicConditions'] is List
@@ -45,7 +46,7 @@ class EmergencyCardView extends StatelessWidget {
         .where((e) => e.isNotEmpty && e != 'None' && e != 'Not provided')
         .join(', ');
     final finalConditions = displayConditions.isEmpty
-        ? 'Not provided'
+        ? context.l10n.emergencyCardNotProvided
         : displayConditions;
 
     return Container(
@@ -69,9 +70,9 @@ class EmergencyCardView extends StatelessWidget {
             children: [
               const Icon(Icons.shield_outlined, color: Colors.white, size: 28),
               const SizedBox(width: 12),
-              const Text(
-                "Emergency Card",
-                style: TextStyle(
+              Text(
+                context.l10n.emergencyCardTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -88,14 +89,14 @@ class EmergencyCardView extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.info_outline, color: Colors.white, size: 14),
-                SizedBox(width: 5),
+                const Icon(Icons.info_outline, color: Colors.white, size: 14),
+                const SizedBox(width: 5),
                 Text(
-                  "PATIENT-ENTERED, UNVERIFIED",
-                  style: TextStyle(
+                  context.l10n.emergencyCardUnverifiedBadge,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -106,9 +107,12 @@ class EmergencyCardView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _buildInfoTile("Blood Group", displayBlood),
-          _buildInfoTile("Allergies", finalAllergies),
-          _buildInfoTile("Chronic Conditions", finalConditions),
+          _buildInfoTile(context.l10n.emergencyCardBloodGroup, displayBlood),
+          _buildInfoTile(context.l10n.emergencyCardAllergies, finalAllergies),
+          _buildInfoTile(
+            context.l10n.emergencyCardChronicConditions,
+            finalConditions,
+          ),
         ],
       ),
     );
@@ -166,9 +170,9 @@ class EmergencyCardView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Family Profiles",
-            style: TextStyle(
+          Text(
+            context.l10n.emergencyCardFamilyProfiles,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -191,9 +195,9 @@ class EmergencyCardView extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, AppRouter.familyProfiles);
               },
-              child: const Text(
-                "View all family profiles",
-                style: TextStyle(
+              child: Text(
+                context.l10n.emergencyCardViewAllProfiles,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -214,14 +218,15 @@ class EmergencyCardView extends StatelessWidget {
         .where((m) => m.isEmergencyContact)
         .firstOrNull;
 
-    final contactName = emergencyMember?.name ?? "Not assigned";
+    final contactName =
+        emergencyMember?.name ?? context.l10n.emergencyCardNotAssigned;
     final contactRelation = emergencyMember != null
-        ? "${emergencyMember.relation} (Emergency Contact)"
-        : "Emergency Contact";
+        ? "${emergencyMember.relation} (${context.l10n.emergencyContact})"
+        : context.l10n.emergencyContact;
     final contactPhone =
         emergencyMember?.phone != null && emergencyMember!.phone!.isNotEmpty
         ? emergencyMember.phone!
-        : "Phone not provided";
+        : context.l10n.emergencyCardPhoneNotProvided;
 
     return InkWell(
       onTap: () {

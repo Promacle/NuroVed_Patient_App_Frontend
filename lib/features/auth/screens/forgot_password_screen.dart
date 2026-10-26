@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../controllers/auth_controller.dart';
@@ -81,11 +82,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const AuthHeader(
-              titles: ['Forgot Password?'],
-              subTitles: [
-                'Enter your email to receive password reset instructions.',
-              ],
+            AuthHeader(
+              titles: [context.l10n.forgotPasswordTitle],
+              subTitles: [context.l10n.forgotPasswordSubtitle],
               imageAsset: AppAssets.forgotPassDog,
             ),
             Padding(
@@ -95,7 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 children: [
                   const SizedBox(height: 10),
                   CustomTextField(
-                    label: 'Registered Email',
+                    label: context.l10n.loginEmailLabel,
                     hint: 'name@example.com',
                     prefixIcon: Icons.mail_outline,
                     controller: _emailController,
@@ -158,19 +157,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 strokeWidth: 2.5,
                               ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Send Reset Instructions',
-                                  style: TextStyle(
+                                  context.l10n.forgotPasswordButton,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(width: 10),
-                                Icon(
+                                const SizedBox(width: 10),
+                                const Icon(
                                   Icons.arrow_right_alt,
                                   color: Colors.white,
                                   size: 28,
@@ -183,9 +182,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   Center(
                     child: GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Text(
-                        "Back to Login",
-                        style: TextStyle(
+                      child: Text(
+                        context.l10n.forgotPasswordBackToLogin,
+                        style: const TextStyle(
                           color: AppColors.primaryTeal,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -224,20 +223,20 @@ class SuccessEmailSheet extends StatelessWidget {
             children: [
               Image.asset(AppAssets.successEmailDog, height: 180),
               const SizedBox(height: 24),
-              const Text(
-                'Reset Password Email Sent!',
+              Text(
+                context.l10n.forgotPasswordSuccess,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E293B),
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'We have sent password reset instructions to your registered email address. Please follow the link in the email.',
+              Text(
+                context.l10n.forgotPasswordSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF64748B),
                   fontSize: 14,
                   height: 1.5,
@@ -259,9 +258,9 @@ class SuccessEmailSheet extends StatelessWidget {
                     Navigator.pop(context); // close sheet
                     Navigator.pop(context); // return to login
                   },
-                  child: const Text(
-                    'Return to Login',
-                    style: TextStyle(
+                  child: Text(
+                    context.l10n.forgotPasswordBackToLogin,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

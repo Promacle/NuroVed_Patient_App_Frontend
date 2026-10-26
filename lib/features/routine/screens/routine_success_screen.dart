@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class RoutineSuccessScreen extends StatelessWidget {
   const RoutineSuccessScreen({super.key});
@@ -69,7 +70,7 @@ class RoutineSuccessScreen extends StatelessWidget {
                       alignment: Alignment.topLeft,
                       child: Semantics(
                         button: true,
-                        label: 'Back',
+                        label: context.l10n.semanticsBack,
                         child: GestureDetector(
                           onTap: () => _handleBack(context),
                           child: Container(
@@ -110,10 +111,10 @@ class RoutineSuccessScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    const Text(
-                      "Meal has been taken calorie\nhas been saved",
+                    Text(
+                      context.l10n.routineMealTakenSuccess,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -122,9 +123,9 @@ class RoutineSuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 80),
                     // Data Rows
-                    _buildInfoRow("Date", dateStr),
+                    _buildInfoRow(context.l10n.premiumDate, dateStr),
                     const SizedBox(height: 15),
-                    _buildInfoRow("Time", timeStr),
+                    _buildInfoRow(context.l10n.premiumTime, timeStr),
                     const SizedBox(height: 60),
                     // See in Diet Section Button
                     SizedBox(
@@ -140,9 +141,9 @@ class RoutineSuccessScreen extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          "See in Diet Section",
-                          style: TextStyle(
+                        child: Text(
+                          context.l10n.routineSeeDietSection,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),

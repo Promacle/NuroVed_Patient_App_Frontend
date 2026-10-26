@@ -2,14 +2,15 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../core/models/medicine_routine.dart';
-import '../../../core/services/notification_scheduler.dart';
-import '../../../core/utils/uuid_generator.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 import 'package:nuroved_patient/features/routine/controllers/routine_controller.dart';
+import '../../../core/models/medicine_routine.dart';
+import '../../../core/services/notification_scheduler.dart';
+import '../../../core/utils/uuid_generator.dart';
 
 class AddMedicineScreen extends StatefulWidget {
   const AddMedicineScreen({super.key});
@@ -79,7 +80,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         children: [
           Semantics(
             button: true,
-            label: 'Back',
+            label: context.l10n.semanticsBack,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.pop(context),
@@ -103,21 +104,21 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Add Medicines",
-                  style: TextStyle(
+                  context.l10n.routineAddMedicinesTitle,
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Add Your Medicine Reminder So You Dont Forget",
-                  style: TextStyle(color: Colors.black54, fontSize: 13),
+                  context.l10n.routineAddMedicinesSubtitle,
+                  style: const TextStyle(color: Colors.black54, fontSize: 13),
                 ),
               ],
             ),
@@ -182,9 +183,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Profiles",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.routineProfiles,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2C4E4E),
@@ -192,8 +193,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                         ),
                         Text(
                           _selectedProfileName.isEmpty
-                              ? "Select Profile In Which You Want To Save"
-                              : "Selected: $_selectedProfileName",
+                              ? context.l10n.routineSelectProfilePrompt
+                              : "${context.l10n.routineSelectedProfile}: $_selectedProfileName",
                           style: const TextStyle(
                             color: Colors.black54,
                             fontSize: 11,
@@ -323,9 +324,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Medicine Details",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.routineMedicineDetails,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2C4E4E),
@@ -333,8 +334,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                         ),
                         Text(
                           _medicineNameController.text.isEmpty
-                              ? "Enter Your Medicine Details"
-                              : "Name: ${_medicineNameController.text}",
+                              ? context.l10n.routineEnterMedicineDetails
+                              : "${context.l10n.routineMedicineNameLabel}: ${_medicineNameController.text}",
                           style: const TextStyle(
                             color: Colors.black54,
                             fontSize: 11,
@@ -361,12 +362,12 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                 children: [
                   _buildTextField(
                     controller: _medicineNameController,
-                    hint: "Enter medicine name....",
+                    hint: context.l10n.routineEnterMedicineNameHint,
                   ),
                   const SizedBox(height: 10),
                   _buildTextField(
                     controller: _instructionController,
-                    hint: "Enter instructions (e.g. 1 tablet after meal)....",
+                    hint: context.l10n.routineEnterInstructionsHint,
                     maxLines: 2,
                   ),
                 ],
@@ -438,21 +439,21 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                   ),
                 ),
                 const SizedBox(width: 15),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Reminder Time",
-                        style: TextStyle(
+                        context.l10n.routineReminderTime,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C4E4E),
                         ),
                       ),
                       Text(
-                        "Select Time On Which You Want Remider",
-                        style: TextStyle(color: Colors.black54, fontSize: 11),
+                        context.l10n.routineSelectTimePrompt,
+                        style: const TextStyle(color: Colors.black54, fontSize: 11),
                       ),
                     ],
                   ),
@@ -513,9 +514,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                "Save Reminder",
-                style: TextStyle(
+            : Text(
+                context.l10n.routineSaveReminder,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -531,8 +532,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     if (_selectedProfileName.isEmpty ||
         _medicineNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please select profile and enter medicine name"),
+        SnackBar(
+          content: Text(context.l10n.routineSelectProfileAndNameError),
         ),
       );
       return;
@@ -578,8 +579,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              scheduleResult.failureOrNull?.message ??
-                  "Failed to schedule notification reminder",
+              context.l10n.routineFailedToScheduleNotification(
+                scheduleResult.failureOrNull?.message ?? "Error",
+              ),
             ),
             backgroundColor: const Color(0xFFE11D48),
           ),
@@ -604,9 +606,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            "Medication reminder scheduled and saved successfully!",
+            context.l10n.routineReminderSavedSuccess,
           ),
           backgroundColor: AppColors.primaryTeal,
         ),
@@ -620,24 +622,27 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.notifications_off_outlined, color: Color(0xFFE11D48)),
-            SizedBox(width: 10),
+            const Icon(Icons.notifications_off_outlined, color: Color(0xFFE11D48)),
+            const SizedBox(width: 10),
             Text(
-              'Permission Denied',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              dialogCtx.l10n.routinePermissionDenied,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        content: const Text(
-          'Notification permission is required to sound medication alarms at your scheduled time.\n\nPlease enable notifications in device settings to receive timely dosage reminders.',
-          style: TextStyle(fontSize: 14, height: 1.5),
+        content: Text(
+          dialogCtx.l10n.routinePermissionDeniedMessage,
+          style: const TextStyle(fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              dialogCtx.l10n.commonCancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -647,9 +652,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
               ),
             ),
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text(
-              'Understood',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              dialogCtx.l10n.commonUnderstood,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],

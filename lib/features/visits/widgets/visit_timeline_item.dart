@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class VisitTimelineItem extends StatelessWidget {
   final String date;
@@ -145,18 +146,18 @@ class VisitTimelineItem extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "View Related Record",
-                                  style: TextStyle(
+                                  context.l10n.visitsViewRelatedRecord,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                Icon(
+                                const SizedBox(width: 8),
+                                const Icon(
                                   Icons.arrow_forward,
                                   color: Colors.white,
                                   size: 16,

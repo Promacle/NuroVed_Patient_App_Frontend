@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 
@@ -73,7 +74,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
             children: [
               Semantics(
                 button: true,
-                label: 'Back',
+                label: context.l10n.commonBack,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => Navigator.pop(context),
@@ -100,10 +101,10 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                 ),
               ),
               const SizedBox(width: 15),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  "Add Family Profile",
-                  style: TextStyle(
+                  context.l10n.familyAddProfileTitle,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -114,11 +115,11 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          const Padding(
-            padding: EdgeInsets.only(left: 48),
+          Padding(
+            padding: const EdgeInsets.only(left: 48),
             child: Text(
-              "Manage Your And Your Families Personal Information",
-              style: TextStyle(
+              context.l10n.familyAddProfileSubtitle,
+              style: const TextStyle(
                 color: Color(0xFF5A6A6A),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -144,7 +145,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
           const SizedBox(height: 25),
           FamilyFormFields.buildTextField(
             controller: _nameController,
-            hint: "Enter family member name",
+            hint: context.l10n.familyEnterNameHint,
           ),
           _buildRelationRow(),
           FamilyFormFields.buildDatePicker(
@@ -178,22 +179,28 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
               Expanded(
                 child: FamilyFormFields.buildTextField(
                   controller: _heightController,
-                  hint: "Height",
+                  hint: context.l10n.profileMetricHeight,
                 ),
               ),
               const SizedBox(width: 15),
               Expanded(
                 child: FamilyFormFields.buildTextField(
                   controller: _weightController,
-                  hint: "Weight",
+                  hint: context.l10n.profileMetricWeight,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 15),
-          _buildDynamicList("Known Allergies", _allergyControllers),
+          _buildDynamicList(
+            context.l10n.profileKnownAllergies,
+            _allergyControllers,
+          ),
           const SizedBox(height: 15),
-          _buildDynamicList("Chronic Condition", _chronicControllers),
+          _buildDynamicList(
+            context.l10n.profileChronicCondition,
+            _chronicControllers,
+          ),
           const SizedBox(height: 30),
           _buildAddButton(),
         ],
@@ -244,9 +251,9 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
   Widget _buildRelationRow() {
     return Row(
       children: [
-        const Text(
-          "Relation: ",
-          style: TextStyle(
+        Text(
+          "${context.l10n.familyRelationLabel}: ",
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Color(0xFF2C4E4E),
           ),
@@ -255,7 +262,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
         Expanded(
           child: FamilyFormFields.buildTextField(
             controller: _relationController,
-            hint: "Enter relation with family member",
+            hint: context.l10n.familyEnterRelationHint,
           ),
         ),
       ],
@@ -298,9 +305,9 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                "+ Add New",
-                style: TextStyle(
+              child: Text(
+                "+ ${context.l10n.commonAdd}",
+                style: const TextStyle(
                   color: AppColors.sageGreen,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
@@ -323,7 +330,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
             : () async {
                 if (_nameController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Please enter a name")),
+                    SnackBar(content: Text(context.l10n.familyEnterNameError)),
                   );
                   return;
                 }
@@ -354,8 +361,8 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
 
                 if (result.isSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Family member added successfully!"),
+                    SnackBar(
+                      content: Text(context.l10n.familyMemberAddedSuccess),
                       backgroundColor: AppColors.primaryTeal,
                     ),
                   );
@@ -366,7 +373,7 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                     SnackBar(
                       content: Text(
                         result.failureOrNull?.message ??
-                            "Failed to add family member",
+                            context.l10n.familyMemberAddFailed(""),
                       ),
                       backgroundColor: Colors.redAccent,
                     ),
@@ -388,9 +395,9 @@ class _AddFamilyMemberScreenState extends State<AddFamilyMemberScreen> {
                   strokeWidth: 2,
                 ),
               )
-            : const Text(
-                "Add New Profile",
-                style: TextStyle(
+            : Text(
+                context.l10n.familyAddNewProfileButton,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.white,

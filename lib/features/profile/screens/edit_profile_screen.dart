@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 import '../../../core/utils/app_logger.dart';
 import '../../../core/utils/platform_file.dart';
@@ -230,8 +231,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: [
                   Center(child: _buildAvatarPicker()),
                   const SizedBox(height: 25),
-                  _buildSharpField(_nameController, "Name"),
-                  _buildSharpField(_emailController, "Email"),
+                  _buildSharpField(_nameController, context.l10n.familyFieldName),
+                  _buildSharpField(_emailController, context.l10n.loginEmailLabel),
 
                   // NEW: Phone Number with Country Code
                   _buildPhoneField(),
@@ -266,7 +267,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Expanded(
                         child: _buildSharpField(
                           _heightController,
-                          "Height",
+                          context.l10n.profileMetricHeight,
                           suffix: "Cm",
                         ),
                       ),
@@ -274,15 +275,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Expanded(
                         child: _buildSharpField(
                           _weightController,
-                          "Weight",
+                          context.l10n.profileMetricWeight,
                           suffix: "Kg",
                         ),
                       ),
                     ],
                   ),
-                  const Text(
-                    "Known Allergies",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.profileKnownAllergies,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Color(0xFF2C4E4E),
@@ -295,9 +296,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  const Text(
-                    "Chronic Condition",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.profileChronicCondition,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Color(0xFF2C4E4E),
@@ -327,7 +328,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: IntlPhoneField(
         controller: _phoneController,
         decoration: InputDecoration(
-          hintText: 'Phone Number',
+          hintText: context.l10n.loginPhoneLabel,
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(
@@ -358,7 +359,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Back',
+            tooltip: context.l10n.commonBack,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(
               Icons.arrow_back_ios_new,
@@ -370,10 +371,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             },
           ),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
-              "Edit Profile",
-              style: TextStyle(
+              context.l10n.profileEditTitle,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF2C4E4E),
@@ -475,7 +476,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: AbsorbPointer(
         child: _buildSharpField(
           _dobController,
-          "DOB",
+          context.l10n.familyFieldDob,
           icon: Icons.calendar_today_outlined,
         ),
       ),
@@ -548,9 +549,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(25),
           ),
-          child: const Text(
-            "+ Add New",
-            style: TextStyle(
+          child: Text(
+            "+ ${context.l10n.commonAdd}",
+            style: const TextStyle(
               color: Color(0xFF81C7AD),
               fontWeight: FontWeight.bold,
             ),
@@ -574,9 +575,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           elevation: 0,
         ),
-        child: const Text(
-          "Save Changes",
-          style: TextStyle(
+        child: Text(
+          context.l10n.commonSave,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.white,

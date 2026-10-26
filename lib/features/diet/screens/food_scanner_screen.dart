@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/errors/failures.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/models/scanned_food_product.dart';
 import '../../../core/services/nutrition_service.dart';
 import '../../../core/services/open_food_facts_service.dart';
@@ -108,9 +109,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  "Looking up product...",
-                  style: TextStyle(
+                Text(
+                  dialogCtx.l10n.foodScannerLookingUpTitle,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -118,7 +119,7 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  "Querying Open Food Facts for barcode $barcode",
+                  dialogCtx.l10n.foodScannerQueryingBarcode(barcode),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 12,
@@ -238,13 +239,16 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
       barrierDismissible: true,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.info_outline_rounded, color: AppColors.primaryTeal),
-            SizedBox(width: 8),
+            const Icon(
+              Icons.info_outline_rounded,
+              color: AppColors.primaryTeal,
+            ),
+            const SizedBox(width: 8),
             Text(
-              "Product Lookup",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              dialogCtx.l10n.foodScannerProductLookup,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -295,7 +299,7 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
             onPressed: () {
               Navigator.pop(dialogCtx, 'retry');
             },
-            child: const Text("Scan Again"),
+            child: Text(dialogCtx.l10n.foodScannerScanAgain),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -308,7 +312,7 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
             onPressed: () {
               Navigator.pop(dialogCtx, 'manual');
             },
-            child: const Text("Enter Manually"),
+            child: Text(dialogCtx.l10n.foodScannerEnterManually),
           ),
         ],
       ),
@@ -344,9 +348,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Enter Barcode Manually",
-                      style: TextStyle(
+                    Text(
+                      context.l10n.foodScannerManualButton,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2C4E4E),
@@ -359,9 +363,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                   ],
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  "Type the 8, 12, 13, or 14-digit retail barcode found on the product packaging (EAN / UPC).",
-                  style: TextStyle(
+                Text(
+                  context.l10n.foodScannerManualSubtitle,
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textGrey,
                     height: 1.4,
@@ -377,8 +381,8 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                     LengthLimitingTextInputFormatter(14),
                   ],
                   decoration: InputDecoration(
-                    labelText: "Barcode Digits",
-                    hintText: "e.g. 3017620422003",
+                    labelText: context.l10n.foodScannerBarcodeLabel,
+                    hintText: context.l10n.foodScannerBarcodeHint,
                     errorText: localError,
                     prefixIcon: const Icon(Icons.qr_code_2_rounded),
                     border: OutlineInputBorder(
@@ -410,14 +414,13 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                       final input = textController.text.trim();
                       if (input.isEmpty) {
                         setSheetState(() {
-                          localError = 'Please enter a barcode number.';
+                          localError = context.l10n.foodScannerValidationEmpty;
                         });
                         return;
                       }
                       if (input.length < 8) {
                         setSheetState(() {
-                          localError =
-                              'Barcode must contain at least 8 digits (EAN-8).';
+                          localError = context.l10n.foodScannerValidationMin;
                         });
                         return;
                       }
@@ -425,9 +428,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                       Navigator.pop(sheetCtx);
                       _handleBarcode(input);
                     },
-                    child: const Text(
-                      "Look Up Product",
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.foodScannerLookUpProduct,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
@@ -543,10 +546,10 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
       child: Row(
         children: [
           Tooltip(
-            message: 'Back',
+            message: context.l10n.commonBack,
             child: Semantics(
               button: true,
-              label: 'Back',
+              label: context.l10n.commonBack,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
@@ -573,24 +576,24 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
             ),
           ),
           const SizedBox(width: 8),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Food Scanner",
-                  style: TextStyle(
+                  context.l10n.foodScannerTitle,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryTeal,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Scan Retail Food Barcode",
-                  style: TextStyle(
+                  context.l10n.foodScannerSubtitle,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textGrey,
                     fontWeight: FontWeight.w500,
@@ -601,7 +604,7 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
             ),
           ),
           IconButton(
-            tooltip: 'Enter Barcode Manually',
+            tooltip: context.l10n.foodScannerManualButton,
             icon: const Icon(
               Icons.keyboard_alt_outlined,
               color: AppColors.primaryTeal,
@@ -666,9 +669,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                 color: Colors.black87,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                "Align barcode inside the frame",
-                style: TextStyle(
+              child: Text(
+                context.l10n.foodScannerAlignPrompt,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -691,22 +694,26 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
         children: [
           _buildControlButton(
             icon: _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-            label: _isTorchOn ? "Torch On" : "Torch Off",
-            tooltip: _isTorchOn ? "Turn flashlight off" : "Turn flashlight on",
+            label: _isTorchOn
+                ? context.l10n.foodScannerTorchOff
+                : context.l10n.foodScannerTorchOn,
+            tooltip: _isTorchOn
+                ? context.l10n.foodScannerTorchOff
+                : context.l10n.foodScannerTorchOn,
             isActive: _isTorchOn,
             onPressed: _toggleTorch,
           ),
           _buildControlButton(
             icon: Icons.keyboard_alt_rounded,
-            label: "Manual Code",
-            tooltip: "Enter barcode manually",
+            label: context.l10n.foodScannerManualCode,
+            tooltip: context.l10n.foodScannerManualCode,
             isActive: false,
             onPressed: _showManualEntrySheet,
           ),
           _buildControlButton(
             icon: Icons.flip_camera_ios_rounded,
-            label: "Flip Lens",
-            tooltip: "Switch camera lens",
+            label: context.l10n.foodScannerFlipLens,
+            tooltip: context.l10n.foodScannerFlipLens,
             isActive: false,
             onPressed: _switchCamera,
           ),
@@ -785,10 +792,10 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                "Camera Unavailable",
+              Text(
+                context.l10n.foodScannerCameraUnavailable,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
@@ -798,7 +805,7 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
               Text(
                 _cameraErrorMessage.isNotEmpty
                     ? _cameraErrorMessage
-                    : "Camera access is denied or no camera hardware is available on this device/simulator.\n\nYou can still look up any food product by entering its barcode number manually.",
+                    : context.l10n.foodScannerCameraUnavailableDesc,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 13,
@@ -819,9 +826,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                     ),
                   ),
                   icon: const Icon(Icons.keyboard_alt_rounded),
-                  label: const Text(
-                    "Enter Barcode Manually",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  label: Text(
+                    context.l10n.foodScannerManualButton,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   onPressed: _showManualEntrySheet,
                 ),
@@ -845,9 +852,9 @@ class FoodScannerScreenState extends State<FoodScannerScreen>
                       HomeController().setTab(0);
                     }
                   },
-                  child: const Text(
-                    "Back to Home",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  child: Text(
+                    context.l10n.foodScannerBackToHome,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

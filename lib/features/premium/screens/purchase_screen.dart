@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 class PurchaseScreen extends StatefulWidget {
   final String planName;
   final String price;
@@ -24,8 +26,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     // Dynamic calculations based on selected plan
-    bool isYearly = widget.planName.contains('Yearly');
+    bool isYearly = widget.planName.toLowerCase().contains('yearly') ||
+        widget.planName == l10n.premiumYearlyPlan;
 
     // Values matched to the reference photo for Yearly, and proportional for Monthly
     double serviceCharge = isYearly ? 2870.00 : 255.00;
@@ -44,20 +48,21 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    _buildStatusCard(isYearly),
+                    _buildStatusCard(context, isYearly),
                     const SizedBox(height: 25),
-                    _buildPaymentMethods(),
+                    _buildPaymentMethods(context),
                     const SizedBox(height: 25),
-                    _buildSecureBadge(),
+                    _buildSecureBadge(context),
                     const SizedBox(height: 30),
                     _buildCalculationSection(
+                      context,
                       serviceCharge,
                       discount,
                       gst,
                       total,
                     ),
                     const SizedBox(height: 30),
-                    _buildPayButton(total, serviceCharge, discount, gst),
+                    _buildPayButton(context, total, serviceCharge, discount, gst),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -83,45 +88,52 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 20),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "NuroVed Purchase",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.purchaseTitle,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              Text(
-                "Promacle private limited",
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
+                Text(
+                  context.l10n.purchaseCompanySubtitle,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusCard(bool isYearly) {
+  Widget _buildStatusCard(BuildContext context, bool isYearly) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -141,12 +153,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Your account will be active for",
-                style: TextStyle(color: Colors.black54, fontSize: 14),
+              Text(
+                l10n.purchaseActiveDuration,
+                style: const TextStyle(color: Colors.black54, fontSize: 14),
               ),
               Text(
-                isYearly ? "365 Days" : "30 Days",
+                l10n.purchaseDaysCount(isYearly ? 365 : 30),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -156,9 +168,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             ],
           ),
           const SizedBox(height: 15),
-          const Text(
-            "NuroVed special Offer",
-            style: TextStyle(fontSize: 12, color: Colors.black45),
+          Text(
+            l10n.purchaseSpecialOffer,
+            style: const TextStyle(fontSize: 12, color: Colors.black45),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -167,7 +179,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isYearly ? "70% Off Yearly" : "65% Off Monthly",
+                    isYearly ? l10n.purchaseOffYearly : l10n.purchaseOffMonthly,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -175,7 +187,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                     ),
                   ),
                   Text(
-                    "you will save ₹${isYearly ? '2100' : '166'} on ${isYearly ? 'yearly' : 'monthly'}",
+                    l10n.purchaseYouWillSave(
+                      isYearly ? '2100' : '166',
+                      isYearly ? l10n.purchaseYearly : l10n.purchaseMonthly,
+                    ),
                     style: const TextStyle(fontSize: 10, color: Colors.black38),
                   ),
                 ],
@@ -192,13 +207,13 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     );
   }
 
-  Widget _buildPaymentMethods() {
+  Widget _buildPaymentMethods(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Select Method",
-          style: TextStyle(
+        Text(
+          context.l10n.purchaseSelectMethod,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Color(0xFF1B4E4E),
@@ -296,7 +311,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     );
   }
 
-  Widget _buildSecureBadge() {
+  Widget _buildSecureBadge(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -307,34 +322,36 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               const Icon(Icons.security, color: Color(0xFF004D40)),
         ),
         const SizedBox(width: 10),
-        const Text(
-          "100% Secure & Safe payments",
-          style: TextStyle(color: Colors.black38, fontSize: 12),
+        Text(
+          context.l10n.purchaseSecureBadge,
+          style: const TextStyle(color: Colors.black38, fontSize: 12),
         ),
       ],
     );
   }
 
   Widget _buildCalculationSection(
+    BuildContext context,
     double serviceCharge,
     double discount,
     double gst,
     double total,
   ) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           _buildCalcRow(
-            "Service Charge",
+            l10n.purchaseServiceCharge,
             "₹${serviceCharge.toStringAsFixed(2)}",
           ),
           _buildCalcRow(
-            "Discount",
+            l10n.purchaseDiscount,
             "- ₹${discount.toStringAsFixed(2)}",
             isDiscount: true,
           ),
-          _buildCalcRow("GST", "₹${gst.toStringAsFixed(2)}"),
+          _buildCalcRow(l10n.premiumGst, "₹${gst.toStringAsFixed(2)}"),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(),
@@ -342,9 +359,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Total Amount To Pay",
-                style: TextStyle(
+              Text(
+                l10n.purchaseTotalAmountToPay,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -389,11 +406,13 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   }
 
   Widget _buildPayButton(
+    BuildContext context,
     double total,
     double serviceCharge,
     double discount,
     double gst,
   ) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -424,20 +443,20 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            "In-App Purchases Unavailable in MVP",
+          Text(
+            l10n.purchaseUnavailableTitle,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Payment checkout is disabled in this MVP release.\n\nIn accordance with NuroVed safety guidelines, subscription entitlement requires server-side receipt validation with Apple StoreKit and Google Play Billing, which is not yet configured.\n\nAll current core continuity-of-care tools remain accessible in free preview mode.",
+          Text(
+            l10n.purchaseUnavailableDesc,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textGrey,
               height: 1.45,
@@ -456,9 +475,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                "Return to App",
-                style: TextStyle(
+              child: Text(
+                l10n.purchaseReturnToApp,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../widgets/access_widgets.dart';
@@ -13,10 +14,9 @@ class AccessScreen extends StatefulWidget {
 }
 
 class _AccessScreenState extends State<AccessScreen> {
-  int _selectedTab = 0; // 0 for Manage Access, 1 for Access Request
-  int? _expandedIndex; // Null if no tile is expanded
+  int _selectedTab = 0;
+  int? _expandedIndex;
 
-  // --- DYNAMIC DATA LISTS ---
   final List<Map<String, String>> _activeHospitals = [
     {
       "name": "Apollo Hospitals",
@@ -37,6 +37,7 @@ class _AccessScreenState extends State<AccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.kMainBg,
       body: SingleChildScrollView(
@@ -47,14 +48,14 @@ class _AccessScreenState extends State<AccessScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 children: [
-                  _buildTabToggle(),
+                  _buildTabToggle(l10n),
                   const SizedBox(height: 25),
                   if (_selectedTab == 0) ...[
-                    _buildGrantAccessCard(),
+                    _buildGrantAccessCard(l10n),
                     const SizedBox(height: 25),
-                    _buildActiveAccessCard(),
+                    _buildActiveAccessCard(l10n),
                   ] else ...[
-                    _buildAccessRequestView(),
+                    _buildAccessRequestView(l10n),
                   ],
                   const SizedBox(height: 150),
                 ],
@@ -77,37 +78,47 @@ class _AccessScreenState extends State<AccessScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF769E93),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
+          Tooltip(
+            message: context.l10n.commonBack,
+            child: Semantics(
+              button: true,
+              label: context.l10n.commonBack,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF769E93),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Hospital Access",
-                  style: TextStyle(
+                  context.l10n.accessTitle,
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Manage What Profile Access To Hospital",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  context.l10n.accessSubtitle,
+                  style: const TextStyle(
+                    color: AppColors.textGrey,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -117,7 +128,7 @@ class _AccessScreenState extends State<AccessScreen> {
     );
   }
 
-  Widget _buildTabToggle() {
+  Widget _buildTabToggle(dynamic l10n) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
@@ -127,12 +138,12 @@ class _AccessScreenState extends State<AccessScreen> {
       child: Row(
         children: [
           _ToggleItem(
-            label: "Manage Access",
+            label: l10n.accessManageTab,
             isSelected: _selectedTab == 0,
             onTap: () => setState(() => _selectedTab = 0),
           ),
           _ToggleItem(
-            label: "Access Request",
+            label: l10n.accessRequestTab,
             isSelected: _selectedTab == 1,
             onTap: () => setState(() => _selectedTab = 1),
           ),
@@ -141,7 +152,17 @@ class _AccessScreenState extends State<AccessScreen> {
     );
   }
 
-  Widget _buildGrantAccessCard() {
+  String _formatDataShared(dynamic l10n, List<String> data) {
+    if (data.isEmpty) return l10n.accessFullProfile;
+    return data.map((d) {
+      if (d == "Only Health Timeline") return l10n.accessHealthTimelineOnly;
+      if (d == "Only Medical Records") return l10n.accessMedicalRecordsOnly;
+      if (d == "Only Profile Page") return l10n.accessProfilePageOnly;
+      return d;
+    }).join(", ");
+  }
+
+  Widget _buildGrantAccessCard(dynamic l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -152,23 +173,25 @@ class _AccessScreenState extends State<AccessScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Grant New Access",
-            style: TextStyle(
+          Text(
+            l10n.accessGrantNewTitle,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
             ),
           ),
-          const Text(
-            "Give Hospitals Access To Your Health Profile",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          Text(
+            l10n.accessGrantNewSubtitle,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
           const SizedBox(height: 20),
           AccessExpansionTile(
             icon: Icons.local_hospital_outlined,
-            title: _selectedHospital,
-            subtitle: "Choose A Hospital Or Healthcare Provider",
+            title: _selectedHospital == "Select Hospital"
+                ? l10n.accessSelectHospital
+                : _selectedHospital,
+            subtitle: l10n.accessChooseHospitalSubtitle,
             isExpanded: _expandedIndex == 0,
             onTap: () =>
                 setState(() => _expandedIndex = _expandedIndex == 0 ? null : 0),
@@ -176,15 +199,17 @@ class _AccessScreenState extends State<AccessScreen> {
           ),
           AccessExpansionTile(
             icon: Icons.access_time,
-            title: "Access Duration",
-            subtitle: _selectedDuration,
+            title: l10n.accessDurationTitle,
+            subtitle: _selectedDuration == "Permanent Access"
+                ? l10n.accessPermanent
+                : _selectedDuration,
             isExpanded: _expandedIndex == 1,
             onTap: () =>
                 setState(() => _expandedIndex = _expandedIndex == 1 ? null : 1),
             expandedContent: Column(
               children: [
                 SelectionPill(
-                  label: "Permanent Access",
+                  label: l10n.accessPermanent,
                   isSelected: _selectedDuration == "Permanent Access",
                   onTap: () => setState(() {
                     _selectedDuration = "Permanent Access";
@@ -192,7 +217,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   }),
                 ),
                 SelectionPill(
-                  label: "Select Access Until Day",
+                  label: l10n.accessUntilDay,
                   isSelected: _selectedDuration != "Permanent Access",
                   onTap: () async {
                     final date = await showDatePicker(
@@ -215,22 +240,20 @@ class _AccessScreenState extends State<AccessScreen> {
           ),
           AccessExpansionTile(
             icon: Icons.create_new_folder_outlined,
-            title: "Data To Share",
-            subtitle: _selectedData.isEmpty
-                ? "Full Profile"
-                : _selectedData.join(", "),
+            title: l10n.accessDataToShare,
+            subtitle: _formatDataShared(l10n, _selectedData),
             isExpanded: _expandedIndex == 2,
             onTap: () =>
                 setState(() => _expandedIndex = _expandedIndex == 2 ? null : 2),
             expandedContent: Column(
               children: [
                 SelectionPill(
-                  label: "Full Profile Access",
+                  label: l10n.accessFullProfile,
                   isSelected: _selectedData.isEmpty,
                   onTap: () => setState(() => _selectedData.clear()),
                 ),
                 SelectionPill(
-                  label: "Only Health Timeline",
+                  label: l10n.accessHealthTimelineOnly,
                   isSelected: _selectedData.contains("Only Health Timeline"),
                   onTap: () => setState(() {
                     _selectedData.contains("Only Health Timeline")
@@ -239,7 +262,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   }),
                 ),
                 SelectionPill(
-                  label: "Only Medical Records",
+                  label: l10n.accessMedicalRecordsOnly,
                   isSelected: _selectedData.contains("Only Medical Records"),
                   onTap: () => setState(() {
                     _selectedData.contains("Only Medical Records")
@@ -248,7 +271,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   }),
                 ),
                 SelectionPill(
-                  label: "Only Profile Page",
+                  label: l10n.accessProfilePageOnly,
                   isSelected: _selectedData.contains("Only Profile Page"),
                   onTap: () => setState(() {
                     _selectedData.contains("Only Profile Page")
@@ -261,8 +284,10 @@ class _AccessScreenState extends State<AccessScreen> {
           ),
           AccessExpansionTile(
             icon: Icons.lock_outline,
-            title: "Access Type",
-            subtitle: _selectedType,
+            title: l10n.accessTypeTitle,
+            subtitle: _selectedType == "Edit & View"
+                ? l10n.accessEditAndView
+                : l10n.accessViewOnly,
             isExpanded: _expandedIndex == 3,
             onTap: () =>
                 setState(() => _expandedIndex = _expandedIndex == 3 ? null : 3),
@@ -270,7 +295,7 @@ class _AccessScreenState extends State<AccessScreen> {
             expandedContent: Column(
               children: [
                 SelectionPill(
-                  label: "View Only",
+                  label: l10n.accessViewOnly,
                   isSelected: _selectedType == "View Only",
                   onTap: () => setState(() {
                     _selectedType = "View Only";
@@ -278,7 +303,7 @@ class _AccessScreenState extends State<AccessScreen> {
                   }),
                 ),
                 SelectionPill(
-                  label: "Edit & View",
+                  label: l10n.accessEditAndView,
                   isSelected: _selectedType == "Edit & View",
                   onTap: () => setState(() {
                     _selectedType = "Edit & View";
@@ -335,8 +360,8 @@ class _AccessScreenState extends State<AccessScreen> {
                 });
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Access Granted Successfully!"),
+                    SnackBar(
+                      content: Text(l10n.accessGrantedSuccess),
                     ),
                   );
                 }
@@ -348,9 +373,9 @@ class _AccessScreenState extends State<AccessScreen> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                "Review & Grant Access",
-                style: TextStyle(
+              child: Text(
+                l10n.accessReviewAndGrant,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -398,7 +423,7 @@ class _AccessScreenState extends State<AccessScreen> {
     );
   }
 
-  Widget _buildActiveAccessCard() {
+  Widget _buildActiveAccessCard(dynamic l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -409,31 +434,31 @@ class _AccessScreenState extends State<AccessScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Active Hospital Access",
-            style: TextStyle(
+          Text(
+            l10n.accessActiveHospitals,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
             ),
           ),
-          const Text(
-            "Hospitals That Currently Have Access To Your Profile",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          Text(
+            l10n.accessActiveHospitalsSubtitle,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
           const SizedBox(height: 20),
           if (_activeHospitals.isEmpty)
-            const Text("No active access", style: TextStyle(color: Colors.grey))
+            Text(l10n.accessNoActive, style: const TextStyle(color: Colors.grey))
           else
             ..._activeHospitals.map(
-              (hospital) => _buildActiveHospitalTile(hospital),
+              (hospital) => _buildActiveHospitalTile(hospital, l10n),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildActiveHospitalTile(Map<String, String> hospital) {
+  Widget _buildActiveHospitalTile(Map<String, String> hospital, dynamic l10n) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -490,8 +515,8 @@ class _AccessScreenState extends State<AccessScreen> {
                 color: Colors.redAccent,
                 size: 22,
               ),
-              tooltip: "Revoke Access",
-              onPressed: () => _confirmRevoke(hospital),
+              tooltip: l10n.accessRevokeAction,
+              onPressed: () => _confirmRevoke(hospital, l10n),
             ),
             const Icon(Icons.arrow_forward, size: 18, color: Colors.black54),
           ],
@@ -500,18 +525,18 @@ class _AccessScreenState extends State<AccessScreen> {
     );
   }
 
-  void _confirmRevoke(Map<String, String> hospital) {
+  void _confirmRevoke(Map<String, String> hospital, dynamic l10n) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Revoke Access?"),
+        title: Text(l10n.accessRevokeTitle),
         content: Text(
-          "Are you sure you want to revoke access for ${hospital['name']}? They will immediately lose access to your data.",
+          l10n.accessRevokeConfirmMessage(hospital['name']!),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel"),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () async {
@@ -527,11 +552,11 @@ class _AccessScreenState extends State<AccessScreen> {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text("Access revoked for ${hospital['name']}"),
+                  content: Text(l10n.accessRevokedSnackbar(hospital['name']!)),
                 ),
               );
             },
-            child: const Text("Revoke", style: TextStyle(color: Colors.red)),
+            child: Text(l10n.accessRevokeConfirm, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -540,7 +565,7 @@ class _AccessScreenState extends State<AccessScreen> {
 
   // --- ACCESS REQUEST TAB METHODS ---
 
-  Widget _buildAccessRequestView() {
+  Widget _buildAccessRequestView(dynamic l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -551,17 +576,17 @@ class _AccessScreenState extends State<AccessScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Hospital Access Request",
-            style: TextStyle(
+          Text(
+            l10n.accessHospitalRequestTitle,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
             ),
           ),
-          const Text(
-            "Hospitals Requesting Access To Your Profile",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          Text(
+            l10n.accessHospitalRequestSubtitle,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
           const SizedBox(height: 20),
           Container(
@@ -587,20 +612,20 @@ class _AccessScreenState extends State<AccessScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  "Clinician Direct Sharing Coming Soon",
+                Text(
+                  l10n.accessClinicianComingSoon,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Direct institutional hospital and clinician sharing is disabled in the MVP.\n\nIn accordance with healthcare safety standards, clinical access requires server-side identity verification through accredited provider directories. A clinician's identity is never proven by an unverified name or typed email.\n\nDelegated caregiver access is available in the 'Manage Access' tab, protected by authenticated Row Level Security.",
+                Text(
+                  l10n.accessClinicianNotice,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textGrey,
                     height: 1.5,
@@ -617,18 +642,18 @@ class _AccessScreenState extends State<AccessScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFFD2E4DD)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.security,
                         size: 16,
                         color: AppColors.primaryTeal,
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          "Enforced via Care Access Grants & RLS policies",
-                          style: TextStyle(
+                          l10n.accessEnforcedSecurity,
+                          style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryTeal,
@@ -651,9 +676,9 @@ class _AccessScreenState extends State<AccessScreen> {
                       elevation: 0,
                     ),
                     onPressed: () => setState(() => _selectedTab = 0),
-                    child: const Text(
-                      "Go to Manage Access",
-                      style: TextStyle(
+                    child: Text(
+                      l10n.accessGoToManage,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class GraphCard extends StatefulWidget {
@@ -54,13 +55,13 @@ class _GraphCardState extends State<GraphCard>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Health Timeline",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              Text(
+                context.l10n.homeHealthTimeline,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              const Text(
-                "Visits",
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              Text(
+                context.l10n.navVisits,
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
             ],
           ),

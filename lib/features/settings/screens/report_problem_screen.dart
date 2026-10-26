@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state_view.dart';
@@ -70,11 +71,12 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   }
 
   Future<void> _handleSubmit() async {
+    final l10n = context.l10n;
     final text = _problemController.text.trim();
 
     if (text.isEmpty) {
       setState(() {
-        _validationError = 'Please describe the problem you experienced.';
+        _validationError = l10n.validationEnterIssue;
       });
       _problemFocusNode.requestFocus();
       return;
@@ -82,8 +84,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
 
     if (text.length < _minCharacterCount) {
       setState(() {
-        _validationError =
-            'Please provide more detail (minimum $_minCharacterCount characters).';
+        _validationError = l10n.validationIssueTooShort;
       });
       _problemFocusNode.requestFocus();
       return;
@@ -113,14 +114,14 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.white, size: 20),
-            SizedBox(width: 10),
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Report saved to local device diagnostics.',
-                style: TextStyle(fontWeight: FontWeight.w500),
+                l10n.reportProblemSavedSuccess,
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -198,10 +199,10 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Tooltip(
-            message: 'Back',
+            message: context.l10n.commonBack,
             child: Semantics(
               button: true,
-              label: 'Back',
+              label: context.l10n.commonBack,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
@@ -234,24 +235,24 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Report a Problem",
-                  style: TextStyle(
+                  context.l10n.reportProblemTitle,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Describe bugs or anomalies to improve NuroVed",
-                  style: TextStyle(
+                  context.l10n.reportProblemSubtitle,
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textGrey,
                     fontWeight: FontWeight.w500,
@@ -267,6 +268,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   }
 
   Widget _buildInputCard() {
+    final l10n = context.l10n;
     final currentLength = _problemController.text.length;
 
     return AppCard(
@@ -295,21 +297,24 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Describe your issue",
-                      style: TextStyle(
+                      l10n.reportProblemDescribeLabel,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2C4E4E),
                       ),
                     ),
                     Text(
-                      "Include what screen you were on and what went wrong",
-                      style: TextStyle(fontSize: 12, color: AppColors.textGrey),
+                      l10n.reportProblemDescribeSubtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textGrey,
+                      ),
                     ),
                   ],
                 ),
@@ -330,8 +335,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
               height: 1.45,
             ),
             decoration: InputDecoration(
-              hintText:
-                  "e.g., The symptom analyser stalled on question 3 and did not display a recommendation...",
+              hintText: context.l10n.reportProblemDescribeHint,
               hintStyle: const TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 13,
@@ -424,7 +428,9 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                     )
                   : const Icon(Icons.send_rounded, size: 18),
               label: Text(
-                _isSubmitting ? "Recording Diagnostic..." : "Submit Report",
+                _isSubmitting
+                    ? context.l10n.reportProblemSubmitting
+                    : context.l10n.reportProblemSubmitButton,
                 style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -438,13 +444,13 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   }
 
   Widget _buildHistorySection() {
+    final l10n = context.l10n;
     if (_pastProblems.isEmpty) {
-      return const EmptyStateView(
+      return EmptyStateView(
         icon: Icons.assignment_outlined,
-        title: "No Past Reports",
-        description:
-            "Any problems you report on this device will be recorded here for local diagnostic tracking.",
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+        title: l10n.reportProblemEmpty,
+        description: l10n.reportProblemEmptyDesc,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
       );
     }
 
@@ -454,10 +460,10 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
-                "Past Reported Problems",
-                style: TextStyle(
+                l10n.reportProblemPastSection,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
@@ -484,9 +490,9 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
           ],
         ),
         const SizedBox(height: 4),
-        const Text(
-          "Recorded on this device for diagnostic analysis.",
-          style: TextStyle(fontSize: 12, color: AppColors.textGrey),
+        Text(
+          l10n.reportProblemDeviceRecorded,
+          style: const TextStyle(fontSize: 12, color: AppColors.textGrey),
         ),
         const SizedBox(height: 16),
         ..._pastProblems.map((problem) => _buildProblemCard(problem)),
@@ -538,7 +544,9 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          isDemo ? "Sample Reference" : "Saved on Device",
+                          isDemo
+                              ? context.l10n.reportProblemBadgeSample
+                              : context.l10n.reportProblemBadgeSaved,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(

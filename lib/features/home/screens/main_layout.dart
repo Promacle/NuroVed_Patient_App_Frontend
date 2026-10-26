@@ -11,7 +11,7 @@ import '../controllers/home_controller.dart';
 import '../widgets/custom_bottom_nav.dart';
 
 class MainLayout extends StatefulWidget {
-  final int initialIndex; // Add this line
+  final int initialIndex;
 
   const MainLayout({super.key, this.initialIndex = 0});
 
@@ -20,7 +20,7 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  final HomeController _homeController = HomeController(); // Access singleton
+  final HomeController _homeController = HomeController();
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(), // Home
@@ -33,7 +33,6 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    // Initialize current index with the value passed to the widget
     _homeController.setTab(widget.initialIndex);
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 class RecordCard extends StatelessWidget {
@@ -51,7 +52,7 @@ class RecordCard extends StatelessWidget {
                     size: 20,
                     color: Color(0xFF7CB9A8),
                   ),
-                  tooltip: "Delete record",
+                  tooltip: context.l10n.recordsDeleteRecordAction,
                   onPressed: onDelete,
                 ),
               ),
@@ -118,9 +119,9 @@ class RecordCard extends StatelessWidget {
                       shape: const StadiumBorder(),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      "View",
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.commonView,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),

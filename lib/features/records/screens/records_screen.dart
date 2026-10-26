@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/medical_record.dart';
 import 'package:nuroved_patient/core/repositories/records_repository.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
@@ -50,9 +51,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 20),
-                      const Text(
-                        "Recent Records",
-                        style: TextStyle(
+                      Text(
+                        context.l10n.homeRecentRecords,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -74,9 +75,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Previous Records",
-                            style: TextStyle(
+                          Text(
+                            context.l10n.recordsPreviousRecords,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -94,18 +95,18 @@ class _RecordsScreenState extends State<RecordsScreen> {
                               _controller.setSortOrder(order);
                               setState(() {});
                             },
-                            itemBuilder: (context) => const [
+                            itemBuilder: (context) => [
                               PopupMenuItem(
                                 value: RecordSortOrder.newestFirst,
-                                child: Text('Newest First'),
+                                child: Text(context.l10n.recordsSortNewest),
                               ),
                               PopupMenuItem(
                                 value: RecordSortOrder.oldestFirst,
-                                child: Text('Oldest First'),
+                                child: Text(context.l10n.recordsSortOldest),
                               ),
                               PopupMenuItem(
                                 value: RecordSortOrder.titleAsc,
-                                child: Text('Title (A-Z)'),
+                                child: Text(context.l10n.recordsSortTitle),
                               ),
                             ],
                           ),
@@ -163,19 +164,17 @@ class _RecordsScreenState extends State<RecordsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Records",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.navRecords,
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C4E4E),
                     ),
                   ),
-                  // 2. Pass the dynamic name and imageFile
                   ProfileSelector(
                     name: activeName.split(" ")[0],
-                    imageFile:
-                        activeMember['imageFile'], // THIS REFLECTS THE PHOTO
+                    imageFile: activeMember['imageFile'],
                     familyNames: profileController.familyMembers
                         .map((e) => e['name'] as String)
                         .toList(),
@@ -186,9 +185,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
                   ),
                 ],
               ),
-              const Text(
-                "All Your And Your Families Health Record In One Place.",
-                style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+              Text(
+                context.l10n.recordsSubtitle,
+                style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
               ),
             ],
           ),
@@ -202,14 +201,15 @@ class _RecordsScreenState extends State<RecordsScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Medical Record?'),
-        content: const Text(
-          'Are you sure you want to delete this record? This action will remove it from your records list.',
-        ),
+        title: Text(context.l10n.recordsDeleteDialogTitle),
+        content: Text(context.l10n.recordsDeleteDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              context.l10n.commonCancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -227,8 +227,8 @@ class _RecordsScreenState extends State<RecordsScreen> {
                   result.when(
                     success: (_) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Record deleted successfully'),
+                        SnackBar(
+                          content: Text(context.l10n.recordsDeletedSuccess),
                           backgroundColor: AppColors.primaryTeal,
                         ),
                       );
@@ -248,7 +248,10 @@ class _RecordsScreenState extends State<RecordsScreen> {
                 }
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(
+              context.l10n.commonDelete,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -306,7 +309,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
             Text(
               isSearching
                   ? "No records matching '${_searchController.text}'"
-                  : "No medical records found for this profile",
+                  : context.l10n.recordsNoRecordsFound,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
@@ -318,7 +321,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
             Text(
               isSearching
                   ? "Check for typos or try clearing your search filter"
-                  : "Tap '+' below to add your first diagnostic report or prescription",
+                  : context.l10n.recordsEmptyUploadPrompt,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
             ),
@@ -366,7 +369,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
       padding: const EdgeInsets.only(bottom: 100, right: 10),
       child: FloatingActionButton(
         heroTag: 'records_fab',
-        tooltip: "Add medical record",
+        tooltip: context.l10n.recordsAddRecordButton,
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (c) => const AddRecordScreen()),
@@ -383,6 +386,23 @@ class _RecordsScreenState extends State<RecordsScreen> {
     );
   }
 
+  String _getFilterLabel(String filter) {
+    switch (filter) {
+      case "All":
+        return context.l10n.recordsFilterAll;
+      case "Medical Records":
+        return context.l10n.recordsFilterMedicalRecords;
+      case "Vaccinations":
+        return context.l10n.recordsFilterVaccinations;
+      case "Bills":
+        return context.l10n.recordsFilterBills;
+      case "Lab":
+        return context.l10n.recordsFilterLab;
+      default:
+        return filter;
+    }
+  }
+
   Widget _buildFilterChips() {
     final filters = ["All", "Medical Records", "Vaccinations", "Bills", "Lab"];
     return SingleChildScrollView(
@@ -393,7 +413,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              label: Text(f),
+              label: Text(_getFilterLabel(f)),
               selected: isSelected,
               onSelected: (val) {
                 _controller.selectedFilter = f;

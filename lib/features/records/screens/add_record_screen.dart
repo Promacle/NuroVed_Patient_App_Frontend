@@ -1,8 +1,9 @@
-import 'package:file_picker/file_picker.dart'; // Add this
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Add this
+import 'package:image_picker/image_picker.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/core/utils/validators.dart';
@@ -21,9 +22,9 @@ class AddRecordScreen extends StatefulWidget {
 
 class _AddRecordScreenState extends State<AddRecordScreen> {
   bool _isProfileExpanded = false;
-  bool _isTypeExpanded = false; // Added this
+  bool _isTypeExpanded = false;
   String _selectedProfileName = "";
-  String _selectedRecordType = ""; // Added this
+  String _selectedRecordType = "";
   bool _isDateExpanded = false;
   bool _isDetailsExpanded = false;
   final TextEditingController _titleController = TextEditingController();
@@ -33,35 +34,33 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   String _fileName = "Upload Your Record Document";
 
   DateTime _selectedDate = DateTime.now();
-  // Format the date for the subtitle
   String get _formattedDate =>
       "${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}";
 
   @override
   void initState() {
     super.initState();
-    // Initialize with the current active profile from the controller
     _selectedProfileName = "";
   }
 
   Future<void> _saveRecord() async {
     if (_selectedProfileName.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Select a profile")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.recordsSelectProfilePrompt)),
+      );
       return;
     }
 
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a record title")),
+        SnackBar(content: Text(context.l10n.recordsEnterTitlePrompt)),
       );
       return;
     }
 
     if (_pickedPlatformFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please attach a document or photo")),
+        SnackBar(content: Text(context.l10n.recordsAttachPrompt)),
       );
       return;
     }
@@ -221,7 +220,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         _buildDetailsInputCard(),
                         _buildFileUploadCard(),
                         const SizedBox(height: 40),
-                        _buildSaveButtonWidget(), // Helper for your styled save button
+                        _buildSaveButtonWidget(),
                         const SizedBox(height: 20),
                         const SizedBox(height: 150),
                       ],
@@ -264,11 +263,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                   ),
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Text(
-                    "Add New Record",
-                    style: TextStyle(
+                    context.l10n.recordsAddRecordTitle,
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C4E4E),
@@ -280,10 +279,10 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            "Add Your New Medical Report, Prescription, Or Other\nHealth Record",
+          Text(
+            context.l10n.recordsAddRecordSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 13),
+            style: const TextStyle(color: Colors.grey, fontSize: 13),
           ),
         ],
       ),
@@ -349,9 +348,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Profiles",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.familyTitle,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: Color(0xFF2C4E4E),
@@ -359,8 +358,8 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ),
                         Text(
                           _selectedProfileName.isEmpty
-                              ? "Select Profile"
-                              : "Selected: $_selectedProfileName",
+                              ? context.l10n.recordsSelectProfile
+                              : "${context.l10n.routineSelectedProfile}: $_selectedProfileName",
                           style: const TextStyle(
                             color: AppColors.textGrey,
                             fontSize: 11,
@@ -471,6 +470,21 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     );
   }
 
+  String _getRecordTypeLabel(BuildContext context, String type) {
+    switch (type) {
+      case "Medical Records":
+        return context.l10n.recordsFilterMedicalRecords;
+      case "Vaccinations":
+        return context.l10n.recordsFilterVaccinations;
+      case "Bills":
+        return context.l10n.recordsFilterBills;
+      case "Lab":
+        return context.l10n.recordsFilterLab;
+      default:
+        return type;
+    }
+  }
+
   Widget _buildRecordTypeSelectionCard() {
     final List<String> types = [
       "Medical Records",
@@ -526,9 +540,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Record Type",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.recordsRecordType,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: Color(0xFF2C4E4E),
@@ -536,8 +550,8 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ),
                         Text(
                           _selectedRecordType.isEmpty
-                              ? "Select Record Type"
-                              : "Selected: $_selectedRecordType",
+                              ? context.l10n.recordsSelectRecordType
+                              : "${context.l10n.routineSelectedProfile}: ${_getRecordTypeLabel(context, _selectedRecordType)}",
                           style: const TextStyle(
                             color: AppColors.textGrey,
                             fontSize: 11,
@@ -592,7 +606,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ],
                       ),
                       child: Text(
-                        type,
+                        _getRecordTypeLabel(context, type),
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: isSelected
@@ -662,9 +676,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Date",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.recordsDateLabel,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: Color(0xFF2C4E4E),
@@ -672,8 +686,8 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ),
                         Text(
                           _isDateExpanded
-                              ? "Select Date You Get The Record"
-                              : "Selected: $_formattedDate",
+                              ? context.l10n.recordsSelectDatePrompt
+                              : "${context.l10n.routineSelectedProfile}: $_formattedDate",
                           style: const TextStyle(
                             color: AppColors.textGrey,
                             fontSize: 11,
@@ -710,18 +724,14 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
               ),
               child: Theme(
                 data: Theme.of(context).copyWith(
-                  // Set background to pure white for visibility
                   scaffoldBackgroundColor: AppColors.surfaceWhite,
                   colorScheme: const ColorScheme.light(
-                    primary: AppColors.primaryTeal, // Selection Circle Color
-                    onPrimary: AppColors.white, // Text inside the Circle
-                    onSurface: Color(0xFF1E293B), // High-contrast numbers/text
+                    primary: AppColors.primaryTeal,
+                    onPrimary: AppColors.white,
+                    onSurface: Color(0xFF1E293B),
                   ),
                   datePickerTheme: DatePickerThemeData(
-                    // THIS FORCES THE SHAPE TO BE A CIRCLE LIKE YOUR PHOTO
                     dayShape: WidgetStateProperty.all(const CircleBorder()),
-
-                    // Background color for the selected day
                     dayBackgroundColor: WidgetStateProperty.resolveWith((
                       states,
                     ) {
@@ -730,8 +740,6 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       }
                       return null;
                     }),
-
-                    // Text color logic
                     dayForegroundColor: WidgetStateProperty.resolveWith((
                       states,
                     ) {
@@ -740,8 +748,6 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       }
                       return const Color(0xFF1E293B);
                     }),
-
-                    // Styling the Month-Year header (Jan-2026)
                     headerForegroundColor: const Color(0xFF1E293B),
                     headerHeadlineStyle: const TextStyle(
                       fontWeight: FontWeight.bold,
@@ -750,18 +756,15 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     ),
                   ),
                   textTheme: const TextTheme(
-                    // Month-Year display (e.g., Jan-2026)
                     titleMedium: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Color(0xFF1E293B),
                     ),
-                    // Days of the week labels
                     bodyLarge: TextStyle(
                       color: Color(0xFF1E293B),
                       fontWeight: FontWeight.bold,
                     ),
-                    // The date numbers
                     bodySmall: TextStyle(
                       color: Color(0xFF1E293B),
                       fontSize: 14,
@@ -777,7 +780,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     onDateChanged: (date) {
                       setState(() {
                         _selectedDate = date;
-                        _isDateExpanded = false; // Collapse after selection
+                        _isDateExpanded = false;
                       });
                     },
                   ),
@@ -813,7 +816,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Uploading securely... $progressPercent%',
+                    '${context.l10n.recordsUploadingSecurely} $progressPercent%',
                     style: const TextStyle(fontSize: 13, color: Colors.black87),
                   ),
                   TextButton.icon(
@@ -823,9 +826,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                       size: 16,
                       color: Colors.red,
                     ),
-                    label: const Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.red, fontSize: 13),
+                    label: Text(
+                      context.l10n.commonCancel,
+                      style: const TextStyle(color: Colors.red, fontSize: 13),
                     ),
                   ),
                 ],
@@ -846,9 +849,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
               ),
               elevation: 4,
             ),
-            child: const Text(
-              "Save Records",
-              style: TextStyle(
+            child: Text(
+              context.l10n.recordsSaveButton,
+              style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -872,9 +875,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "Select Profile",
-          style: TextStyle(color: Colors.white),
+        child: Text(
+          context.l10n.recordsSelectProfile,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -929,9 +932,9 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Record title & description",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.recordsTitleAndDescription,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: Color(0xFF2C4E4E),
@@ -939,7 +942,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                         ),
                         Text(
                           _titleController.text.isEmpty
-                              ? "Enter Record Title & Description"
+                              ? context.l10n.recordsEnterTitleAndDescription
                               : _titleController.text,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -970,13 +973,13 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                   // Title Field
                   _buildStyledTextField(
                     controller: _titleController,
-                    hint: "Enter record title....",
+                    hint: context.l10n.recordsEnterRecordTitleHint,
                   ),
                   const SizedBox(height: 15),
                   // Description Field
                   _buildStyledTextField(
                     controller: _descController,
-                    hint: "Enter record description....",
+                    hint: context.l10n.recordsEnterRecordDescriptionHint,
                     maxLines: 3,
                   ),
                 ],
@@ -987,7 +990,6 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     );
   }
 
-  // Helper widget to create those clean white text fields in your photo
   Widget _buildStyledTextField({
     required TextEditingController controller,
     required String hint,
@@ -1008,7 +1010,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        onChanged: (value) => setState(() {}), // Refresh header subtitle
+        onChanged: (value) => setState(() {}),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
@@ -1062,16 +1064,18 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Record file",
-                          style: TextStyle(
+                        Text(
+                          context.l10n.recordsRecordFile,
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
                             color: Color(0xFF2C4E4E),
                           ),
                         ),
                         Text(
-                          _fileName, // DYNAMIC FILE NAME
+                          _fileName == "Upload Your Record Document"
+                              ? context.l10n.recordsUploadDocumentPrompt
+                              : _fileName,
                           style: TextStyle(
                             color: _pickedPlatformFile != null
                                 ? AppColors.primaryTeal
@@ -1103,14 +1107,14 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                 children: [
                   _buildUploadOption(
                     icon: Icons.unarchive_outlined,
-                    label: "Upload Files",
-                    onTap: _pickFile, // CONNECTED LOGIC
+                    label: context.l10n.recordsUploadFilesOption,
+                    onTap: _pickFile,
                   ),
                   const SizedBox(height: 12),
                   _buildUploadOption(
                     icon: Icons.camera_alt_outlined,
-                    label: "Click Photo",
-                    onTap: _takePhoto, // CONNECTED LOGIC
+                    label: context.l10n.recordsClickPhotoOption,
+                    onTap: _takePhoto,
                   ),
                 ],
               ),
@@ -1120,7 +1124,6 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     );
   }
 
-  // Helper for the white buttons inside the expansion
   Widget _buildUploadOption({
     required IconData icon,
     required String label,

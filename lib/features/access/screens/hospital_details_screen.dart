@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import '../../profile/controllers/profile_controller.dart';
 
@@ -18,6 +19,7 @@ class HospitalDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.kMainBg,
       body: Column(
@@ -28,9 +30,9 @@ class HospitalDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               child: Column(
                 children: [
-                  _buildSummaryCard(),
+                  _buildSummaryCard(l10n),
                   const SizedBox(height: 25),
-                  _buildActivityLog(),
+                  _buildActivityLog(l10n),
                   const SizedBox(height: 25),
                   SizedBox(
                     width: double.infinity,
@@ -44,14 +46,14 @@ class HospitalDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       icon: const Icon(Icons.cancel_outlined),
-                      label: const Text(
-                        "Revoke Access",
-                        style: TextStyle(
+                      label: Text(
+                        l10n.accessRevokeAction,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      onPressed: () => _confirmRevoke(context),
+                      onPressed: () => _confirmRevoke(context, l10n),
                     ),
                   ),
                   const SizedBox(height: 50),
@@ -64,18 +66,18 @@ class HospitalDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _confirmRevoke(BuildContext context) {
+  void _confirmRevoke(BuildContext context, dynamic l10n) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Revoke Access?"),
+        title: Text(l10n.accessRevokeTitle),
         content: Text(
-          "Are you sure you want to revoke access for $hospitalName? They will immediately lose access to your data.",
+          l10n.accessRevokeConfirmMessage(hospitalName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancel"),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () async {
@@ -88,10 +90,10 @@ class HospitalDetailsScreen extends StatelessWidget {
               if (!context.mounted) return;
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Access revoked for $hospitalName")),
+                SnackBar(content: Text(l10n.accessRevokedSnackbar(hospitalName))),
               );
             },
-            child: const Text("Revoke", style: TextStyle(color: Colors.red)),
+            child: Text(l10n.accessRevokeConfirm, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -109,18 +111,25 @@ class HospitalDetailsScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF769E93),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
+          Tooltip(
+            message: context.l10n.commonBack,
+            child: Semantics(
+              button: true,
+              label: context.l10n.commonBack,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF769E93),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
             ),
           ),
@@ -153,7 +162,7 @@ class HospitalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(dynamic l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -206,16 +215,16 @@ class HospitalDetailsScreen extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
-                "Expiring In",
-                style: TextStyle(
+              Text(
+                l10n.hospitalDetailsExpiringIn,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                   color: Color(0xFF2C4E4E),
                 ),
               ),
               Text(
-                expiry,
+                expiry == "Never" ? l10n.accessExpiryNever : expiry,
                 style: const TextStyle(color: Colors.black54, fontSize: 12),
               ),
             ],
@@ -225,7 +234,7 @@ class HospitalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActivityLog() {
+  Widget _buildActivityLog(dynamic l10n) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(25),
@@ -237,34 +246,34 @@ class HospitalDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Activity Log",
-            style: TextStyle(
+          Text(
+            l10n.hospitalDetailsActivityLog,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
             ),
           ),
-          const Text(
-            "Recent Actions By Hospitals",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          Text(
+            l10n.hospitalDetailsRecentActions,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
           const SizedBox(height: 30),
           _buildTimelineItem(
             icon: Icons.article_outlined,
-            title: "Viewed Medical Record",
-            subtitle: "By $hospitalName - Today, 10:30",
+            title: l10n.hospitalDetailsViewedRecord,
+            subtitle: l10n.hospitalDetailsActionSubtitle(hospitalName, "Today, 10:30"),
             isFirst: true,
           ),
           _buildTimelineItem(
             icon: Icons.article_outlined,
-            title: "Added New Record",
-            subtitle: "By $hospitalName - Today, 9:10",
+            title: l10n.hospitalDetailsAddedRecord,
+            subtitle: l10n.hospitalDetailsActionSubtitle(hospitalName, "Today, 9:10"),
           ),
           _buildTimelineItem(
             icon: Icons.calendar_today_outlined,
-            title: "Added New Visits",
-            subtitle: "By $hospitalName - Yesterday, 10:30",
+            title: l10n.hospitalDetailsAddedVisits,
+            subtitle: l10n.hospitalDetailsActionSubtitle(hospitalName, "Yesterday, 10:30"),
             isLast: true,
           ),
         ],

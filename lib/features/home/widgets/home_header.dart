@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/utils/platform_file.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../controllers/home_controller.dart';
@@ -64,9 +65,9 @@ class HomeHeader extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text(
-                              "Welcome Back,",
-                              style: TextStyle(
+                            Text(
+                              "${context.l10n.loginTitle},",
+                              style: const TextStyle(
                                 color: Colors.black54,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
@@ -96,7 +97,7 @@ class HomeHeader extends StatelessWidget {
               height: 55,
               shape: BoxShape.circle,
               child: IconButton(
-                tooltip: 'Notifications',
+                tooltip: context.l10n.homeTooltipNotifications,
                 icon: const Icon(
                   Icons.notifications,
                   color: Color(0xFF7CB9A8),
@@ -112,7 +113,7 @@ class HomeHeader extends StatelessWidget {
               height: 55,
               shape: BoxShape.circle,
               child: IconButton(
-                tooltip: 'Upgrade to Premium',
+                tooltip: context.l10n.homeTooltipUpgradePremium,
                 onPressed: () =>
                     Navigator.pushNamed(context, AppRouter.premium),
                 icon: const FaIcon(

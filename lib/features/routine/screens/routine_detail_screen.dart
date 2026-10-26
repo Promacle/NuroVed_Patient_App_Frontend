@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/routine/controllers/routine_controller.dart';
 import 'package:nuroved_patient/features/routine/screens/edit_routine_screen.dart';
@@ -72,7 +73,7 @@ class RoutineDetailScreen extends StatelessWidget {
                         const SizedBox(height: 35),
                         _buildMealInfo(currentMealName, currentCalories),
                         const SizedBox(height: 45),
-                        _buildIngredientsCard(currentIngredients),
+                        _buildIngredientsCard(context, currentIngredients),
                         const SizedBox(height: 40),
                         _buildActionButtons(
                           context,
@@ -103,7 +104,7 @@ class RoutineDetailScreen extends StatelessWidget {
           children: [
             Semantics(
               button: true,
-              label: 'Back',
+              label: context.l10n.semanticsBack,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => Navigator.pop(context),
@@ -142,7 +143,7 @@ class RoutineDetailScreen extends StatelessWidget {
             ),
             Semantics(
               button: true,
-              label: 'Edit Routine',
+              label: context.l10n.routineEditMeal,
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
@@ -219,7 +220,7 @@ class RoutineDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIngredientsCard(List<String> ingredients) {
+  Widget _buildIngredientsCard(BuildContext context, List<String> ingredients) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(30),
@@ -237,9 +238,9 @@ class RoutineDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Ingredients",
-            style: TextStyle(
+          Text(
+            context.l10n.routineIngredients,
+            style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: Color(0xFF5A6A6A),
@@ -290,7 +291,7 @@ class RoutineDetailScreen extends StatelessWidget {
               shadowColor: Colors.black45,
             ),
             child: Text(
-              "Intake $title",
+              context.l10n.routineIntakeMeal(title),
               style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 18,
@@ -312,10 +313,10 @@ class RoutineDetailScreen extends StatelessWidget {
             onTap: () => Navigator.pop(context),
             child: CustomPaint(
               painter: _DashedBorderPainter(),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  "Ignore and Skip",
-                  style: TextStyle(
+                  context.l10n.routineIgnoreAndSkip,
+                  style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -329,7 +330,6 @@ class RoutineDetailScreen extends StatelessWidget {
     );
   }
 
-  // Helper method to show the confirmation dialog
   void _showIntakeConfirmation(
     BuildContext context,
     RoutineController controller,
@@ -354,7 +354,7 @@ class RoutineDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  "Confirm $title",
+                  dialogCtx.l10n.routineConfirmMeal(title),
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -363,7 +363,7 @@ class RoutineDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Have you finished your $title meal?",
+                  dialogCtx.l10n.routineHaveYouFinishedMeal(title),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
@@ -374,7 +374,7 @@ class RoutineDetailScreen extends StatelessWidget {
                       child: TextButton(
                         onPressed: () => Navigator.pop(dialogCtx),
                         child: Text(
-                          "Not yet",
+                          dialogCtx.l10n.routineNotYet,
                           style: TextStyle(
                             color: Colors.grey[500],
                             fontWeight: FontWeight.bold,
@@ -406,9 +406,9 @@ class RoutineDetailScreen extends StatelessWidget {
                             ),
                           );
                         },
-                        child: const Text(
-                          "Yes, Done",
-                          style: TextStyle(
+                        child: Text(
+                          dialogCtx.l10n.routineYesDone,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),

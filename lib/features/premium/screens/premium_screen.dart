@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -16,6 +17,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       backgroundColor: AppColors.kMainBg,
       body: SingleChildScrollView(
@@ -26,9 +29,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 children: [
-                  _buildUpgradeCard(),
+                  _buildUpgradeCard(context),
                   const SizedBox(height: 25),
-                  _buildSectionDivider("Everything is Free, plus"),
+                  _buildSectionDivider(l10n.premiumSectionEverythingFreePlus),
                   const SizedBox(height: 15),
                   _buildFeatureCard(
                     icon: const Icon(
@@ -36,9 +39,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "Share with Doctors",
-                    subtitle:
-                        "Share your complete health profile with doctors in one tap.",
+                    title: l10n.premiumFeatureShareTitle,
+                    subtitle: l10n.premiumFeatureShareSub,
                   ),
                   _buildFeatureCard(
                     icon: const FaIcon(
@@ -46,9 +48,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "AI Health Insights",
-                    subtitle:
-                        "Get intelligent insights and risk alerts from your health data.",
+                    title: l10n.premiumFeatureAiInsightsTitle,
+                    subtitle: l10n.premiumFeatureAiInsightsSub,
                   ),
                   _buildFeatureCard(
                     icon: const Icon(
@@ -56,9 +57,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "Advanced Timeline",
-                    subtitle:
-                        "Track trends and patterns with advanced health timeline.",
+                    title: l10n.premiumFeatureTimelineTitle,
+                    subtitle: l10n.premiumFeatureTimelineSub,
                   ),
                   _buildFeatureCard(
                     icon: const Icon(
@@ -66,9 +66,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "Family Profiles",
-                    subtitle:
-                        "Add and manage your family's health in one secure place.",
+                    title: l10n.premiumFeatureFamilyTitle,
+                    subtitle: l10n.premiumFeatureFamilySub,
                   ),
                   _buildFeatureCard(
                     icon: const Icon(
@@ -76,9 +75,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "Unlimited Scanner",
-                    subtitle:
-                        "Scan and store unlimited reports with smart auto-tagging.",
+                    title: l10n.premiumFeatureScannerTitle,
+                    subtitle: l10n.premiumFeatureScannerSub,
                   ),
                   _buildFeatureCard(
                     icon: const Icon(
@@ -86,36 +84,36 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       color: Color(0xFF397D71),
                       size: 24,
                     ),
-                    title: "Context Aware Diet Plans",
-                    subtitle:
-                        "Personalized diet recommendations based on your goals.",
+                    title: l10n.premiumFeatureDietTitle,
+                    subtitle: l10n.premiumFeatureDietSub,
                   ),
                   const SizedBox(height: 20),
-                  _buildSectionDivider("Limited Time Offer"),
+                  _buildSectionDivider(l10n.premiumLimitedOffer),
                   const SizedBox(height: 15),
-                  _buildOfferBanner(),
+                  _buildOfferBanner(context),
                   const SizedBox(height: 20),
-                  _buildSectionDivider("Select your plan"),
+                  _buildSectionDivider(l10n.premiumSelectYourPlan),
                   const SizedBox(height: 15),
                   _buildPlanCard(
                     index: 0,
-                    title: "Monthly Premium",
+                    title: l10n.premiumMonthlyPlan,
                     price: "₹89",
-                    period: "/Month",
-                    subtitle: "65% Off Offer",
+                    period: l10n.premiumPerMonth,
+                    subtitle: l10n.premiumMonthlyOffer,
                   ),
                   const SizedBox(height: 15),
                   _buildPlanCard(
                     index: 1,
-                    title: "Yearly Premium",
+                    title: l10n.premiumYearlyPlan,
                     price: "₹67",
-                    period: "/Month",
-                    subtitle: "₹804/Year",
+                    period: l10n.premiumPerMonth,
+                    subtitle: l10n.premiumYearlyPricePerYear,
                     isMostPopular: true,
+                    mostPopularLabel: l10n.premiumMostPopular,
                   ),
                   const SizedBox(height: 25),
-                  _buildSubscriptionPreviewNotice(),
-                  _buildContinueButton(),
+                  _buildSubscriptionPreviewNotice(context),
+                  _buildContinueButton(context),
                   const SizedBox(height: 150),
                 ],
               ),
@@ -137,37 +135,41 @@ class _PremiumScreenState extends State<PremiumScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF769E93),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF769E93),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Explore Premium",
-                  style: TextStyle(
+                  context.l10n.premiumExploreTitle,
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Unlock The Full Potential Of Your Health",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  context.l10n.premiumExploreSubtitle,
+                  style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],
             ),
@@ -177,7 +179,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildUpgradeCard() {
+  Widget _buildUpgradeCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -193,22 +195,22 @@ class _PremiumScreenState extends State<PremiumScreen> {
       ),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Upgrade to premium",
-                  style: TextStyle(
+                  context.l10n.premiumUpgradeCardTitle,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1B5E20),
                   ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
-                  "Unlock the full power of NuroVed and take control of your health.",
-                  style: TextStyle(color: Colors.black54, fontSize: 13),
+                  context.l10n.premiumUpgradeCardSubtitle,
+                  style: const TextStyle(color: Colors.black54, fontSize: 13),
                 ),
               ],
             ),
@@ -306,7 +308,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildOfferBanner() {
+  Widget _buildOfferBanner(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -318,28 +320,28 @@ class _PremiumScreenState extends State<PremiumScreen> {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Limited Time Offer",
-                style: TextStyle(
+                context.l10n.premiumLimitedOffer,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
                 ),
               ),
               Text(
-                "70% OFF On Yearly Plan",
-                style: TextStyle(
+                context.l10n.premiumYearlyDiscount,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF004D40),
                 ),
               ),
               Text(
-                "Take control of your health today",
-                style: TextStyle(color: Colors.black54, fontSize: 12),
+                context.l10n.premiumTakeControlToday,
+                style: const TextStyle(color: Colors.black54, fontSize: 12),
               ),
             ],
           ),
@@ -353,9 +355,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: Colors.black26),
               ),
-              child: const Text(
-                "Save ₹2100",
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              child: Text(
+                context.l10n.premiumSaveAmount,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -371,6 +373,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     required String period,
     required String subtitle,
     bool isMostPopular = false,
+    String? mostPopularLabel,
   }) {
     bool isSelected = _selectedPlan == index;
     return GestureDetector(
@@ -475,9 +478,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   color: const Color(0xFF004D40),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  "Most Popular",
-                  style: TextStyle(
+                child: Text(
+                  mostPopularLabel ?? "Most Popular",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -490,7 +493,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildContinueButton() {
+  Widget _buildContinueButton(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -507,7 +510,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ? "Yearly Premium"
               : "Monthly Premium";
           String price = _selectedPlan == 1 ? "₹67" : "₹89";
-          String period = "/Month";
+          String period = context.l10n.premiumPerMonth;
 
           Navigator.pushNamed(
             context,
@@ -523,26 +526,26 @@ class _PremiumScreenState extends State<PremiumScreen> {
           ),
           elevation: 0,
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Continue to Premium",
-              style: TextStyle(
+              context.l10n.premiumContinueButton,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
-            SizedBox(width: 10),
-            Icon(Icons.arrow_forward, color: Colors.white, size: 24),
+            const SizedBox(width: 10),
+            const Icon(Icons.arrow_forward, color: Colors.white, size: 24),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSubscriptionPreviewNotice() {
+  Widget _buildSubscriptionPreviewNotice(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       margin: const EdgeInsets.only(bottom: 15),
@@ -551,14 +554,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFC7E2D9)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.info_outline, size: 18, color: Color(0xFF2C4E4E)),
-          SizedBox(width: 10),
+          const Icon(Icons.info_outline, size: 18, color: Color(0xFF2C4E4E)),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              "Subscriptions are currently in preview mode. In-app checkout is disabled until store release.",
-              style: TextStyle(
+              context.l10n.premiumPreviewNotice,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF2C4E4E),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class CalorieSuccessScreen extends StatelessWidget {
   final DateTime timestamp;
@@ -65,7 +66,7 @@ class CalorieSuccessScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20),
                     child: Semantics(
                       button: true,
-                      label: 'Back',
+                      label: context.l10n.commonBack,
                       child: GestureDetector(
                         onTap: () => _handleBack(context),
                         child: Container(
@@ -103,10 +104,10 @@ class CalorieSuccessScreen extends StatelessWidget {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 40),
-                const Text(
-                  "Calorie Saved\nSuccessfully",
+                Text(
+                  context.l10n.dietCalorieSavedSuccess,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -118,9 +119,9 @@ class CalorieSuccessScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: Column(
                     children: [
-                      _buildDataRow("Date", formattedDate),
+                      _buildDataRow(context.l10n.recordsDateLabel, formattedDate),
                       const SizedBox(height: 20),
-                      _buildDataRow("Time", formattedTime),
+                      _buildDataRow(context.l10n.commonTime, formattedTime),
                     ],
                   ),
                 ),
@@ -141,9 +142,9 @@ class CalorieSuccessScreen extends StatelessWidget {
                       ),
                       elevation: 2,
                     ),
-                    child: const Text(
-                      "See in Diet Section",
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.dietSeeInDietSection,
+                      style: const TextStyle(
                         color: Color(0xFF2C4E4E),
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
