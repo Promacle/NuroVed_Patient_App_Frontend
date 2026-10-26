@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nuroved_patient/features/home/controllers/home_controller.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 enum PremiumPurchaseStatus { success, failed, renew }
 
 class PremiumStatusScreen extends StatelessWidget {
@@ -30,6 +32,7 @@ class PremiumStatusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     LinearGradient backgroundGradient;
     Color iconBackgroundColor;
     IconData statusIcon;
@@ -46,9 +49,9 @@ class PremiumStatusScreen extends StatelessWidget {
         );
         iconBackgroundColor = const Color(0xFF2E8B57);
         statusIcon = Icons.check;
-        statusTitle = "Welcome to NuroVed\nPremium Plus";
-        statusMessage = "Activated";
-        actionButtonLabel = "Jump to Home";
+        statusTitle = l10n.premiumWelcomeTitle;
+        statusMessage = l10n.premiumStatusActivated;
+        actionButtonLabel = l10n.premiumJumpToHome;
         break;
       case PremiumPurchaseStatus.failed:
         backgroundGradient = const LinearGradient(
@@ -58,9 +61,9 @@ class PremiumStatusScreen extends StatelessWidget {
         );
         iconBackgroundColor = const Color(0xFFFF5252);
         statusIcon = Icons.close;
-        statusTitle = "Payment failed";
-        statusMessage = "Payment Failed";
-        actionButtonLabel = "Retry";
+        statusTitle = l10n.premiumPaymentFailedTitle;
+        statusMessage = l10n.premiumStatusFailed;
+        actionButtonLabel = l10n.premiumRetry;
         break;
       case PremiumPurchaseStatus.renew:
         backgroundGradient = const LinearGradient(
@@ -70,9 +73,9 @@ class PremiumStatusScreen extends StatelessWidget {
         );
         iconBackgroundColor = const Color(0xFFE68900);
         statusIcon = Icons.info_outline;
-        statusTitle = "Renew the premium plan";
-        statusMessage = "Expired";
-        actionButtonLabel = "Renew Now";
+        statusTitle = l10n.premiumRenewTitle;
+        statusMessage = l10n.premiumStatusExpired;
+        actionButtonLabel = l10n.premiumRenewNow;
         break;
     }
 
@@ -103,7 +106,7 @@ class PremiumStatusScreen extends StatelessWidget {
                     alignment: Alignment.topLeft,
                     child: Semantics(
                       button: true,
-                      label: 'Back',
+                      label: l10n.commonBack,
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () {
@@ -148,9 +151,9 @@ class PremiumStatusScreen extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const SizedBox(height: 30),
-                                  const Text(
-                                    "Payment Total",
-                                    style: TextStyle(
+                                  Text(
+                                    l10n.premiumPaymentTotal,
+                                    style: const TextStyle(
                                       color: Colors.black26,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
@@ -176,30 +179,30 @@ class PremiumStatusScreen extends StatelessWidget {
                                   const SizedBox(height: 30),
                                   if (status ==
                                       PremiumPurchaseStatus.success) ...[
-                                    _buildSimpleRow("Date", formattedDate),
+                                    _buildSimpleRow(l10n.premiumDate, formattedDate),
                                     const SizedBox(height: 15),
-                                    _buildSimpleRow("Time", formattedTime),
+                                    _buildSimpleRow(l10n.premiumTime, formattedTime),
                                   ] else ...[
                                     _buildDetailRow(
-                                      "Billed To",
+                                      l10n.premiumBilledTo,
                                       "Krishna Kumar",
                                     ),
-                                    _buildDetailRow("Date", formattedDate),
-                                    _buildDetailRow("time", formattedTime),
+                                    _buildDetailRow(l10n.premiumDate, formattedDate),
+                                    _buildDetailRow(l10n.premiumTime, formattedTime),
                                     const SizedBox(height: 10),
                                     const Divider(),
                                     const SizedBox(height: 10),
                                     _buildDetailRow(
-                                      "Billed Amount",
+                                      l10n.premiumBilledAmount,
                                       "₹${serviceCharge.toStringAsFixed(2)}",
                                     ),
                                     _buildDetailRow(
-                                      "Savings",
+                                      l10n.premiumSavings,
                                       "- ₹${discount.toStringAsFixed(2)}",
                                       valueColor: const Color(0xFFFBC02D),
                                     ),
                                     _buildDetailRow(
-                                      "GST",
+                                      l10n.premiumGst,
                                       "+ ₹${gst.toStringAsFixed(2)}",
                                       valueColor: const Color(0xFF2E7D32),
                                     ),
@@ -208,9 +211,9 @@ class PremiumStatusScreen extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text(
-                                          "Amount Paid",
-                                          style: TextStyle(
+                                        Text(
+                                          l10n.premiumAmountPaid,
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14,
                                           ),
@@ -299,9 +302,9 @@ class PremiumStatusScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
-                          "Jump to Home",
-                          style: TextStyle(
+                        child: Text(
+                          l10n.premiumJumpToHome,
+                          style: const TextStyle(
                             color: Color(0xFF1B4E4E),
                             fontSize: 11,
                             fontWeight: FontWeight.bold,

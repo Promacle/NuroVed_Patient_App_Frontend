@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/backend_status_banner.dart';
 import '../widgets/auth_form.dart';
@@ -18,8 +19,8 @@ class LoginScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const AuthHeader(
-              titles: ['Welcome Back'],
+            AuthHeader(
+              titles: [context.l10n.loginTitle],
               imageAsset: AppAssets.loginDog,
             ),
             const BackendStatusBanner(),
@@ -106,17 +107,17 @@ class LoginScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          "Don't have an account? ",
-          style: TextStyle(color: Colors.grey),
+        Text(
+          "${context.l10n.loginNoAccount} ",
+          style: const TextStyle(color: Colors.grey),
         ),
         GestureDetector(
           onTap: () {
             Navigator.pushNamed(context, AppRouter.signup);
           },
-          child: const Text(
-            "Sign Up.",
-            style: TextStyle(
+          child: Text(
+            "${context.l10n.loginSignUpLink}.",
+            style: const TextStyle(
               color: AppColors.errorRed,
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.underline,

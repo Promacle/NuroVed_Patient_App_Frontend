@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class DietSuccessScreen extends StatelessWidget {
   final DateTime timestamp;
@@ -60,7 +61,7 @@ class DietSuccessScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20),
                     child: Semantics(
                       button: true,
-                      label: 'Back to diet overview',
+                      label: context.l10n.dietSuccessBackSemantics,
                       child: GestureDetector(
                         onTap: () => _navigateToDiet(context),
                         child: Container(
@@ -98,10 +99,10 @@ class DietSuccessScreen extends StatelessWidget {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 40),
-                const Text(
-                  "New Meal Routine Saved\nSuccessfully",
+                Text(
+                  context.l10n.dietRoutineSavedSuccess,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -113,9 +114,9 @@ class DietSuccessScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: Column(
                     children: [
-                      _buildDataRow("Date", formattedDate),
+                      _buildDataRow(context.l10n.recordsDateLabel, formattedDate),
                       const SizedBox(height: 20),
-                      _buildDataRow("Time", formattedTime),
+                      _buildDataRow(context.l10n.commonTime, formattedTime),
                     ],
                   ),
                 ),
@@ -145,9 +146,9 @@ class DietSuccessScreen extends StatelessWidget {
                       ),
                       elevation: 2,
                     ),
-                    child: const Text(
-                      "See in Meal Routine History",
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.dietSeeMealRoutineHistory,
+                      style: const TextStyle(
                         color: Color(0xFF2C4E4E),
                         fontWeight: FontWeight.bold,
                         fontSize: 14,

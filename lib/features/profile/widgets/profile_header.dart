@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../app/app_router.dart';
@@ -21,9 +22,9 @@ class ProfileHeader extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Profile",
-                style: TextStyle(
+              Text(
+                context.l10n.profileTitle,
+                style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
@@ -31,7 +32,7 @@ class ProfileHeader extends StatelessWidget {
               ),
               Semantics(
                 button: true,
-                label: 'Settings',
+                label: context.l10n.settingsTitle,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () =>
@@ -49,9 +50,9 @@ class ProfileHeader extends StatelessWidget {
               ),
             ],
           ),
-          const Text(
-            "Manage Your And Your Families Personal Information",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+          Text(
+            context.l10n.profileSubtitle,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
         ],
       ),

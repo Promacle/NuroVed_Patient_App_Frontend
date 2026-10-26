@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/medical_record.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/date_parser.dart';
@@ -48,7 +49,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
   }
 
   String _formatFileSize(int? bytes) {
-    if (bytes == null || bytes <= 0) return 'Unknown size';
+    if (bytes == null || bytes <= 0) return context.l10n.recordsUnknownSize;
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
@@ -58,8 +59,8 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
     final path = _record.storagePath;
     if (path == null || path.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No storage file attached to this record'),
+        SnackBar(
+          content: Text(context.l10n.recordsNoStorageFile),
         ),
       );
       return;
@@ -76,7 +77,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
         failure: (f) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to retrieve secure URL: ${f.message}'),
+              content: Text(context.l10n.recordsFailedRetrieveSecureUrl(f.message)),
             ),
           );
         },
@@ -89,20 +90,20 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.lock_clock_outlined, color: AppColors.primaryTeal),
-            SizedBox(width: 10),
-            Text('Secure Retrieval', style: TextStyle(fontSize: 18)),
+            const Icon(Icons.lock_clock_outlined, color: AppColors.primaryTeal),
+            const SizedBox(width: 10),
+            Text(context.l10n.recordsSecureRetrievalTitle, style: const TextStyle(fontSize: 18)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'A short-lived signed URL has been authorized for this private record.',
-              style: TextStyle(fontSize: 13, color: Colors.black87),
+            Text(
+              context.l10n.recordsSecureRetrievalSubtitle,
+              style: const TextStyle(fontSize: 13, color: Colors.black87),
             ),
             const SizedBox(height: 12),
             Container(
@@ -118,13 +119,13 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.shield_outlined, size: 14, color: Colors.green),
-                SizedBox(width: 6),
+                const Icon(Icons.shield_outlined, size: 14, color: Colors.green),
+                const SizedBox(width: 6),
                 Text(
-                  'Valid for 10 minutes (authorization-checked)',
-                  style: TextStyle(
+                  context.l10n.recordsSecureRetrievalValid,
+                  style: const TextStyle(
                     fontSize: 11,
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
@@ -137,7 +138,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(context.l10n.commonClose),
           ),
         ],
       ),
@@ -149,14 +150,12 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Medical Record?'),
-        content: const Text(
-          'Are you sure you want to delete this medical record? It will be removed from your active list.',
-        ),
+        title: Text(context.l10n.recordsDeleteDialogTitle),
+        content: Text(context.l10n.recordsDeleteDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(context.l10n.commonCancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -174,8 +173,8 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                 result.when(
                   success: (_) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Record deleted successfully'),
+                      SnackBar(
+                        content: Text(context.l10n.recordsDeletedSuccess),
                       ),
                     );
                     Navigator.pop(context);
@@ -183,14 +182,14 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                   failure: (f) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Failed to delete record: ${f.message}'),
+                        content: Text(context.l10n.recordsFailedDelete(f.message)),
                       ),
                     );
                   },
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.commonDelete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -213,33 +212,33 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Edit Record Metadata'),
+        title: Text(context.l10n.recordsEditMetadataTitle),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'Record Title'),
+                decoration: InputDecoration(labelText: context.l10n.recordsEditTitleLabel),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: doctorController,
-                decoration: const InputDecoration(labelText: 'Doctor Name'),
+                decoration: InputDecoration(labelText: context.l10n.recordsEditDoctorLabel),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: hospitalController,
-                decoration: const InputDecoration(
-                  labelText: 'Hospital / Clinic',
+                decoration: InputDecoration(
+                  labelText: context.l10n.recordsEditHospitalLabel,
                 ),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: descController,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Notes / Description',
+                decoration: InputDecoration(
+                  labelText: context.l10n.recordsEditNotesLabel,
                 ),
               ),
             ],
@@ -248,7 +247,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(context.l10n.commonCancel, style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -269,11 +268,11 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               if (mounted && result.isSuccess) {
                 setState(() => _record = updated);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Record updated successfully')),
+                  SnackBar(content: Text(context.l10n.recordsUpdatedSuccess)),
                 );
               }
             },
-            child: const Text('Save', style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.commonSave, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -325,9 +324,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          const Text(
-            'Record Details',
-            style: TextStyle(
+          Text(
+            context.l10n.recordsDetailsTitle,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -346,27 +345,27 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.edit_outlined,
                       size: 20,
                       color: Color(0xFF2C4E4E),
                     ),
-                    SizedBox(width: 10),
-                    Text('Edit Metadata'),
+                    const SizedBox(width: 10),
+                    Text(context.l10n.recordsEditMetadataAction),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text('Delete Record', style: TextStyle(color: Colors.red)),
+                    const Icon(Icons.delete_outline, size: 20, color: Colors.red),
+                    const SizedBox(width: 10),
+                    Text(context.l10n.recordsDeleteRecordAction, style: const TextStyle(color: Colors.red)),
                   ],
                 ),
               ),
@@ -454,7 +453,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Date: ${displayDate.isNotEmpty ? displayDate : _record.date}',
+                context.l10n.recordsDatePrefix(displayDate.isNotEmpty ? displayDate : _record.date),
                 style: const TextStyle(fontSize: 13, color: Colors.black87),
               ),
             ],
@@ -466,7 +465,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                 const Icon(Icons.person_outline, size: 18, color: Colors.grey),
                 const SizedBox(width: 8),
                 Text(
-                  'Doctor: ${_record.doctorName}',
+                  context.l10n.recordsDoctorPrefix(_record.doctorName!),
                   style: const TextStyle(fontSize: 13, color: Colors.black87),
                 ),
               ],
@@ -484,7 +483,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Hospital: ${_record.hospitalName}',
+                  context.l10n.recordsHospitalPrefix(_record.hospitalName!),
                   style: const TextStyle(fontSize: 13, color: Colors.black87),
                 ),
               ],
@@ -519,9 +518,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Attached Document',
-            style: TextStyle(
+          Text(
+            context.l10n.recordsAttachedDocument,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -602,10 +601,10 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
                     ),
               label: Text(
                 _isGeneratingUrl
-                    ? 'Authorizing...'
+                    ? context.l10n.recordsAuthorizing
                     : (hasStorage
-                          ? 'Request Secure Signed URL'
-                          : 'No Remote File Available'),
+                          ? context.l10n.recordsRequestSecureUrl
+                          : context.l10n.recordsNoRemoteFile),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -639,9 +638,9 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Clinical Notes & Description',
-            style: TextStyle(
+          Text(
+            context.l10n.recordsClinicalNotesTitle,
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C4E4E),
@@ -649,7 +648,7 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            notes.isNotEmpty ? notes : 'No notes entered for this document.',
+            notes.isNotEmpty ? notes : context.l10n.recordsNoNotesEntered,
             style: TextStyle(
               fontSize: 14,
               color: notes.isNotEmpty ? Colors.black87 : Colors.grey,

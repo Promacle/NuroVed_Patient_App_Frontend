@@ -68,8 +68,8 @@ class AppRouter {
   static const String access = '/access';
   static const String diet = '/diet';
   static const String routine = '/routine';
-  static const String premium = '/premium'; // Added premium route
-  static const String purchase = '/purchase'; // Added this missing constant
+  static const String premium = '/premium';
+  static const String purchase = '/purchase';
   static const String settingsRoute = '/settings';
   static const String addVisit = '/add-visit';
   static const String addMedicine = '/add-medicine';
@@ -143,11 +143,9 @@ class AppRouter {
       );
     }
 
-    // Helper function to create an animated route that triggers the skeleton
     Route createAnimatedRoute(Widget child) {
       return PageRouteBuilder(
-        settings: settings, // <--- THIS IS THE CRITICAL FIX
-        // Setting maintainState to false forces the skeleton to re-run on 'back'
+        settings: settings,
         maintainState: false,
         pageBuilder: (context, animation, secondaryAnimation) =>
             SkeletonWrapper(child: child),
@@ -186,14 +184,13 @@ class AppRouter {
           builder: (_) => const ForgotPasswordScreen(),
         );
 
-      // Change the home case to this:
       case home:
         final initialIndex = settings.arguments is int
             ? settings.arguments as int
             : 0;
         return PageRouteBuilder(
-          settings: settings, // <--- THIS IS THE CRITICAL FIX
-          maintainState: false, // Important for "Back" button re-animation
+          settings: settings,
+          maintainState: false,
           pageBuilder: (context, animation, secondaryAnimation) =>
               MainLayout(initialIndex: initialIndex),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -221,7 +218,7 @@ class AppRouter {
 
       case routine:
         return createAnimatedRoute(const RoutineScreen());
-      case premium: // Handle premium route
+      case premium:
         return createAnimatedRoute(const PremiumScreen());
 
       case aiDietPlanner:
@@ -230,7 +227,6 @@ class AppRouter {
             initialPreferences: settings.arguments as DietPreferences?,
           ),
         );
-      // Inside generateRoute switch:
       case dietPreference:
         return createAnimatedRoute(
           DietPreferenceScreen(

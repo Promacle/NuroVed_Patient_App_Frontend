@@ -2,18 +2,16 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../../core/utils/platform_file.dart';
 
-// lib/features/records/widgets/profile_selector.dart
-
 class ProfileSelector extends StatelessWidget {
   final String name;
-  final dynamic imageFile; // Added this parameter
+  final dynamic imageFile;
   final List<String> familyNames;
   final Function(String) onSelected;
 
   const ProfileSelector({
     super.key,
     required this.name,
-    this.imageFile, // Added this parameter
+    this.imageFile,
     required this.familyNames,
     required this.onSelected,
   });
@@ -42,7 +40,6 @@ class ProfileSelector extends StatelessWidget {
             CircleAvatar(
               radius: 14,
               backgroundColor: const Color(0xFFE1ECE7),
-              // DYNAMIC PHOTO LOGIC
               backgroundImage: imageFile is AppPlatformFile
                   ? imageFile.toImageProvider()
                   : (imageFile is Uint8List ? MemoryImage(imageFile) : null),

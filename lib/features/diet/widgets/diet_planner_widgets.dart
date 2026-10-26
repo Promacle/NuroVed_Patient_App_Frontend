@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class DietPlannerHeader extends StatelessWidget {
   final String title;
@@ -34,7 +35,7 @@ class DietPlannerHeader extends StatelessWidget {
             children: [
               Semantics(
                 button: true,
-                label: 'Back',
+                label: context.l10n.commonBack,
                 child: GestureDetector(
                   onTap: () {
                     if (Navigator.canPop(context)) {

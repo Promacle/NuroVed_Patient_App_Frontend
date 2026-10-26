@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
 import '../controllers/app_settings_controller.dart';
 
 class AppSettingsScreen extends StatefulWidget {
@@ -30,6 +31,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = context.l10n;
     final topPad = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
@@ -43,7 +45,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         children: [
           Semantics(
             button: true,
-            label: "Back",
+            label: l10n.semanticsBack,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -66,22 +68,22 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             ),
           ),
           const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "App Settings",
-                style: TextStyle(
+                l10n.settingsAppSettingsCard,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
-                "Personalize Display & Clinical Units",
-                style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                l10n.settingsAppSettingsSubtitle,
+                style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
               ),
             ],
           ),
@@ -91,25 +93,26 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Widget _buildSettingsList() {
+    final l10n = context.l10n;
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       children: [
         _buildSettingItem(
-          title: "Time Format",
+          title: l10n.settingsTimeFormat,
           value: _controller.timeFormat,
           icon: Icons.access_time_rounded,
           options: const ["12hr", "24hr"],
           onSelect: (v) => _controller.setTimeFormat(v),
         ),
         _buildSettingItem(
-          title: "Weight Unit",
+          title: l10n.settingsWeightUnit,
           value: _controller.weightUnit,
           icon: Icons.monitor_weight_outlined,
           options: const ["Kg", "Lbs"],
           onSelect: (v) => _controller.setWeightUnit(v),
         ),
         _buildSettingItem(
-          title: "Height Unit",
+          title: l10n.settingsHeightUnit,
           value: _controller.heightUnit,
           icon: Icons.height_rounded,
           options: const ["Cm", "Ft"],
@@ -239,7 +242,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Select $title",
+                context.l10n.settingsSelectOption(title),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

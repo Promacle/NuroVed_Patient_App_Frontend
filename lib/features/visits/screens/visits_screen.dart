@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/home/widgets/graph_card.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
@@ -43,9 +44,9 @@ class _VisitsScreenState extends State<VisitsScreen> {
                 children: [
                   const GraphCard(), // Reused from Home
                   const SizedBox(height: 30),
-                  const Text(
-                    "Recent Visits",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.visitsTitle,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C4E4E),
@@ -66,9 +67,9 @@ class _VisitsScreenState extends State<VisitsScreen> {
                                 color: Colors.grey[400],
                               ),
                               const SizedBox(height: 12),
-                              const Text(
-                                "No visits recorded for this profile yet",
-                                style: TextStyle(
+                              Text(
+                                context.l10n.visitsEmptyTitle,
+                                style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 14,
                                 ),
@@ -130,7 +131,7 @@ class _VisitsScreenState extends State<VisitsScreen> {
         padding: const EdgeInsets.only(bottom: 100),
         child: FloatingActionButton(
           heroTag: 'visits_fab',
-          tooltip: "Add doctor visit",
+          tooltip: context.l10n.visitsAddVisit,
           onPressed: () => Navigator.pushNamed(context, AppRouter.addVisit),
           backgroundColor: AppColors.primaryTeal,
           shape: const CircleBorder(),
@@ -141,7 +142,7 @@ class _VisitsScreenState extends State<VisitsScreen> {
   }
 
   Widget _buildHeader() {
-    final profileController = ProfileController(); // Get the singleton
+    final profileController = ProfileController();
 
     return ListenableBuilder(
       listenable: profileController,
@@ -166,9 +167,9 @@ class _VisitsScreenState extends State<VisitsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Visits",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.navVisits,
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C4E4E),
@@ -188,9 +189,9 @@ class _VisitsScreenState extends State<VisitsScreen> {
                   ),
                 ],
               ),
-              const Text(
-                "Your Health Timeline",
-                style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+              Text(
+                context.l10n.visitsSubtitle,
+                style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
               ),
             ],
           ),

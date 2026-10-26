@@ -3,12 +3,17 @@ import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/widgets/section_header.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/localization/app_localizations_extension.dart';
+import '../../../core/localization/locale_controller.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final localeController = LocaleController.instance;
+
     return Scaffold(
       backgroundColor: AppColors.kMainBg,
       body: Column(
@@ -20,61 +25,66 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionHeader(
-                    title: "Preferences",
-                    subtitle: "Customize your tracking experience",
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                  SectionHeader(
+                    title: l10n.settingsSectionPreferences,
+                    subtitle: l10n.settingsSubtitle,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   _buildSettingCard(
-                    title: "App Settings",
-                    subtitle: "Units, time format, and clinical display",
+                    title: l10n.settingsLanguageCard,
+                    subtitle: localeController.currentLanguageNativeName,
+                    icon: Icons.language_rounded,
+                    onTap: () => _showLanguageSelection(context),
+                  ),
+                  _buildSettingCard(
+                    title: l10n.settingsAppSettingsCard,
+                    subtitle: l10n.settingsAppSettingsSubtitle,
                     icon: Icons.tune_rounded,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.appSettings),
                   ),
                   _buildSettingCard(
-                    title: "Data & Privacy",
-                    subtitle: "Row Level Security, permissions & account data",
+                    title: l10n.settingsDataPrivacyCard,
+                    subtitle: l10n.settingsDataPrivacySubtitle,
                     icon: Icons.shield_outlined,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.dataPrivacy),
                   ),
                   const SizedBox(height: 16),
-                  const SectionHeader(
-                    title: "Support & Feedback",
-                    subtitle: "Assistance from care coordinators",
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                  SectionHeader(
+                    title: l10n.settingsSectionSupport,
+                    subtitle: l10n.settingsCustomerSupportSubtitle,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   _buildSettingCard(
-                    title: "Customer Support",
-                    subtitle: "Direct care coordination and helpdesk",
+                    title: l10n.settingsCustomerSupportCard,
+                    subtitle: l10n.settingsCustomerSupportSubtitle,
                     icon: Icons.support_agent_rounded,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.customerSupport),
                   ),
                   _buildSettingCard(
-                    title: "Report a Problem",
-                    subtitle: "Report bugs or sync anomalies",
+                    title: l10n.settingsReportProblemCard,
+                    subtitle: l10n.settingsReportProblemSubtitle,
                     icon: Icons.bug_report_outlined,
                     onTap: () =>
                         Navigator.pushNamed(context, AppRouter.reportProblem),
                   ),
                   const SizedBox(height: 16),
-                  const SectionHeader(
-                    title: "Legal & Compliance",
-                    subtitle: "Clinical boundaries and privacy safeguards",
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                  SectionHeader(
+                    title: l10n.settingsSectionLegal,
+                    subtitle: l10n.settingsTermsSubtitle,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   _buildSettingCard(
-                    title: "Privacy Policy",
-                    subtitle: "Zero third-party monetization & RLS sovereignty",
+                    title: l10n.settingsPrivacyPolicyCard,
+                    subtitle: l10n.settingsPrivacyPolicySubtitle,
                     icon: Icons.policy_outlined,
                     onTap: () => _showPrivacyPolicy(context),
                   ),
                   _buildSettingCard(
-                    title: "Terms of Service",
-                    subtitle:
-                        "Continuity of care guidelines and emergency terms",
+                    title: l10n.settingsTermsCard,
+                    subtitle: l10n.settingsTermsSubtitle,
                     icon: Icons.gavel_outlined,
                     onTap: () => _showTermsOfService(context),
                   ),
@@ -89,6 +99,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = context.l10n;
     final topPad = MediaQuery.of(context).padding.top;
     return Container(
       width: double.infinity,
@@ -102,7 +113,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           Semantics(
             button: true,
-            label: "Back",
+            label: l10n.semanticsBack,
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -125,23 +136,26 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Settings",
-                  style: TextStyle(
+                  l10n.settingsTitle,
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Manage Your App Settings & Preferences",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  l10n.settingsSubtitle,
+                  style: const TextStyle(
+                    color: AppColors.textGrey,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -229,12 +243,107 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  void _showLanguageSelection(BuildContext context) {
+    final l10n = context.l10n;
+    final controller = LocaleController.instance;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.settingsLanguageSelectTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 14),
+              ...LocaleController.supportedLocales.map((loc) {
+                final code = loc.languageCode;
+                final isSelected = controller.currentLanguageCode == code;
+                final nativeName = LocaleController.getNativeName(code);
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primaryTeal
+                          : AppColors.borderSubtle,
+                    ),
+                  ),
+                  child: Material(
+                    color: isSelected
+                        ? AppColors.surfaceMint
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 2,
+                      ),
+                      title: Text(
+                        nativeName,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.primaryTeal
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(
+                              Icons.check_circle_rounded,
+                              color: AppColors.primaryTeal,
+                            )
+                          : null,
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        await controller.setLocale(loc);
+                      },
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showPrivacyPolicy(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Privacy Policy'),
+        title: Text(l10n.privacyPolicyTitle),
         content: const SingleChildScrollView(
           child: Text(
             'NuroVed Privacy & Data Protection\n\n'
@@ -249,7 +358,7 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(l10n.commonClose),
           ),
         ],
       ),
@@ -257,11 +366,12 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showTermsOfService(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Terms of Service'),
+        title: Text(l10n.termsOfServiceTitle),
         content: const SingleChildScrollView(
           child: Text(
             'NuroVed Terms of Service\n\n'
@@ -275,7 +385,7 @@ class SettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: Text(l10n.commonClose),
           ),
         ],
       ),

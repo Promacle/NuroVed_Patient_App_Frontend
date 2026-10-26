@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/family/screens/add_family_member_screen.dart';
 
@@ -107,9 +108,9 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                     Icons.check_circle_outline,
                     color: AppColors.primaryTeal,
                   ),
-                  title: const Text("Select as Active Profile"),
-                  subtitle: const Text(
-                    "Switch health timeline, records and routine to this person",
+                  title: Text(context.l10n.familySelectActiveProfile),
+                  subtitle: Text(
+                    context.l10n.familySwitchActiveProfileSubtitle,
                   ),
                   onTap: () {
                     profileCtrl.switchSubject(memberId);
@@ -117,7 +118,9 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          "Switched active profile to ${member['name']}",
+                          context.l10n.familySwitchedActiveProfile(
+                            member['name'] ?? '',
+                          ),
                         ),
                       ),
                     );
@@ -128,7 +131,7 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                   Icons.edit_outlined,
                   color: Color(0xFF2C4E4E),
                 ),
-                title: const Text("Edit Member Profile"),
+                title: Text(context.l10n.familyEditMemberProfile),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await Navigator.push(
@@ -155,14 +158,14 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        title: const Text("Remove Profile?"),
+        title: Text(context.l10n.familyRemoveProfileTitle),
         content: Text(
-          "Are you sure you want to remove $name from your family?",
+          context.l10n.familyRemoveProfileMessage(name),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text("Cancel"),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () {
@@ -171,13 +174,18 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                 _controller.removeFamilyMemberById(id);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Removed "$name" from family profiles.'),
+                    content: Text(
+                      context.l10n.familyRemovedMemberSnackbar(name),
+                    ),
                     backgroundColor: AppColors.primaryTeal,
                   ),
                 );
               }
             },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            child: Text(
+              context.l10n.commonDelete,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -202,7 +210,7 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
             children: [
               Semantics(
                 button: true,
-                label: 'Back',
+                label: context.l10n.commonBack,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => Navigator.pop(context),
@@ -229,10 +237,10 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
                 ),
               ),
               const SizedBox(width: 15),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  "Family Profile",
-                  style: TextStyle(
+                  context.l10n.familyProfilesTitle,
+                  style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -243,11 +251,11 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          const Padding(
-            padding: EdgeInsets.only(left: 48),
+          Padding(
+            padding: const EdgeInsets.only(left: 48),
             child: Text(
-              "Manage Your Families Profiles Information",
-              style: TextStyle(
+              context.l10n.familyProfilesSubtitle,
+              style: const TextStyle(
                 color: Color(0xFF5A6A6A),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -278,13 +286,13 @@ class _FamilyProfilesScreenState extends State<FamilyProfilesScreen> {
             color: const Color(0xFFE8F1ED).withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(15),
           ),
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "+ Add New\nFamily Profile",
+                "+ ${context.l10n.familyAddNewProfile}",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF4A5A5A),

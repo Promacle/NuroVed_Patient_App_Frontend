@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 class CustomerSupportScreen extends StatefulWidget {
   const CustomerSupportScreen({super.key});
 
@@ -14,73 +16,76 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   bool isContactUs = true;
   String searchQuery = "";
   final TextEditingController _searchController = TextEditingController();
+  final Set<int> _expandedFaqs = {};
 
-  final List<Map<String, dynamic>> faqs = [
-    {
-      "question": "What is NuroVed and how does it work?",
-      "answer":
-          "NuroVed is an AI-powered health companion that understands your lifestyle, preferences, and medical context to provide personalized diet plans, insights, and health guidance—all in one place.",
-      "isExpanded": false,
-    },
-    {
-      "question": "How is NuroVed different from other health apps?",
-      "answer":
-          "Unlike generic trackers, NuroVed adapts to you. It combines AI, real-time analysis, and behavior-focused design to deliver recommendations that actually fit your daily life.",
-      "isExpanded": false,
-    },
-    {
-      "question": "Is my health data safe with NuroVed?",
-      "answer":
-          "Yes. Your data is securely stored and handled with strict privacy measures. NuroVed is built with a strong focus on protecting your personal and medical information.",
-      "isExpanded": false,
-    },
-    {
-      "question":
-          "Can NuroVed handle specific needs like allergies or medical conditions?",
-      "answer":
-          "Absolutely. NuroVed considers your allergies, dietary restrictions, and health conditions to provide safe and personalized recommendations.",
-      "isExpanded": false,
-    },
-  ];
+  List<Map<String, dynamic>> _getFaqs(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      {
+        "question": l10n.customerSupportFaqQ1,
+        "answer": l10n.customerSupportFaqA1,
+      },
+      {
+        "question": l10n.customerSupportFaqQ2,
+        "answer": l10n.customerSupportFaqA2,
+      },
+      {
+        "question": l10n.customerSupportFaqQ3,
+        "answer": l10n.customerSupportFaqA3,
+      },
+      {
+        "question": l10n.customerSupportFaqQ4,
+        "answer": l10n.customerSupportFaqA4,
+      },
+    ];
+  }
 
-  final List<Map<String, dynamic>> contactOptions = [
-    {
-      "icon": const Icon(
-        Icons.headset_mic_outlined,
-        color: Color(0xFF2C4E4E),
-        size: 22,
-      ),
-      "title": "Customer Service",
-    },
-    {
-      "icon": const Icon(Icons.language, color: Color(0xFF2C4E4E), size: 22),
-      "title": "Website",
-    },
-    {
-      "icon": const FaIcon(
-        FontAwesomeIcons.whatsapp,
-        color: Color(0xFF2C4E4E),
-        size: 22,
-      ),
-      "title": "Whatsapp",
-    },
-    {
-      "icon": const FaIcon(
-        FontAwesomeIcons.facebook,
-        color: Color(0xFF2C4E4E),
-        size: 22,
-      ),
-      "title": "Facebook",
-    },
-    {
-      "icon": const FaIcon(
-        FontAwesomeIcons.instagram,
-        color: Color(0xFF2C4E4E),
-        size: 22,
-      ),
-      "title": "Instagram",
-    },
-  ];
+  List<Map<String, dynamic>> _getContactOptions(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      {
+        "key": "customer_service",
+        "icon": const Icon(
+          Icons.headset_mic_outlined,
+          color: Color(0xFF2C4E4E),
+          size: 22,
+        ),
+        "title": l10n.customerSupportService,
+      },
+      {
+        "key": "website",
+        "icon": const Icon(Icons.language, color: Color(0xFF2C4E4E), size: 22),
+        "title": l10n.customerSupportWebsite,
+      },
+      {
+        "key": "whatsapp",
+        "icon": const FaIcon(
+          FontAwesomeIcons.whatsapp,
+          color: Color(0xFF2C4E4E),
+          size: 22,
+        ),
+        "title": l10n.customerSupportWhatsapp,
+      },
+      {
+        "key": "facebook",
+        "icon": const FaIcon(
+          FontAwesomeIcons.facebook,
+          color: Color(0xFF2C4E4E),
+          size: 22,
+        ),
+        "title": l10n.customerSupportFacebook,
+      },
+      {
+        "key": "instagram",
+        "icon": const FaIcon(
+          FontAwesomeIcons.instagram,
+          color: Color(0xFF2C4E4E),
+          size: 22,
+        ),
+        "title": l10n.customerSupportInstagram,
+      },
+    ];
+  }
 
   @override
   void dispose() {
@@ -98,7 +103,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           children: [
             _buildHeader(context),
             const SizedBox(height: 25),
-            _buildToggle(),
+            _buildToggle(context),
             const SizedBox(height: 25),
             Expanded(
               child: SingleChildScrollView(
@@ -132,7 +137,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             children: [
               Semantics(
                 button: true,
-                label: 'Back',
+                label: context.l10n.commonBack,
                 child: GestureDetector(
                   onTap: () {
                     if (Navigator.canPop(context)) {
@@ -150,21 +155,21 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Customer Support",
-                      style: TextStyle(
+                      context.l10n.customerSupportTitle,
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF2C4E4E),
                       ),
                     ),
                     Text(
-                      "About Us",
-                      style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                      context.l10n.customerSupportAboutUs,
+                      style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
                     ),
                   ],
                 ),
@@ -185,10 +190,10 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   searchQuery = value.toLowerCase();
                 });
               },
-              decoration: const InputDecoration(
-                hintText: "Search...",
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Color(0xFF2C4E4E)),
+              decoration: InputDecoration(
+                hintText: context.l10n.customerSupportSearchHint,
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF2C4E4E)),
                 border: InputBorder.none,
               ),
             ),
@@ -198,7 +203,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
-  Widget _buildToggle() {
+  Widget _buildToggle(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(6),
@@ -219,7 +224,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    "Contact Us",
+                    context.l10n.customerSupportContactUs,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: isContactUs
@@ -242,7 +247,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    "FAQ",
+                    context.l10n.customerSupportFaq,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: !isContactUs
@@ -260,45 +265,47 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   }
 
   Widget _buildContactUsList() {
-    final filteredOptions = contactOptions.where((option) {
+    final filteredOptions = _getContactOptions(context).where((option) {
       return option['title'].toString().toLowerCase().contains(searchQuery);
     }).toList();
 
     if (filteredOptions.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
         child: Text(
-          "No contact options match your search.",
-          style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+          context.l10n.customerSupportNoContactMatch,
+          style: const TextStyle(color: AppColors.textGrey, fontSize: 14),
         ),
       );
     }
 
     return Column(
       children: filteredOptions.map((option) {
-        return _buildExpandableTile(option['icon'], option['title']);
+        return _buildExpandableTile(option['icon'], option['title'], option['key'] as String);
       }).toList(),
     );
   }
 
   Widget _buildFAQList() {
-    final filteredFaqs = faqs.where((faq) {
+    final faqs = _getFaqs(context);
+    final filteredFaqs = faqs.asMap().entries.where((entry) {
+      final faq = entry.value;
       return faq['question'].toString().toLowerCase().contains(searchQuery) ||
           faq['answer'].toString().toLowerCase().contains(searchQuery);
     }).toList();
 
     if (filteredFaqs.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
         child: Text(
-          "No FAQs match your search.",
-          style: TextStyle(color: AppColors.textGrey, fontSize: 14),
+          context.l10n.customerSupportNoFaqMatch,
+          style: const TextStyle(color: AppColors.textGrey, fontSize: 14),
         ),
       );
     }
 
     return Column(
-      children: filteredFaqs.asMap().entries.map((entry) {
+      children: filteredFaqs.map((entry) {
         final index = entry.key;
         final faq = entry.value;
         return _buildFAQTile(faq, index);
@@ -307,11 +314,15 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   }
 
   Widget _buildFAQTile(Map<String, dynamic> faq, int index) {
-    bool isExpanded = faq['isExpanded'];
+    bool isExpanded = _expandedFaqs.contains(index);
     return GestureDetector(
       onTap: () {
         setState(() {
-          faq['isExpanded'] = !isExpanded;
+          if (isExpanded) {
+            _expandedFaqs.remove(index);
+          } else {
+            _expandedFaqs.add(index);
+          }
         });
       },
       child: AnimatedContainer(
@@ -370,7 +381,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
-  Widget _buildExpandableTile(dynamic icon, String title) {
+  Widget _buildExpandableTile(dynamic icon, String title, String key) {
     Widget iconWidget;
     if (icon is Widget) {
       iconWidget = icon;
@@ -385,7 +396,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     }
 
     return GestureDetector(
-      onTap: () => _handleContactAction(context, title),
+      onTap: () => _handleContactAction(context, key, title),
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
@@ -435,16 +446,17 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
-  Future<void> _handleContactAction(BuildContext context, String title) async {
-    switch (title) {
-      case "Customer Service":
+  Future<void> _handleContactAction(BuildContext context, String key, String title) async {
+    final l10n = context.l10n;
+    switch (key) {
+      case "customer_service":
         _showChannelDialog(
           context,
           title,
-          "Direct phone support is currently unconfigured in this release. Please visit our website or report a problem via Settings.",
+          l10n.customerSupportPhoneNotConfigured,
         );
         break;
-      case "Website":
+      case "website":
         final uri = Uri.parse("https://nuroved.com");
         try {
           if (await canLaunchUrl(uri)) {
@@ -453,7 +465,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             _showChannelDialog(
               context,
               title,
-              "Official website: https://nuroved.com\nPlease open this link in your web browser.",
+              l10n.customerSupportWebsiteDialog,
             );
           }
         } catch (_) {
@@ -461,23 +473,23 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             _showChannelDialog(
               context,
               title,
-              "Official website: https://nuroved.com\nPlease open this link in your web browser.",
+              l10n.customerSupportWebsiteDialog,
             );
           }
         }
         break;
-      case "Whatsapp":
+      case "whatsapp":
         _showChannelDialog(
           context,
           title,
-          "WhatsApp support is currently unconfigured in this release. Please visit our website or report a problem via Settings.",
+          l10n.customerSupportWhatsappNotConfigured,
         );
         break;
       default:
         _showChannelDialog(
           context,
           title,
-          "The $title support channel is not yet active in this release. Please visit our website or report a problem via Settings.",
+          l10n.customerSupportChannelNotActive(title),
         );
         break;
     }
@@ -496,7 +508,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: Text(context.l10n.commonOk),
           ),
         ],
       ),

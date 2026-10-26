@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/controllers/auth_controller.dart';
 
@@ -42,21 +43,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
     if (currentPass.isEmpty) {
       setState(() {
-        _errorMessage = 'Current password is required.';
+        _errorMessage = context.l10n.changePasswordCurrentRequired;
       });
       return;
     }
 
     if (newPass.length < 8) {
       setState(() {
-        _errorMessage = 'New password must be at least 8 characters.';
+        _errorMessage = context.l10n.changePasswordMinLength;
       });
       return;
     }
 
     if (newPass != confirmPass) {
       setState(() {
-        _errorMessage = 'New passwords do not match.';
+        _errorMessage = context.l10n.changePasswordMismatch;
       });
       return;
     }
@@ -80,10 +81,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     result.when(
       success: (_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Password changed successfully.'),
+          SnackBar(
+            content: Text(context.l10n.changePasswordSuccess),
             backgroundColor: AppColors.primaryTeal,
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
         Navigator.pop(context);
@@ -129,7 +130,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   const SizedBox(height: 30),
                   _buildInputField(
                     controller: _currentPassController,
-                    hintText: "Enter current password",
+                    hintText: context.l10n.changePasswordEnterCurrent,
                     isVisible: _isCurrentPassVisible,
                     onToggle: () => setState(
                       () => _isCurrentPassVisible = !_isCurrentPassVisible,
@@ -138,7 +139,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   const SizedBox(height: 16),
                   _buildInputField(
                     controller: _newPassController,
-                    hintText: "Enter new password (min. 8 characters)",
+                    hintText: context.l10n.changePasswordEnterNew,
                     isVisible: _isNewPassVisible,
                     onToggle: () =>
                         setState(() => _isNewPassVisible = !_isNewPassVisible),
@@ -146,7 +147,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   const SizedBox(height: 16),
                   _buildInputField(
                     controller: _confirmPassController,
-                    hintText: "Re-enter new password",
+                    hintText: context.l10n.changePasswordReEnterNew,
                     isVisible: _isConfirmPassVisible,
                     onToggle: () => setState(
                       () => _isConfirmPassVisible = !_isConfirmPassVisible,
@@ -188,7 +189,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                   ],
                   const SizedBox(height: 40),
-                  _buildSaveButton(),
+                  _buildSaveButton(context),
                   const SizedBox(height: 60),
                 ],
               ),
@@ -210,29 +211,33 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
-              backgroundColor: Color(0xFF769E93),
-              child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: const CircleAvatar(
+                backgroundColor: Color(0xFF769E93),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              ),
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Change Password",
-                  style: TextStyle(
+                  context.l10n.changePasswordTitle,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Re-authenticate and set your new password",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  context.l10n.changePasswordSubtitle,
+                  style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],
             ),
@@ -292,7 +297,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 60,
@@ -313,9 +318,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                "Save New Password",
-                style: TextStyle(
+            : Text(
+                context.l10n.changePasswordSaveButton,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,

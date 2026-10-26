@@ -11,7 +11,7 @@ class SplashController extends ChangeNotifier {
 
   void handleGetStarted(BuildContext context) {
     if (_isChecked) {
-      // Navigate to Login
+      // Future navigation hook if get-started flow is extended
     }
   }
 }

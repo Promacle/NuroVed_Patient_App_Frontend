@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 import '../../home/controllers/home_controller.dart';
@@ -59,7 +60,7 @@ class RecordSuccessScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20),
                     child: Semantics(
                       button: true,
-                      label: 'Back to records',
+                      label: context.l10n.recordsBackToRecords,
                       child: GestureDetector(
                         onTap: () => _navigateToRecords(context),
                         child: Container(
@@ -90,10 +91,10 @@ class RecordSuccessScreen extends StatelessWidget {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 40),
-                const Text(
-                  "New Record Saved\nSuccessfully",
+                Text(
+                  context.l10n.recordsSavedSuccess,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -105,9 +106,9 @@ class RecordSuccessScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 50),
                   child: Column(
                     children: [
-                      _buildDataRow("Date", formattedDate),
+                      _buildDataRow(context.l10n.recordsDateLabel, formattedDate),
                       const SizedBox(height: 20),
-                      _buildDataRow("Time", formattedTime),
+                      _buildDataRow(context.l10n.commonTime, formattedTime),
                     ],
                   ),
                 ),
@@ -131,9 +132,9 @@ class RecordSuccessScreen extends StatelessWidget {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        "See in Records",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      child: Text(
+                        context.l10n.recordsSeeInRecords,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/diet/diet_preferences.dart';
 import 'package:nuroved_patient/core/models/diet/meal_recipe.dart';
 import 'package:nuroved_patient/core/services/diet/diet_planning_engine.dart';
@@ -96,7 +97,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                "Clinical Supervision Notice",
+                context.l10n.dietClinicalSupervisionTitle,
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -117,7 +118,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Condition: ${supervision.detectedCondition}",
+                context.l10n.dietConditionPrefix(supervision.detectedCondition),
                 style: const TextStyle(
                   color: Color(0xFFDC2626),
                   fontWeight: FontWeight.bold,
@@ -163,7 +164,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
                     route.settings.name == AppRouter.diet || route.isFirst,
               );
             },
-            child: const Text("Return to Diet Overview"),
+            child: Text(context.l10n.dietReturnToOverview),
           ),
         ],
       ),
@@ -175,7 +176,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text("Notice: Constraints Too Restrictive"),
+        title: Text(context.l10n.dietConstraintsRestrictiveTitle),
         content: Text(
           message,
           style: const TextStyle(fontSize: 13, height: 1.4),
@@ -183,7 +184,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text("Adjust Exclusions"),
+            child: Text(context.l10n.dietAdjustExclusions),
           ),
         ],
       ),
@@ -196,37 +197,37 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Ai Diet Planner",
-            subtitle: "Calculate Your Every Single Bite",
+          DietPlannerHeader(
+            title: context.l10n.dietPlannerTitle,
+            subtitle: context.l10n.dietSectionSubtitle,
           ),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: DietPlannerCard(
-                title: "Time & Context",
+                title: context.l10n.dietStep4Title,
                 icon: Icons.access_time_rounded,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel("Meal Timing / Fasting Preferences (Optional)"),
+                    _buildLabel(context.l10n.dietMealTimingLabel),
                     _buildDashedInputField(
                       _mealTimingController,
-                      "e.g., Skip Breakfast, Intermittent Fasting 16:8, or Regular 4 meals",
+                      context.l10n.dietMealTimingHint,
                     ),
                     const SizedBox(height: 25),
-                    _buildLabel("Monthly Grocery Budget Level (Optional)"),
+                    _buildLabel(context.l10n.dietBudgetLabel),
                     _buildDashedInputField(
                       _budgetController,
-                      "e.g., Budget-friendly, Standard, or Flexible",
+                      context.l10n.dietBudgetHint,
                     ),
                     const SizedBox(height: 25),
                     _buildLabel(
-                      "Practical Cooking & Availability Context (Optional)",
+                      context.l10n.dietCookingContextLabel,
                     ),
                     _buildDashedInputField(
                       _anythingElseController,
-                      "e.g., Prefer 15-minute quick prep, family meals, no microwave...",
+                      context.l10n.dietCookingContextHint,
                       maxLines: 4,
                     ),
                     const SizedBox(height: 40),
@@ -241,7 +242,7 @@ class _TimeAndContextScreenState extends State<TimeAndContextScreen> {
                       )
                     else
                       DietPlannerActionButton(
-                        label: "Generate Verified Diet Plan",
+                        label: context.l10n.dietBtnGeneratePlan,
                         onPressed: _onGeneratePlan,
                       ),
                     const SizedBox(height: 80),

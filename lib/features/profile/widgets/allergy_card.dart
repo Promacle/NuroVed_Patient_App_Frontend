@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 class AllergyCard extends StatelessWidget {
@@ -34,9 +35,9 @@ class AllergyCard extends StatelessWidget {
                 size: 28,
               ),
               const SizedBox(width: 10),
-              const Text(
-                "Known Allergies",
-                style: TextStyle(
+              Text(
+                context.l10n.profileKnownAllergies,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF2C4E4E),

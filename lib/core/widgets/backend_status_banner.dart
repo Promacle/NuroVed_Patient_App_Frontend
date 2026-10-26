@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/app_config.dart';
+import '../localization/app_localizations_extension.dart';
 
 /// Renders a clear informative banner when backend configuration is missing,
 /// informing the user that the app is operating in local in-memory mode.
@@ -13,6 +14,8 @@ class BackendStatusBanner extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final l10n = context.l10n;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -22,28 +25,31 @@ class BackendStatusBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFFFEEBA)),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.info_outline, size: 20, color: Color(0xFF856404)),
-          SizedBox(width: 10),
+          const Icon(Icons.info_outline, size: 20, color: Color(0xFF856404)),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Backend Not Configured",
-                  style: TextStyle(
+                  l10n.backendNotConfigured,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF856404),
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "Supabase credentials not provided. Operating in local in-memory mode.",
-                  style: TextStyle(fontSize: 11, color: Color(0xFF856404)),
+                  l10n.backendRunningOffline,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF856404),
+                  ),
                 ),
               ],
             ),

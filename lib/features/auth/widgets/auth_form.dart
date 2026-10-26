@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../controllers/auth_controller.dart';
 import 'custom_text_field.dart';
 
@@ -18,8 +19,8 @@ class AuthForm extends StatelessWidget {
       children: [
         // 1. Email Field
         CustomTextField(
-          label: 'Email Address',
-          hint: isSignUp ? 'Enter your email address...' : 'name@example.com',
+          label: context.l10n.loginEmailLabel,
+          hint: isSignUp ? context.l10n.loginEmailHint : 'name@example.com',
           prefixIcon: Icons.email_outlined,
           controller: authController.emailController,
           keyboardType: TextInputType.emailAddress,
@@ -28,7 +29,7 @@ class AuthForm extends StatelessWidget {
 
         // 2. Password Field
         CustomTextField(
-          label: 'Password',
+          label: context.l10n.loginPasswordLabel,
           hint: '*******************',
           prefixIcon: Icons.lock_outline,
           isPassword: !authController.isPasswordVisible,
@@ -36,8 +37,8 @@ class AuthForm extends StatelessWidget {
           onChanged: (_) => authController.validatePasswords(),
           suffixIcon: IconButton(
             tooltip: authController.isPasswordVisible
-                ? 'Hide password'
-                : 'Show password',
+                ? context.l10n.semanticsHidePassword
+                : context.l10n.semanticsShowPassword,
             icon: Icon(
               authController.isPasswordVisible
                   ? Icons.visibility_outlined
@@ -60,9 +61,9 @@ class AuthForm extends StatelessWidget {
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Text(
-                'Forget password?',
-                style: TextStyle(
+              child: Text(
+                context.l10n.loginForgotPassword,
+                style: const TextStyle(
                   color: Color(0xFFE11D48),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -77,7 +78,7 @@ class AuthForm extends StatelessWidget {
         if (isSignUp) ...[
           const SizedBox(height: 20),
           CustomTextField(
-            label: 'Password Confirmation',
+            label: context.l10n.signupConfirmPasswordLabel,
             hint: '*******************',
             prefixIcon: Icons.lock_outline,
             isPassword: !authController.isConfirmPasswordVisible,
@@ -88,8 +89,8 @@ class AuthForm extends StatelessWidget {
                 : null,
             suffixIcon: IconButton(
               tooltip: authController.isConfirmPasswordVisible
-                  ? 'Hide password'
-                  : 'Show password',
+                  ? context.l10n.semanticsHidePassword
+                  : context.l10n.semanticsShowPassword,
               icon: Icon(
                 authController.isConfirmPasswordVisible
                     ? Icons.visibility_outlined
@@ -101,7 +102,7 @@ class AuthForm extends StatelessWidget {
           ),
           if (authController.showPasswordError) ...[
             const SizedBox(height: 12),
-            _buildErrorBox('Passwords do not match!'),
+            _buildErrorBox(context.l10n.validationPasswordMismatch),
           ],
         ],
 
@@ -147,7 +148,9 @@ class AuthForm extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isSignUp ? 'Continue' : 'Sign In',
+                        isSignUp
+                            ? context.l10n.commonContinue
+                            : context.l10n.loginSignInButton,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,

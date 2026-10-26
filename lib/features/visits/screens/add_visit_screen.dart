@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
@@ -36,13 +37,13 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
 
     if (_selectedProfileName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a profile first")),
+        SnackBar(content: Text(context.l10n.visitsSelectProfileFirst)),
       );
       return;
     }
     if (_visitTitleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a visit title")),
+        SnackBar(content: Text(context.l10n.visitsEnterTitlePrompt)),
       );
       return;
     }
@@ -68,8 +69,8 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
     if (result.isSuccess) {
       ProfileController().activeProfileName = _selectedProfileName;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Doctor visit added successfully!"),
+        SnackBar(
+          content: Text(context.l10n.visitsAddedSuccess),
           backgroundColor: AppColors.primaryTeal,
         ),
       );
@@ -79,7 +80,10 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            result.failureOrNull?.message ?? "Failed to save doctor visit",
+            result.failureOrNull?.message != null &&
+                    result.failureOrNull!.message.isNotEmpty
+                ? result.failureOrNull!.message
+                : context.l10n.visitsSaveFailed(""),
           ),
           backgroundColor: Colors.redAccent,
         ),
@@ -133,18 +137,18 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                       _buildDateSelectionCard(),
                       const SizedBox(height: 15),
                       _buildOptionCard(
-                        title: "Attach Records",
+                        title: context.l10n.visitsAttachRecords,
                         subtitle: _selectedRecordTitle.isEmpty
-                            ? "Select Record Related To Visit"
-                            : "Selected: $_selectedRecordTitle",
+                            ? context.l10n.visitsSelectRecordRelated
+                            : "${context.l10n.routineSelectedProfile}: $_selectedRecordTitle",
                         icon: Icons.account_balance_wallet_rounded,
                         iconColor: Colors.black,
                         isNext: true,
                         onTap: () async {
                           if (_selectedProfileName.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Please select a profile first"),
+                              SnackBar(
+                                content: Text(context.l10n.visitsSelectProfileFirst),
                               ),
                             );
                             return;
@@ -196,7 +200,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
         children: [
           Semantics(
             button: true,
-            label: 'Back',
+            label: context.l10n.commonBack,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.pop(context),
@@ -212,13 +216,13 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
             ),
           ),
           const SizedBox(width: 15),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Add New Visit",
-                  style: TextStyle(
+                  context.l10n.visitsAddNewTitle,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
@@ -227,8 +231,8 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  "Add Visit Details Below",
-                  style: TextStyle(color: Colors.black54, fontSize: 14),
+                  context.l10n.visitsAddSubtitle,
+                  style: const TextStyle(color: Colors.black54, fontSize: 14),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -268,10 +272,10 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                       )),
         ),
       ),
-      title: "Profiles",
+      title: context.l10n.routineProfiles,
       subtitle: _selectedProfileName.isEmpty
-          ? "Select Profile"
-          : "Selected: $_selectedProfileName",
+          ? context.l10n.recordsSelectProfile
+          : "${context.l10n.routineSelectedProfile}: $_selectedProfileName",
       children: [
         GridView.builder(
           shrinkWrap: true,
@@ -354,19 +358,19 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       isExpanded: _isDetailsExpanded,
       onToggle: () => setState(() => _isDetailsExpanded = !_isDetailsExpanded),
       iconAsset: AppAssets.medicineIcon,
-      title: "Visit details",
+      title: context.l10n.visitsDetailsCardTitle,
       subtitle: _visitTitleController.text.isEmpty
-          ? "Enter Your Recent Visit Details"
+          ? context.l10n.visitsEnterDetailsPrompt
           : _visitTitleController.text,
       children: [
         _buildStyledTextField(
           controller: _visitTitleController,
-          hint: "Enter visit title....",
+          hint: context.l10n.visitsEnterTitleHint,
         ),
         const SizedBox(height: 15),
         _buildStyledTextField(
           controller: _visitDescController,
-          hint: "Enter visit description....",
+          hint: context.l10n.visitsEnterDescriptionHint,
           maxLines: 3,
         ),
       ],
@@ -378,10 +382,10 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
       isExpanded: _isDateExpanded,
       onToggle: () => setState(() => _isDateExpanded = !_isDateExpanded),
       iconData: Icons.calendar_month_rounded,
-      title: "Date",
+      title: context.l10n.recordsDateLabel,
       subtitle: _isDateExpanded
-          ? "Select Date On Which You Visit"
-          : "Selected: $_formattedDate",
+          ? context.l10n.visitsSelectDatePrompt
+          : "${context.l10n.routineSelectedProfile}: $_formattedDate",
       children: [
         Container(
           padding: const EdgeInsets.all(5),
@@ -613,9 +617,9 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "Select Profile",
-          style: TextStyle(color: Colors.white),
+        child: Text(
+          context.l10n.recordsSelectProfile,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
@@ -643,9 +647,9 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                   strokeWidth: 2,
                 ),
               )
-            : const Text(
-                "Save Visit",
-                style: TextStyle(
+            : Text(
+                context.l10n.visitsSaveButton,
+                style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/backend_status_banner.dart';
 import '../controllers/auth_controller.dart';
@@ -61,7 +62,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   AuthHeader(
                     controller: authController.headerPageController,
-                    titles: const ['Sign Up For Free!', 'Create Account'],
+                    titles: [
+                      context.l10n.signupSubtitle,
+                      context.l10n.signupTitle,
+                    ],
                     subTitles: const ['', 'Complete your profile'],
                     imageAsset: AppAssets.signUpDog,
                   ),
@@ -134,8 +138,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomTextField(
-            label: 'Full Name',
-            hint: 'Enter your name...',
+            label: context.l10n.signupFullNameLabel,
+            hint: context.l10n.signupFullNameHint,
             prefixIcon: Icons.person_outline,
             controller: controller.nameController,
           ),
@@ -145,9 +149,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Date of Birth",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              Text(
+                context.l10n.familyFieldDob,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
               const SizedBox(height: 8),
               GestureDetector(
@@ -165,9 +172,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           const SizedBox(height: 20),
 
-          const Text(
-            "Gender",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          Text(
+            context.l10n.familyFieldGender,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 10),
           Row(
@@ -232,30 +239,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Text.rich(
                   TextSpan(
-                    text: 'I acknowledge and agree to the ',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    text: context.l10n.signupTermsAgreement,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                    ),
                     children: [
                       TextSpan(
-                        text: 'Terms of Service',
-                        style: TextStyle(
+                        text: context.l10n.signupTermsLink,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryTeal,
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                      TextSpan(text: ' and '),
+                      TextSpan(text: context.l10n.signupAndWord),
                       TextSpan(
-                        text: 'Privacy Policy',
-                        style: TextStyle(
+                        text: context.l10n.signupPrivacyLink,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryTeal,
                           decoration: TextDecoration.underline,
                         ),
                       ),
-                      TextSpan(text: '.'),
+                      const TextSpan(text: '.'),
                     ],
                   ),
                 ),
@@ -303,6 +313,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _genderButton(String gender, AuthController controller) {
     bool isSelected = controller.selectedGender == gender;
+    final displayLabel = gender == 'Male'
+        ? context.l10n.dietFieldGenderMale
+        : (gender == 'Female'
+              ? context.l10n.dietFieldGenderFemale
+              : context.l10n.dietFieldGenderOther);
+
     return Expanded(
       child: GestureDetector(
         onTap: () => controller.setSelectedGender(gender),
@@ -316,7 +332,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           alignment: Alignment.center,
           child: Text(
-            gender,
+            displayLabel,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.black87,
               fontWeight: FontWeight.w600,
@@ -350,19 +366,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Sign Up',
-                    style: TextStyle(
+                    context.l10n.signupButton,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Icon(Icons.arrow_right_alt, color: Colors.white, size: 28),
+                  const SizedBox(width: 10),
+                  const Icon(
+                    Icons.arrow_right_alt,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ],
               ),
       ),
@@ -373,15 +393,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          "Already have an account? ",
-          style: TextStyle(color: Color(0xFF64748B)),
+        Text(
+          "${context.l10n.signupAlreadyHaveAccount} ",
+          style: const TextStyle(color: Color(0xFF64748B)),
         ),
         GestureDetector(
           onTap: () => Navigator.pushReplacementNamed(context, AppRouter.login),
-          child: const Text(
-            "Sign In.",
-            style: TextStyle(
+          child: Text(
+            "${context.l10n.signupSignInLink}.",
+            style: const TextStyle(
               color: Color(0xFFE11D48),
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.underline,

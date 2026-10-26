@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 
@@ -79,9 +80,9 @@ class FamilyMemberTile extends StatelessWidget {
                         color: AppColors.primaryTeal,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        "ACTIVE",
-                        style: TextStyle(
+                      child: Text(
+                        context.l10n.familyActiveBadge,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/medical_record.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/records/controllers/records_controller.dart';
@@ -142,9 +143,9 @@ class _SelectRelatedRecordsScreenState
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      "View",
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                    child: Text(
+                      context.l10n.commonView,
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),
                 ),
@@ -164,7 +165,7 @@ class _SelectRelatedRecordsScreenState
           Icon(Icons.folder_open_outlined, size: 60, color: Colors.grey[300]),
           const SizedBox(height: 15),
           Text(
-            "No Records Found For ${widget.profileName}",
+            context.l10n.visitsNoRecordsFoundFor(widget.profileName),
             style: const TextStyle(color: Colors.grey, fontSize: 14),
           ),
         ],
@@ -182,31 +183,37 @@ class _SelectRelatedRecordsScreenState
       ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.arrow_back, color: AppColors.sageGreen),
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.arrow_back, color: AppColors.sageGreen),
+              ),
             ),
           ),
           const SizedBox(width: 15),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Add New Visit",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
-                  fontFamily: 'serif',
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.l10n.visitsAddNewTitle,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                    fontFamily: 'serif',
+                  ),
                 ),
-              ),
-              Text(
-                "Select A Visit Related Records",
-                style: TextStyle(color: Colors.black54, fontSize: 14),
-              ),
-            ],
+                Text(
+                  context.l10n.visitsSelectRelatedRecordsSubtitle,
+                  style: const TextStyle(color: Colors.black54, fontSize: 14),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -232,9 +239,9 @@ class _SelectRelatedRecordsScreenState
               borderRadius: BorderRadius.circular(20),
             ),
           ),
-          child: const Text(
-            "Select Related Record",
-            style: TextStyle(
+          child: Text(
+            context.l10n.visitsSelectRelatedRecordButton,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,

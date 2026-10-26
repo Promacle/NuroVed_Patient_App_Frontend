@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/constants/app_assets.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
 class RecentRecordCard extends StatelessWidget {
@@ -11,12 +12,12 @@ class RecentRecordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (record == null) {
-      return const SizedBox(
+      return SizedBox(
         height: 80,
         child: Center(
           child: Text(
-            "No recent records found for this profile",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+            context.l10n.recordsNoRecentRecords,
+            style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
           ),
         ),
       );
@@ -107,9 +108,9 @@ class RecentRecordCard extends StatelessWidget {
                   minimumSize: const Size(64, 34),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
-                child: const Text(
-                  "View",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                child: Text(
+                  context.l10n.commonView,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -206,7 +207,7 @@ class RecordsSearchBar extends StatelessWidget {
         onChanged: onChanged,
         style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
         decoration: InputDecoration(
-          hintText: "Search health records...",
+          hintText: context.l10n.recordsSearchPlaceholder,
           hintStyle: const TextStyle(fontSize: 14, color: AppColors.textMuted),
           prefixIcon: const Icon(
             Icons.search_rounded,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/diet/controllers/diet_controller.dart';
 import 'package:nuroved_patient/features/diet/widgets/diet_planner_widgets.dart';
@@ -47,9 +48,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Edit Meal",
-            subtitle: "Check Out Your Meal Routine And Edit",
+          DietPlannerHeader(
+            title: context.l10n.dietEditMealTitle,
+            subtitle: context.l10n.dietEditMealSubtitle,
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -57,16 +58,16 @@ class _EditMealScreenState extends State<EditMealScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.calendar_month_outlined,
                         color: Color(0xFF7CB9A8),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Text(
-                        "Weekly Meal Plan",
-                        style: TextStyle(
+                        context.l10n.dietWeeklyMealPlan,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C4E4E),
@@ -125,7 +126,7 @@ class _EditMealScreenState extends State<EditMealScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Day $dayNum $dayName",
+                    context.l10n.dietDayNumberName(dayNum, dayName),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -205,9 +206,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
           ),
           const SizedBox(height: 10),
 
-          const Text(
-            "INGREDIENTS:",
-            style: TextStyle(
+          Text(
+            "${context.l10n.dietIngredientsHeader.toUpperCase()}:",
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -249,11 +250,11 @@ class _EditMealScreenState extends State<EditMealScreen> {
                   }),
                   GestureDetector(
                     onTap: () => setState(() => meal['ingredients'].add("")),
-                    child: const Padding(
-                      padding: EdgeInsets.only(top: 5),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5),
                       child: Text(
-                        "+ Add More",
-                        style: TextStyle(
+                        context.l10n.dietAddMore,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -283,9 +284,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
                 final title = (meal['title'] as String?)?.trim();
                 if (title == null || title.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Meal titles cannot be empty.'),
-                      backgroundColor: Color(0xFFE11D48),
+                    SnackBar(
+                      content: Text(context.l10n.dietMealTitleEmpty),
+                      backgroundColor: const Color(0xFFE11D48),
                     ),
                   );
                   return;
@@ -301,8 +302,8 @@ class _EditMealScreenState extends State<EditMealScreen> {
           }
           _dietController.saveDietPlan(_localPlan);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Diet meal plan updated successfully.'),
+            SnackBar(
+              content: Text(context.l10n.dietPlanUpdatedSuccess),
               backgroundColor: AppColors.primaryTeal,
             ),
           );
@@ -314,9 +315,9 @@ class _EditMealScreenState extends State<EditMealScreen> {
             borderRadius: BorderRadius.circular(15),
           ),
         ),
-        child: const Text(
-          "Save Routine",
-          style: TextStyle(
+        child: Text(
+          context.l10n.dietSaveRoutineButton,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 16,

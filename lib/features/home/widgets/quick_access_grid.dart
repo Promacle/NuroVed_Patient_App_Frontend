@@ -2,40 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:nuroved_patient/app/app_router.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 
+import '../../../core/localization/app_localizations_extension.dart';
+
 class QuickAccessGrid extends StatelessWidget {
   const QuickAccessGrid({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final items = [
       _ActionData(
         icon: Icons.description_outlined,
-        label: 'Records',
+        label: l10n.navRecords,
         onTap: () => Navigator.pushNamed(context, AppRouter.records),
       ),
       _ActionData(
         icon: Icons.calendar_month_outlined,
-        label: 'Visits',
+        label: l10n.navVisits,
         onTap: () => Navigator.pushNamed(context, AppRouter.visits),
       ),
       _ActionData(
         icon: Icons.access_time_rounded,
-        label: 'Routine',
+        label: l10n.navRoutine,
         onTap: () => Navigator.pushNamed(context, AppRouter.routine),
       ),
       _ActionData(
         icon: Icons.restaurant_outlined,
-        label: 'Diet Section',
+        label: l10n.homeQuickDietPlan,
         onTap: () => Navigator.pushNamed(context, AppRouter.diet),
       ),
       _ActionData(
         icon: Icons.health_and_safety_outlined,
-        label: 'Access',
+        label: l10n.navAccess,
         onTap: () => Navigator.pushNamed(context, AppRouter.access),
       ),
       _ActionData(
         icon: Icons.family_restroom_outlined,
-        label: 'Family',
+        label: l10n.familyTitle,
         onTap: () => Navigator.pushNamed(context, AppRouter.familyProfiles),
       ),
     ];

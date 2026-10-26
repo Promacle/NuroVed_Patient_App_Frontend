@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 import '../../routine/controllers/routine_controller.dart';
 
@@ -77,16 +78,20 @@ class _GraphCardState extends State<GraphCard>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Medicine Timeline",
-                    style: TextStyle(
+                  Text(
+                    context.l10n.routineMedicineTimeline,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Color(0xFF2C4E4E),
                     ),
                   ),
                   Text(
-                    "${(completedCount / meds.length * 100).toInt()}% Done",
+                    context.l10n.routinePercentDone(
+                      meds.isEmpty
+                          ? 0
+                          : (completedCount / meds.length * 100).toInt(),
+                    ),
                     style: const TextStyle(
                       color: Color(0xFF7CB9A8),
                       fontSize: 12,

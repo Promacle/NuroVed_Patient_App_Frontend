@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nuroved_patient/app/app_router.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/models/diet/diet_preferences.dart';
 import 'package:nuroved_patient/core/models/diet/meal_recipe.dart';
 import 'package:nuroved_patient/core/services/diet/diet_planning_engine.dart';
@@ -55,8 +56,8 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
         _plan = res.plan;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Generated a new balanced meal routine."),
+        SnackBar(
+          content: Text(context.l10n.dietRegeneratedSuccess),
           backgroundColor: AppColors.primaryTeal,
         ),
       );
@@ -73,8 +74,8 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
     setState(() => _isSaving = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Weekly diet plan saved to your routine!"),
+      SnackBar(
+        content: Text(context.l10n.dietSavedToRoutineSuccess),
         backgroundColor: AppColors.primaryTeal,
       ),
     );
@@ -94,9 +95,9 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Weekly Meal Plan",
-            subtitle: "Verified Nutritional Planning",
+          DietPlannerHeader(
+            title: context.l10n.dietOutputTitle,
+            subtitle: context.l10n.dietVerifiedNutritionalPlanning,
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -111,28 +112,32 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                   _buildDailyNutritionSummary(currentDay),
                   const SizedBox(height: 16),
                   _buildMealCard(
-                    categoryTitle: "Breakfast",
+                    categoryTitle: context.l10n.dietMealBreakfast,
                     timeBadge: "8:00 AM",
                     recipe: currentDay.breakfast,
                     icon: Icons.wb_sunny_outlined,
+                    initiallyExpanded: true,
                   ),
                   _buildMealCard(
-                    categoryTitle: "Lunch",
+                    categoryTitle: context.l10n.dietMealLunch,
                     timeBadge: "1:00 PM",
                     recipe: currentDay.lunch,
                     icon: Icons.wb_twilight_outlined,
+                    initiallyExpanded: true,
                   ),
                   _buildMealCard(
-                    categoryTitle: "Evening Snack",
+                    categoryTitle: context.l10n.dietMealSnack,
                     timeBadge: "5:00 PM",
                     recipe: currentDay.snack,
                     icon: Icons.coffee_outlined,
+                    initiallyExpanded: false,
                   ),
                   _buildMealCard(
-                    categoryTitle: "Dinner",
+                    categoryTitle: context.l10n.dietMealDinner,
                     timeBadge: "8:00 PM",
                     recipe: currentDay.dinner,
                     icon: Icons.nightlight_outlined,
+                    initiallyExpanded: false,
                   ),
                   const SizedBox(height: 14),
                   _buildClinicalDisclaimerCard(),
@@ -234,7 +239,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
           final day = _plan.days[index];
           return Semantics(
             button: true,
-            label: "Day ${index + 1}: ${day.dayName}",
+            label: context.l10n.dietDayNumberName(index + 1, day.dayName),
             selected: isSelected,
             child: GestureDetector(
               onTap: () => setState(() => _selectedDayIndex = index),
@@ -278,7 +283,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                       ),
                     ),
                     Text(
-                      "Day ${index + 1}",
+                      context.l10n.dietDayNumber(index + 1),
                       style: TextStyle(
                         fontSize: 9,
                         color: isSelected ? Colors.white70 : AppColors.textGrey,
@@ -309,7 +314,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "${day.dayName} Nutrition Overview",
+                "${day.dayName} ${context.l10n.dietNutritionOverview}",
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -317,7 +322,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                 ),
               ),
               Text(
-                "${day.totalCalories} kcal Total",
+                context.l10n.dietTotalCaloriesKcal(day.totalCalories),
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -331,12 +336,21 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildMacroChip(
-                "Protein",
+                context.l10n.foodScannerProteins,
                 "${day.totalProtein.toStringAsFixed(0)}g",
               ),
-              _buildMacroChip("Carbs", "${day.totalCarbs.toStringAsFixed(0)}g"),
-              _buildMacroChip("Fat", "${day.totalFat.toStringAsFixed(0)}g"),
-              _buildMacroChip("Fiber", "${day.totalFiber.toStringAsFixed(0)}g"),
+              _buildMacroChip(
+                context.l10n.foodScannerCarbs,
+                "${day.totalCarbs.toStringAsFixed(0)}g",
+              ),
+              _buildMacroChip(
+                context.l10n.foodScannerTotalFat,
+                "${day.totalFat.toStringAsFixed(0)}g",
+              ),
+              _buildMacroChip(
+                context.l10n.foodScannerFiber,
+                "${day.totalFiber.toStringAsFixed(0)}g",
+              ),
             ],
           ),
         ],
@@ -369,6 +383,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
     required String timeBadge,
     required MealRecipe recipe,
     required IconData icon,
+    bool initiallyExpanded = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -385,8 +400,7 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
         ],
       ),
       child: ExpansionTile(
-        initiallyExpanded:
-            categoryTitle == "Breakfast" || categoryTitle == "Lunch",
+        initiallyExpanded: initiallyExpanded,
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         shape: const Border(),
         leading: Container(
@@ -444,9 +458,9 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Divider(height: 16),
-                const Text(
-                  "INGREDIENTS & PORTIONS",
-                  style: TextStyle(
+                Text(
+                  context.l10n.dietIngredientsAndPortions,
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -479,9 +493,9 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "ESTIMATED NUTRITION (PER SERVING)",
-                  style: TextStyle(
+                Text(
+                  context.l10n.dietEstimatedNutritionPerServing,
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -494,19 +508,31 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                   runSpacing: 6,
                   children: [
                     _buildNutrientPill(
-                      "Protein: ${recipe.nutrition.proteinGrams}g",
+                      context.l10n.dietProtein(
+                        recipe.nutrition.proteinGrams.toString(),
+                      ),
                     ),
-                    _buildNutrientPill("Carbs: ${recipe.nutrition.carbGrams}g"),
-                    _buildNutrientPill("Fat: ${recipe.nutrition.fatGrams}g"),
                     _buildNutrientPill(
-                      "Fiber: ${recipe.nutrition.fiberGrams}g",
+                      context.l10n.dietCarbs(
+                        recipe.nutrition.carbGrams.toString(),
+                      ),
+                    ),
+                    _buildNutrientPill(
+                      context.l10n.dietFat(
+                        recipe.nutrition.fatGrams.toString(),
+                      ),
+                    ),
+                    _buildNutrientPill(
+                      context.l10n.dietFiber(
+                        recipe.nutrition.fiberGrams.toString(),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "PREPARATION NOTE",
-                  style: TextStyle(
+                Text(
+                  context.l10n.dietPreparationNote,
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -592,17 +618,17 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.shield_outlined,
                 size: 16,
                 color: AppColors.primaryTeal,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
-                "Clinical Reference Notice",
-                style: TextStyle(
+                context.l10n.dietClinicalReferenceNotice,
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryTeal,
@@ -620,9 +646,9 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Source: ICMR-NIN & USDA Food Data Central Dietary Guidelines.",
-            style: TextStyle(
+          Text(
+            context.l10n.dietGuidelinesAttribution,
+            style: const TextStyle(
               fontSize: 10,
               fontStyle: FontStyle.italic,
               color: Color(0xFF94A3B8),
@@ -657,9 +683,12 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text(
-                    "Save to My Routine",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                : Text(
+                    context.l10n.dietSaveToRoutineButton,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
           ),
         ),
@@ -677,14 +706,14 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                   ),
                 ),
                 onPressed: _regeneratePlan,
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.refresh, size: 16),
-                    SizedBox(width: 6),
+                    const Icon(Icons.refresh, size: 16),
+                    const SizedBox(width: 6),
                     Text(
-                      "Regenerate",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      context.l10n.dietRegenerateButton,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -704,14 +733,14 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.tune, size: 16),
-                    SizedBox(width: 6),
+                    const Icon(Icons.tune, size: 16),
+                    const SizedBox(width: 6),
                     Text(
-                      "Edit Inputs",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      context.l10n.dietEditInputsButton,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -727,9 +756,9 @@ class _DietOutputScreenState extends State<DietOutputScreen> {
               (route) => route.settings.name == AppRouter.diet || route.isFirst,
             );
           },
-          child: const Text(
-            "Back to Diet Overview",
-            style: TextStyle(
+          child: Text(
+            context.l10n.dietBackToOverviewButton,
+            style: const TextStyle(
               color: Color(0xFF5A6A6A),
               fontWeight: FontWeight.w600,
             ),

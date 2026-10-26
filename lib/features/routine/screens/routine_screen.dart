@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/profile/controllers/profile_controller.dart';
 import 'package:nuroved_patient/features/records/widgets/profile_selector.dart';
@@ -69,7 +70,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
                   padding: const EdgeInsets.only(bottom: 100),
                   child: FloatingActionButton(
                     heroTag: 'routine_fab',
-                    tooltip: "Add routine medicine",
+                    tooltip: context.l10n.routineAddMedicine,
                     onPressed: () =>
                         Navigator.pushNamed(context, AppRouter.addMedicine),
                     backgroundColor: AppColors.primaryTeal,
@@ -116,10 +117,10 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       ),
                     ),
                     const SizedBox(width: 15),
-                    const Flexible(
+                    Flexible(
                       child: Text(
-                        "Medicines",
-                        style: TextStyle(
+                        context.l10n.navRoutine,
+                        style: const TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C4E4E),
@@ -131,10 +132,9 @@ class _RoutineScreenState extends State<RoutineScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              // 2. Pass the dynamic imageFile here
               ProfileSelector(
                 name: _profileController.activeProfileName.split(" ")[0],
-                imageFile: activeMember['imageFile'], // THIS REFLECTS THE PHOTO
+                imageFile: activeMember['imageFile'],
                 familyNames: _profileController.familyMembers
                     .map((e) => e['name'] as String)
                     .toList(),
@@ -146,11 +146,11 @@ class _RoutineScreenState extends State<RoutineScreen> {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 60),
+          Padding(
+            padding: const EdgeInsets.only(left: 60),
             child: Text(
-              "Never Miss What Matters",
-              style: TextStyle(color: Colors.black54, fontSize: 14),
+              context.l10n.routineSubtitle,
+              style: const TextStyle(color: Colors.black54, fontSize: 14),
             ),
           ),
         ],
@@ -247,9 +247,9 @@ class _RoutineScreenState extends State<RoutineScreen> {
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Text(
-                      "Today's progress",
-                      style: TextStyle(color: Colors.black54, fontSize: 13),
+                    Text(
+                      context.l10n.routineTodaysProgress,
+                      style: const TextStyle(color: Colors.black54, fontSize: 13),
                     ),
                   ],
                 ),
@@ -262,8 +262,8 @@ class _RoutineScreenState extends State<RoutineScreen> {
             child: Text(
               // LOGIC: Label changes based on selected tab
               _controller.selectedTab == "Medicines"
-                  ? "Medicine Adherence"
-                  : "Meal Routine",
+                  ? context.l10n.routineMedicineAdherence
+                  : context.l10n.routineMealRoutine,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 13,
@@ -277,21 +277,27 @@ class _RoutineScreenState extends State<RoutineScreen> {
             width: double.infinity,
             child: _BarChart(values: barValues),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "12AM",
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                  context.l10n.routineTime12AM,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                 ),
-                Text("6AM", style: TextStyle(fontSize: 10, color: Colors.grey)),
                 Text(
-                  "12PM",
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                  context.l10n.routineTime6AM,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                 ),
-                Text("6PM", style: TextStyle(fontSize: 10, color: Colors.grey)),
+                Text(
+                  context.l10n.routineTime12PM,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+                Text(
+                  context.l10n.routineTime6PM,
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -311,14 +317,16 @@ class _RoutineScreenState extends State<RoutineScreen> {
         children: [
           Expanded(
             child: _buildTabButton(
-              "Routines",
-              _controller.selectedTab == "Routines",
+              tabKey: "Routines",
+              displayTitle: context.l10n.routineTabMeals,
+              isActive: _controller.selectedTab == "Routines",
             ),
           ),
           Expanded(
             child: _buildTabButton(
-              "Medicines",
-              _controller.selectedTab == "Medicines",
+              tabKey: "Medicines",
+              displayTitle: context.l10n.routineTabMedicines,
+              isActive: _controller.selectedTab == "Medicines",
             ),
           ),
         ],
@@ -326,9 +334,13 @@ class _RoutineScreenState extends State<RoutineScreen> {
     );
   }
 
-  Widget _buildTabButton(String title, bool isActive) {
+  Widget _buildTabButton({
+    required String tabKey,
+    required String displayTitle,
+    required bool isActive,
+  }) {
     return GestureDetector(
-      onTap: () => _controller.updateTab(title),
+      onTap: () => _controller.updateTab(tabKey),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
@@ -346,7 +358,7 @@ class _RoutineScreenState extends State<RoutineScreen> {
         ),
         child: Center(
           child: Text(
-            title,
+            displayTitle,
             style: TextStyle(
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
               color: isActive ? const Color(0xFF2C4E4E) : Colors.black54,
@@ -375,7 +387,9 @@ class _RoutineScreenState extends State<RoutineScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isMedicineTab ? "Monday Medicines" : "Monday Meals",
+                isMedicineTab
+                    ? context.l10n.routineMondayMedicines
+                    : context.l10n.routineMondayMeals,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -432,14 +446,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Routine'),
-        content: Text(
-          'Are you sure you want to remove "$name" from your routine schedule?',
-        ),
+        title: Text(dialogCtx.l10n.routineDeleteRoutineTitle),
+        content: Text(dialogCtx.l10n.routineDeleteRoutineMessage(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              dialogCtx.l10n.commonCancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -452,10 +467,15 @@ class _RoutineScreenState extends State<RoutineScreen> {
               Navigator.pop(dialogCtx);
               _controller.deleteMedicine(index);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Removed "$name" from routine.')),
+                SnackBar(
+                  content: Text(context.l10n.routineRemovedSnackbar(name)),
+                ),
               );
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(
+              dialogCtx.l10n.commonDelete,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

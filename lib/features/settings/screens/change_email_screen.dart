@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/validators.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -45,7 +46,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
 
     if (password.isEmpty) {
       setState(() {
-        _errorMessage = 'Password is required to verify identity.';
+        _errorMessage = context.l10n.changeEmailPasswordRequired;
       });
       return;
     }
@@ -69,10 +70,10 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
     result.when(
       success: (_) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Verification email sent to your new address.'),
+          SnackBar(
+            content: Text(context.l10n.changeEmailVerificationSent),
             backgroundColor: AppColors.primaryTeal,
-            duration: Duration(seconds: 4),
+            duration: const Duration(seconds: 4),
           ),
         );
         Navigator.pop(context);
@@ -118,13 +119,13 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                   const SizedBox(height: 30),
                   _buildInputField(
                     controller: _emailController,
-                    hintText: "Enter new email address",
+                    hintText: context.l10n.changeEmailEnterNew,
                     keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   _buildInputField(
                     controller: _passwordController,
-                    hintText: "Enter account password",
+                    hintText: context.l10n.changeEmailEnterPassword,
                     isPassword: !_isPasswordVisible,
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -175,7 +176,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                     ),
                   ],
                   const SizedBox(height: 40),
-                  _buildSaveButton(),
+                  _buildSaveButton(context),
                   const SizedBox(height: 60),
                 ],
               ),
@@ -197,29 +198,33 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
-              backgroundColor: Color(0xFF769E93),
-              child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+          Semantics(
+            button: true,
+            label: context.l10n.commonBack,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: const CircleAvatar(
+                backgroundColor: Color(0xFF769E93),
+                child: Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              ),
             ),
           ),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Change Email",
-                  style: TextStyle(
+                  context.l10n.changeEmailTitle,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2C4E4E),
                   ),
                 ),
                 Text(
-                  "Update your registered account email",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 13),
+                  context.l10n.changeEmailSubtitle,
+                  style: const TextStyle(color: AppColors.textGrey, fontSize: 13),
                 ),
               ],
             ),
@@ -274,7 +279,7 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
     );
   }
 
-  Widget _buildSaveButton() {
+  Widget _buildSaveButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 60,
@@ -296,9 +301,9 @@ class _ChangeEmailScreenState extends State<ChangeEmailScreen> {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                "Save New Email",
-                style: TextStyle(
+            : Text(
+                context.l10n.changeEmailSaveButton,
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,

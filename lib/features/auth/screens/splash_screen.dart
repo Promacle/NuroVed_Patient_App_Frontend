@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_router.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/localization/app_localizations_extension.dart';
 import '../../../core/utils/launcher_utils.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -36,11 +37,8 @@ class _SplashScreenState extends State<SplashScreen> {
               right: 0,
               child: Image.asset(
                 AppAssets.doctorPatient,
-                fit: BoxFit.cover, // Makes the image "Big and Close"
-                alignment: const Alignment(
-                  0,
-                  -0.6,
-                ), // Focuses on the face/upper body
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.6),
               ),
             ),
 
@@ -100,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       children: [
                         Expanded(
                           child: _buildActionButton(
-                            "Signup",
+                            context.l10n.signupButton,
                             () =>
                                 Navigator.pushNamed(context, AppRouter.signup),
                           ),
@@ -108,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         const SizedBox(width: 15),
                         Expanded(
                           child: _buildActionButton(
-                            "Login",
+                            context.l10n.loginSignInButton,
                             () => Navigator.pushNamed(context, AppRouter.login),
                           ),
                         ),
@@ -119,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   const SizedBox(height: 30),
 
                   // Footer text at the bottom
-                  _buildFooterText(),
+                  _buildFooterText(context),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -177,7 +175,7 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Widget _buildFooterText() {
+  Widget _buildFooterText(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: RichText(
@@ -189,9 +187,9 @@ class _SplashScreenState extends State<SplashScreen> {
             fontWeight: FontWeight.w500,
           ),
           children: [
-            const TextSpan(text: "Before continuing read all the "),
+            TextSpan(text: context.l10n.signupTermsAgreement),
             TextSpan(
-              text: "terms of\nservice",
+              text: context.l10n.signupTermsLink,
               style: const TextStyle(
                 decoration: TextDecoration.underline,
                 color: Color(0xFF5D2E2E),
@@ -200,9 +198,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 ..onTap = () =>
                     LauncherUtils.launchURL('https://google.com/terms'),
             ),
-            const TextSpan(text: " and "),
+            TextSpan(text: context.l10n.signupAndWord),
             TextSpan(
-              text: "privacy policy",
+              text: context.l10n.signupPrivacyLink,
               style: const TextStyle(
                 decoration: TextDecoration.underline,
                 color: Color(0xFF5D2E2E),

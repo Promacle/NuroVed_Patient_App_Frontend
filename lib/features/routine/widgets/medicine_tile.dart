@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 
 class MedicineTile extends StatelessWidget {
   final String name;
@@ -91,7 +92,11 @@ class MedicineTile extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      sourceDisplay!,
+                      sourceDisplay == 'Verified Prescription'
+                          ? context.l10n.routineSourceVerifiedPrescription
+                          : (sourceDisplay == 'Self-Entered'
+                              ? context.l10n.routineSourceSelfEntered
+                              : sourceDisplay!),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,

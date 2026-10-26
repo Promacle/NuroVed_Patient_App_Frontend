@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/core/utils/platform_file.dart';
 
@@ -78,12 +79,12 @@ class ProfileToggle extends StatelessWidget {
       child: Row(
         children: [
           _buildToggleItem(
-            "Personal Profile",
+            context.l10n.profileTabPersonal,
             isProfileSelected,
             () => onToggle(true),
           ),
           _buildToggleItem(
-            "Emergency Card",
+            context.l10n.profileTabEmergency,
             !isProfileSelected,
             () => onToggle(false),
           ),
@@ -134,14 +135,14 @@ class LogoutButton extends StatelessWidget {
           color: AppColors.sageGreen,
         ),
         child: Center(
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.logout_rounded, color: AppColors.white, size: 20),
-              SizedBox(width: 10),
+              const Icon(Icons.logout_rounded, color: AppColors.white, size: 20),
+              const SizedBox(width: 10),
               Text(
-                "Logout",
-                style: TextStyle(
+                context.l10n.authLogout,
+                style: const TextStyle(
                   color: AppColors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/diet/controllers/diet_controller.dart';
 
@@ -30,9 +31,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
         backgroundColor: AppColors.kMainBg,
         body: Column(
           children: [
-            const DietPlannerHeader(
-              title: "Meal Routine History",
-              subtitle: "Check Out Your Meal Routine And Edit",
+            DietPlannerHeader(
+              title: context.l10n.dietMealRoutineHistoryNav,
+              subtitle: context.l10n.dietMealRoutineHistorySubtitle,
             ),
             Expanded(
               child: ListenableBuilder(
@@ -60,20 +61,20 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              "No Meal Routine Saved Yet",
+                            Text(
+                              context.l10n.dietNoMealRoutineSaved,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF2C4E4E),
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              "Your saved weekly meal routine will appear here once configured.",
+                            Text(
+                              context.l10n.dietNoMealRoutineSavedSubtitle,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 13,
                                 color: Color(0xFF5A6A6A),
                                 height: 1.4,
@@ -97,9 +98,11 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: const Text(
-                                "Back to Diet Overview",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              child: Text(
+                                context.l10n.dietBackToOverview,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -158,17 +161,17 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.calendar_month_outlined,
                 color: Color(0xFF7CB9A8),
                 size: 24,
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
-                "Weekly Meal Plan",
-                style: TextStyle(
+                context.l10n.dietWeeklyMealPlan,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C4E4E),
@@ -176,11 +179,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
               ),
             ],
           ),
-          // Inside _buildWeeklyHeader()
           IconButton(
             icon: const Icon(Icons.edit_note, color: Color(0xFF2C4E4E)),
-            onPressed: () =>
-                Navigator.pushNamed(context, '/edit-meal'), // Add this
+            onPressed: () => Navigator.pushNamed(context, '/edit-meal'),
           ),
         ],
       ),
@@ -224,7 +225,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Day $dayNum $dayName",
+                    context.l10n.dietDayNumberName(dayNum, dayName),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -306,9 +307,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            "INGREDIENTS:",
-            style: TextStyle(
+          Text(
+            "${context.l10n.dietIngredientsHeader.toUpperCase()}:",
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -347,7 +348,7 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
           width: double.infinity,
           height: 55,
           child: ElevatedButton(
-            onPressed: null, // Done button disabled/non-working as requested
+            onPressed: null,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2C4E4E),
               disabledBackgroundColor: const Color(
@@ -357,9 +358,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                 borderRadius: BorderRadius.circular(15),
               ),
             ),
-            child: const Text(
-              "Done",
-              style: TextStyle(
+            child: Text(
+              context.l10n.commonDone,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -378,9 +379,9 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
               border: Border.all(color: Colors.grey.shade400),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              "Delete",
-              style: TextStyle(
+            child: Text(
+              context.l10n.commonDelete,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF5A6A6A),
               ),
@@ -396,14 +397,15 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Diet Plan?'),
-        content: const Text(
-          'Are you sure you want to delete your saved meal routine? This will clear all weekly meal schedule data.',
-        ),
+        title: Text(dialogCtx.l10n.dietDeleteDialogTitle),
+        content: Text(dialogCtx.l10n.dietDeleteDialogMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              dialogCtx.l10n.commonCancel,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -416,8 +418,8 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
               Navigator.pop(dialogCtx);
               _dietController.deleteDietPlan();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Diet plan deleted successfully'),
+                SnackBar(
+                  content: Text(context.l10n.dietPlanDeletedSuccess),
                   backgroundColor: AppColors.primaryTeal,
                 ),
               );
@@ -425,7 +427,10 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(
+              dialogCtx.l10n.commonDelete,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

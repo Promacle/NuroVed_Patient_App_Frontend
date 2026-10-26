@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/diet/widgets/diet_planner_widgets.dart';
 
@@ -11,9 +12,9 @@ class FoodScannerHistoryScreen extends StatelessWidget {
       backgroundColor: AppColors.kMainBg,
       body: Column(
         children: [
-          const DietPlannerHeader(
-            title: "Scanner History",
-            subtitle: "Recent Scanned Food Logs",
+          DietPlannerHeader(
+            title: context.l10n.foodScannerHistoryTitle,
+            subtitle: context.l10n.foodScannerHistorySubtitle,
           ),
           Expanded(
             child: Center(
@@ -49,20 +50,20 @@ class FoodScannerHistoryScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 18),
-                      const Text(
-                        "No Scanned Foods",
+                      Text(
+                        context.l10n.foodScannerHistoryEmpty,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2C4E4E),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        "Scanned food nutrition history will appear here once scanning is enabled.",
+                      Text(
+                        context.l10n.foodScannerHistoryEmptyDesc,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textGrey,
                           height: 1.4,
@@ -81,9 +82,9 @@ class FoodScannerHistoryScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            "Back",
-                            style: TextStyle(
+                          child: Text(
+                            context.l10n.commonBack,
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
