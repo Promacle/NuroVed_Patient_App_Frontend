@@ -972,5 +972,30 @@
       }
     }
   },
-  "dietSuccessBackSemantics": "Back to diet overview"
+  "dietSuccessBackSemantics": "Back to diet overview",
+  "routineDueDosesSection": "Due Doses",
+  "routineCompletedDosesSection": "Completed Doses",
+  "routineTotalMedicines": "{count} Total",
+  "routineShowMoreInstructions": "Show more",
+  "routineShowLessInstructions": "Show less",
+  "routineNoDueDoses": "All scheduled doses completed!",
+  "@routineTotalMedicines": {
+    "description": "Total medicines count label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "routineMealCompleted": "Meal Completed",
+  "routineNoIngredients": "No ingredients listed",
+  "routineScheduledTime": "Scheduled for {time}",
+  "@routineScheduledTime": {
+    "description": "Scheduled time for meal intake",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

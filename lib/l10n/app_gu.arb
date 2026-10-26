@@ -895,5 +895,22 @@
   "homeTooltipNotifications": "સૂચનાઓ",
   "homeTooltipUpgradePremium": "પ્રીમિયમમાં અપગ્રેડ કરો",
   "recordsBackToRecords": "રેકોર્ડ્સ પર પાછા જાઓ",
-  "dietSuccessBackSemantics": "આહાર વિહંગાવલોકન પર પાછા જાઓ"
+  "dietSuccessBackSemantics": "આહાર વિહંગાવલોકન પર પાછા જાઓ",
+  "routineDueDosesSection": "બાકી રહેલા ડોઝ",
+  "routineCompletedDosesSection": "પૂર્ણ થયેલ ડોઝ",
+  "routineTotalMedicines": "કુલ {count}",
+  "routineShowMoreInstructions": "વધુ જુઓ",
+  "routineShowLessInstructions": "ઓછું જુઓ",
+  "routineNoDueDoses": "બધા નિર્ધારિત ડોઝ પૂર્ણ થઈ ગયા છે!",
+  "routineMealCompleted": "ભોજન પૂર્ણ થયું",
+  "routineNoIngredients": "કોઈ સામગ્રી સૂચિબદ્ધ નથી",
+  "routineScheduledTime": "{time} માટે નિર્ધારિત",
+  "@routineScheduledTime": {
+    "description": "Scheduled time for meal intake",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

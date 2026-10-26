@@ -2928,4 +2928,35 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get dietSuccessBackSemantics => 'आहार अवलोकन पर वापस जाएं';
+
+  @override
+  String get routineDueDosesSection => 'बकाया खुराक';
+
+  @override
+  String get routineCompletedDosesSection => 'पूर्ण खुराक';
+
+  @override
+  String routineTotalMedicines(int count) {
+    return 'कुल $count';
+  }
+
+  @override
+  String get routineShowMoreInstructions => 'और देखें';
+
+  @override
+  String get routineShowLessInstructions => 'कम देखें';
+
+  @override
+  String get routineNoDueDoses => 'सभी निर्धारित खुराक पूरी हो चुकी हैं!';
+
+  @override
+  String get routineMealCompleted => 'भोजन पूरा हुआ';
+
+  @override
+  String get routineNoIngredients => 'कोई सामग्री सूचीबद्ध नहीं है';
+
+  @override
+  String routineScheduledTime(String time) {
+    return '$time के लिए निर्धारित';
+  }
 }

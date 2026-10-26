@@ -2913,4 +2913,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dietSuccessBackSemantics => 'Back to diet overview';
+
+  @override
+  String get routineDueDosesSection => 'Due Doses';
+
+  @override
+  String get routineCompletedDosesSection => 'Completed Doses';
+
+  @override
+  String routineTotalMedicines(int count) {
+    return '$count Total';
+  }
+
+  @override
+  String get routineShowMoreInstructions => 'Show more';
+
+  @override
+  String get routineShowLessInstructions => 'Show less';
+
+  @override
+  String get routineNoDueDoses => 'All scheduled doses completed!';
+
+  @override
+  String get routineMealCompleted => 'Meal Completed';
+
+  @override
+  String get routineNoIngredients => 'No ingredients listed';
+
+  @override
+  String routineScheduledTime(String time) {
+    return 'Scheduled for $time';
+  }
 }

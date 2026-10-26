@@ -32,27 +32,33 @@ class _RoutineScreenState extends State<RoutineScreen> {
           backgroundColor: AppColors.white,
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10.0,
+                vertical: 8.0,
+              ),
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFFF3F3F3),
-                  borderRadius: BorderRadius.circular(45),
+                  borderRadius: BorderRadius.circular(36),
                 ),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       _buildHeader(),
                       Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14.0,
+                          vertical: 18.0,
+                        ),
                         child: Column(
                           children: [
                             _buildProgressCard(
                               _controller.progress,
                               _controller.progressText,
                             ),
-                            const SizedBox(height: 25),
+                            const SizedBox(height: 20),
                             _buildTabSwitcher(),
-                            const SizedBox(height: 25),
+                            const SizedBox(height: 20),
                             _buildRoutineSection(),
                             const SizedBox(height: 90),
                           ],
@@ -249,8 +255,67 @@ class _RoutineScreenState extends State<RoutineScreen> {
                     ),
                     Text(
                       context.l10n.routineTodaysProgress,
-                      style: const TextStyle(color: Colors.black54, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 13,
+                      ),
                     ),
+                    if (_controller.selectedTab == "Medicines" &&
+                        total > 0) ...[
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF318686,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              context.l10n.routineTotalMedicines(total),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF004445),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  ((total - completed) > 0
+                                          ? const Color(0xFFD97706)
+                                          : const Color(0xFF16A34A))
+                                      .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              (total - completed) > 0
+                                  ? "${context.l10n.routineDueDosesSection}: ${total - completed}"
+                                  : context.l10n.routineStatusTaken,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: (total - completed) > 0
+                                    ? const Color(0xFFB45309)
+                                    : const Color(0xFF15803D),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -371,35 +436,36 @@ class _RoutineScreenState extends State<RoutineScreen> {
   }
 
   Widget _buildRoutineSection() {
-    bool isMedicineTab = _controller.selectedTab == "Medicines";
+    final isMedicineTab = _controller.selectedTab == "Medicines";
 
     return ListenableBuilder(
       listenable: _settingsController,
       builder: (context, _) {
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMedicineTab ? 14 : 20,
+            vertical: 18,
+          ),
           decoration: BoxDecoration(
             color: const Color(0xFFF1F5F3),
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                isMedicineTab
-                    ? context.l10n.routineMondayMedicines
-                    : context.l10n.routineMondayMeals,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C4E4E),
+              if (!isMedicineTab) ...[
+                Text(
+                  context.l10n.routineMondayMeals,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C4E4E),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              const Divider(thickness: 1, color: Colors.black12),
-              const SizedBox(height: 20),
-              if (!isMedicineTab)
+                const SizedBox(height: 10),
+                const Divider(thickness: 1, color: Colors.black12),
+                const SizedBox(height: 20),
                 ..._controller.meals.map(
                   (m) => RoutineTile(
                     title: m['title'],
@@ -413,32 +479,293 @@ class _RoutineScreenState extends State<RoutineScreen> {
                           time: m['time'].split(" * ").length > 1
                               ? m['time'].split(" * ")[1]
                               : m['time'],
+                          mealName: m['mealName']?.toString(),
+                          calories: m['calories']?.toString(),
+                          ingredients: m['ingredients'] is List
+                              ? (m['ingredients'] as List)
+                                    .map((e) => e.toString())
+                                    .toList()
+                              : null,
+                          isCompleted: m['isCompleted'] == true,
                         ),
                       ),
                     ),
                   ),
-                )
-              else
-                ...List.generate(_controller.medicines.length, (index) {
-                  final med = _controller.medicines[index];
-                  return MedicineTile(
-                    name: med['name']?.toString() ?? '',
-                    instruction: med['instruction']?.toString() ?? '',
-                    isCompleted: med['isCompleted'] == true,
-                    sourceDisplay: med['source_display']?.toString(),
-                    onTap: () => _controller.toggleMedicine(index),
-                    onDelete: () => _confirmDeleteMedicine(
-                      context,
-                      index,
-                      med['name']?.toString() ?? 'Medicine',
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.l10n.routineMondayMedicines,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2C4E4E),
+                        ),
+                      ),
                     ),
-                  );
-                }),
+                    if (_controller.medicines.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFF318686,
+                          ).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          context.l10n.routineTotalMedicines(
+                            _controller.medicines.length,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF004445),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Divider(thickness: 1, color: Colors.black12),
+                const SizedBox(height: 16),
+                if (_controller.medicines.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24.0,
+                        horizontal: 16.0,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF318686,
+                              ).withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.medication_outlined,
+                              size: 32,
+                              color: Color(0xFF004445),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            context.l10n.routineEmptyTitle,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2C4E4E),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            context.l10n.routineEmptySubtitle,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              AppRouter.addMedicine,
+                            ),
+                            icon: const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            label: Text(
+                              context.l10n.routineAddMedicine,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryTeal,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ..._buildMedicineSections(),
+              ],
             ],
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildMedicineSections() {
+    final dueMedicines = _controller.medicines
+        .where((m) => m['isCompleted'] != true)
+        .toList();
+    final completedMedicines = _controller.medicines
+        .where((m) => m['isCompleted'] == true)
+        .toList();
+
+    return [
+      _buildSectionHeader(
+        title: context.l10n.routineDueDosesSection,
+        count: dueMedicines.length,
+        color: const Color(0xFFD97706),
+        icon: Icons.access_time_rounded,
+      ),
+      const SizedBox(height: 12),
+      if (dueMedicines.isEmpty)
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFECFDF5),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFA7F3D0)),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.check_circle_outline,
+                color: Color(0xFF059669),
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.l10n.routineNoDueDoses,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF065F46),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )
+      else
+        ...dueMedicines.map((med) {
+          final originalIndex = _findMedicineIndex(med);
+          return MedicineTile(
+            name: med['name']?.toString() ?? '',
+            instruction: med['instruction']?.toString() ?? '',
+            isCompleted: med['isCompleted'] == true,
+            sourceDisplay: med['source_display']?.toString(),
+            dosage: med['dosage']?.toString(),
+            time: med['time']?.toString(),
+            onTap: () => _controller.toggleMedicine(originalIndex),
+            onDelete: () => _confirmDeleteMedicine(
+              context,
+              originalIndex,
+              med['name']?.toString() ?? 'Medicine',
+            ),
+          );
+        }),
+      if (completedMedicines.isNotEmpty) ...[
+        const SizedBox(height: 10),
+        _buildSectionHeader(
+          title: context.l10n.routineCompletedDosesSection,
+          count: completedMedicines.length,
+          color: const Color(0xFF16A34A),
+          icon: Icons.check_circle_rounded,
+        ),
+        const SizedBox(height: 12),
+        ...completedMedicines.map((med) {
+          final originalIndex = _findMedicineIndex(med);
+          return MedicineTile(
+            name: med['name']?.toString() ?? '',
+            instruction: med['instruction']?.toString() ?? '',
+            isCompleted: med['isCompleted'] == true,
+            sourceDisplay: med['source_display']?.toString(),
+            dosage: med['dosage']?.toString(),
+            time: med['time']?.toString(),
+            onTap: () => _controller.toggleMedicine(originalIndex),
+            onDelete: () => _confirmDeleteMedicine(
+              context,
+              originalIndex,
+              med['name']?.toString() ?? 'Medicine',
+            ),
+          );
+        }),
+      ],
+    ];
+  }
+
+  Widget _buildSectionHeader({
+    required String title,
+    required int count,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF2C4E4E),
+            letterSpacing: 0.2,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            '$count',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  int _findMedicineIndex(Map<String, dynamic> med) {
+    final id = med['id'];
+    if (id != null) {
+      final idx = _controller.medicines.indexWhere((m) => m['id'] == id);
+      if (idx >= 0) return idx;
+    }
+    final identityIdx = _controller.medicines.indexWhere(
+      (m) => identical(m, med),
+    );
+    if (identityIdx >= 0) return identityIdx;
+    return _controller.medicines.indexOf(med);
   }
 
   void _confirmDeleteMedicine(BuildContext context, int index, String name) {

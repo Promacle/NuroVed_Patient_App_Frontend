@@ -453,7 +453,10 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                       ),
                       Text(
                         context.l10n.routineSelectTimePrompt,
-                        style: const TextStyle(color: Colors.black54, fontSize: 11),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -532,9 +535,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     if (_selectedProfileName.isEmpty ||
         _medicineNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.routineSelectProfileAndNameError),
-        ),
+        SnackBar(content: Text(context.l10n.routineSelectProfileAndNameError)),
       );
       return;
     }
@@ -607,9 +608,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            context.l10n.routineReminderSavedSuccess,
-          ),
+          content: Text(context.l10n.routineReminderSavedSuccess),
           backgroundColor: AppColors.primaryTeal,
         ),
       );
@@ -624,7 +623,10 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.notifications_off_outlined, color: Color(0xFFE11D48)),
+            const Icon(
+              Icons.notifications_off_outlined,
+              color: Color(0xFFE11D48),
+            ),
             const SizedBox(width: 10),
             Text(
               dialogCtx.l10n.routinePermissionDenied,
