@@ -895,5 +895,22 @@
   "homeTooltipNotifications": "सूचनाएं",
   "homeTooltipUpgradePremium": "प्रीमियम में अपग्रेड करें",
   "recordsBackToRecords": "रिकॉर्ड्स पर वापस जाएं",
-  "dietSuccessBackSemantics": "आहार अवलोकन पर वापस जाएं"
+  "dietSuccessBackSemantics": "आहार अवलोकन पर वापस जाएं",
+  "routineDueDosesSection": "बकाया खुराक",
+  "routineCompletedDosesSection": "पूर्ण खुराक",
+  "routineTotalMedicines": "कुल {count}",
+  "routineShowMoreInstructions": "और देखें",
+  "routineShowLessInstructions": "कम देखें",
+  "routineNoDueDoses": "सभी निर्धारित खुराक पूरी हो चुकी हैं!",
+  "routineMealCompleted": "भोजन पूरा हुआ",
+  "routineNoIngredients": "कोई सामग्री सूचीबद्ध नहीं है",
+  "routineScheduledTime": "{time} के लिए निर्धारित",
+  "@routineScheduledTime": {
+    "description": "Scheduled time for meal intake",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

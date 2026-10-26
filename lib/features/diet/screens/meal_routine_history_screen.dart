@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nuroved_patient/core/localization/app_localizations_extension.dart';
 import 'package:nuroved_patient/core/theme/app_colors.dart';
 import 'package:nuroved_patient/features/diet/controllers/diet_controller.dart';
+import 'package:nuroved_patient/features/routine/screens/routine_detail_screen.dart';
 
 import '../widgets/diet_planner_widgets.dart';
 
@@ -249,9 +250,15 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
                 children: meals
                     .map(
                       (m) => _buildMealCard(
-                        m['header'],
-                        m['title'],
-                        List<String>.from(m['ingredients']),
+                        m['header']?.toString() ?? '',
+                        m['title']?.toString() ?? '',
+                        (m['ingredients'] as List?)
+                                ?.map((e) => e.toString())
+                                .toList() ??
+                            <String>[],
+                        rawMeal: m is Map<String, dynamic>
+                            ? m
+                            : (m is Map ? Map<String, dynamic>.from(m) : null),
                       ),
                     )
                     .toList(),
@@ -262,11 +269,15 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
     );
   }
 
-  Widget _buildMealCard(String header, String title, List<String> ingredients) {
+  Widget _buildMealCard(
+    String header,
+    String title,
+    List<String> ingredients, {
+    Map<String, dynamic>? rawMeal,
+  }) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: const Color(0xFF7CB9A8).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(15),
@@ -279,64 +290,129 @@ class _MealRoutineHistoryScreenState extends State<MealRoutineHistoryScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              header,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: () {
+            String category = header;
+            String timeStr = '';
+            if (header.contains('(') && header.contains(')')) {
+              final parts = header.split('(');
+              category = parts[0].trim();
+              timeStr = parts[1].replaceAll(')', '').trim();
+            } else if (header.contains('-')) {
+              final parts = header.split('-');
+              category = parts[0].trim();
+              timeStr = parts[1].trim();
+            } else if (header.contains('•')) {
+              final parts = header.split('•');
+              category = parts[0].trim();
+              timeStr = parts[1].trim();
+            }
+            if (category.isEmpty) category = 'Meal';
+            if (timeStr.isEmpty && rawMeal != null && rawMeal['time'] != null) {
+              timeStr = rawMeal['time'].toString();
+            }
+
+            final calories = rawMeal?['calories']?.toString();
+            final protein = rawMeal?['protein']?.toString();
+            final carbs = rawMeal?['carbs']?.toString();
+            final fat = rawMeal?['fat']?.toString();
+            final fiber = rawMeal?['fiber']?.toString();
+            final instructions = rawMeal?['instructions']?.toString();
+            final isCompleted = rawMeal?['isCompleted'] == true;
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RoutineDetailScreen(
+                  title: category,
+                  time: timeStr,
+                  mealName: title,
+                  calories: calories,
+                  ingredients: ingredients,
+                  protein: protein,
+                  carbs: carbs,
+                  fat: fat,
+                  fiber: fiber,
+                  instructions: instructions,
+                  isCompleted: isCompleted,
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            "${context.l10n.dietIngredientsHeader.toUpperCase()}:",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          ...ingredients.map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(left: 5, bottom: 2),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "• ",
-                    style: TextStyle(color: Colors.white, fontSize: 10),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
                   ),
-                  Expanded(
-                    child: Text(
-                      item,
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    header,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "${context.l10n.dietIngredientsHeader.toUpperCase()}:",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...ingredients.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(left: 5, bottom: 2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "• ",
+                          style: TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                        Expanded(
+                          child: Text(
+                            item,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

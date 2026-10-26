@@ -2932,4 +2932,35 @@ class AppLocalizationsGu extends AppLocalizations {
 
   @override
   String get dietSuccessBackSemantics => 'આહાર વિહંગાવલોકન પર પાછા જાઓ';
+
+  @override
+  String get routineDueDosesSection => 'બાકી રહેલા ડોઝ';
+
+  @override
+  String get routineCompletedDosesSection => 'પૂર્ણ થયેલ ડોઝ';
+
+  @override
+  String routineTotalMedicines(int count) {
+    return 'કુલ $count';
+  }
+
+  @override
+  String get routineShowMoreInstructions => 'વધુ જુઓ';
+
+  @override
+  String get routineShowLessInstructions => 'ઓછું જુઓ';
+
+  @override
+  String get routineNoDueDoses => 'બધા નિર્ધારિત ડોઝ પૂર્ણ થઈ ગયા છે!';
+
+  @override
+  String get routineMealCompleted => 'ભોજન પૂર્ણ થયું';
+
+  @override
+  String get routineNoIngredients => 'કોઈ સામગ્રી સૂચિબદ્ધ નથી';
+
+  @override
+  String routineScheduledTime(String time) {
+    return '$time માટે નિર્ધારિત';
+  }
 }

@@ -288,7 +288,10 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
                 child: CustomPaint(
                   painter: _DashedBorderPainter(radius: 20, color: Colors.grey),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 25,
+                      vertical: 10,
+                    ),
                     child: Text(
                       context.l10n.dietAddMore,
                       style: const TextStyle(

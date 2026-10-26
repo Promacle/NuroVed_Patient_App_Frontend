@@ -5475,6 +5475,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to diet overview'**
   String get dietSuccessBackSemantics;
+
+  /// No description provided for @routineDueDosesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Doses'**
+  String get routineDueDosesSection;
+
+  /// No description provided for @routineCompletedDosesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Doses'**
+  String get routineCompletedDosesSection;
+
+  /// Total medicines count label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Total'**
+  String routineTotalMedicines(int count);
+
+  /// No description provided for @routineShowMoreInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get routineShowMoreInstructions;
+
+  /// No description provided for @routineShowLessInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get routineShowLessInstructions;
+
+  /// No description provided for @routineNoDueDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'All scheduled doses completed!'**
+  String get routineNoDueDoses;
+
+  /// No description provided for @routineMealCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Completed'**
+  String get routineMealCompleted;
+
+  /// No description provided for @routineNoIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'No ingredients listed'**
+  String get routineNoIngredients;
+
+  /// Scheduled time for meal intake
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for {time}'**
+  String routineScheduledTime(String time);
 }
 
 class _AppLocalizationsDelegate
